@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="jars">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/jars/junit-jupiter-api-5.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/jars/junit-platform-commons-1.6.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/jars/opentest4j-1.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/src/jars/apiguardian-api-1.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
