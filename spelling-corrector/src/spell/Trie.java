@@ -2,11 +2,11 @@ package spell;
 
 public class Trie implements ITrie {
 
-    private INode root;
+    private final INode root;
     private int wordCount, nodeCount;
 
     /**
-     * Constructor initializes the Trie with a root node.
+     * Constructor initializes Trie with a new root node, 1 nodeCount and no (0) wordCount.
      */
     public Trie() {
         this.root = new Node();
@@ -15,7 +15,7 @@ public class Trie implements ITrie {
     }
 
     /**
-     * Adds a word to the Trie.
+     * Adds a word to the Trie object.
      *
      * @param word The word to be added.
      */
