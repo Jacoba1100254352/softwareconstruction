@@ -31,21 +31,24 @@ classDiagram
     Car ..> Person : uses-a
     Car ..> Route : uses-a
 
-class Car {
-        travel(Person, Route)
-}
+    class Car {
+            travel(Person, Route)
+    }
 
-class GitHubRepo {
-    push()
-    pull()
-}
+    class GitHubRepo {
+        push()
+        pull()
+    }
 
-class FrankenPersonRouteCar {
-    car
-    route
-    person
-    driveCarByRoute()
-}
+    class FrankenPerson {
+        car
+        route
+        person
+        driveCarByRoute()
+        eat()
+        sleep()
+        work()
+    }
 
     Object *-- Object : has-a
 
@@ -53,6 +56,19 @@ class FrankenPersonRouteCar {
         value
     }
 
+
+    classDiagram
+    object <|-- Organism
+    Organism <|-- Animal
+    Animal *-- Soul
+    Animal *-- Body
+    Body *-- Head
+    Body *-- Torso
+    Body *-- Appendage
+    Appendage <|-- Leg
+    Appendage <|-- Arm
+    Animal <|-- Mammal
+    Mammal <|-- Person
 
 
 

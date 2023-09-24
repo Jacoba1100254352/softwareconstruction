@@ -2,8 +2,13 @@ package spell;
 
 /**
  * Note: Create your Trie class based on this interface.
+<<<<<<< HEAD:spelling-corrector/src/spell/ITrie.java
  * <p>
  * You can add to the interface, but do not you alter or remove anything.
+=======
+ * 
+ * You can add to the interface, but do not alter or remove anything.
+>>>>>>> upstream/main:spelling-corrector/starter-code/spell/ITrie.java
  */
 public interface ITrie {
 
