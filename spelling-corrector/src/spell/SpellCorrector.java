@@ -11,66 +11,84 @@ public class SpellCorrector implements ISpellCorrector {
 
     private Trie dictionary;
 
+    // Initialize the Trie dictionary from a given file.
     public void useDictionary(String filename) throws IOException {
         dictionary = new Trie();
+
+        // Open the file and read its contents to populate the Trie dictionary.
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
+            // Loop through each line in the file, adding each word to the Trie.
             while ((line = reader.readLine()) != null)
                 for (String word : line.split("\\s+"))
                     dictionary.add(word.toLowerCase());
         }
     }
 
+    // Suggest a similar word based on the input.
+    @Override
     public String suggestSimilarWord(String inputWord) {
+        // Return null if input is null or empty.
         if (inputWord == null || inputWord.isEmpty())
             return null;
 
-        String lowerInput = inputWord.toLowerCase();
+        // Convert all inputs/strings to lowercase
+        inputWord = inputWord.toLowerCase();
 
-        // If the word is already in the dictionary, return it.
-        if (dictionary.find(lowerInput) != null)
-            return lowerInput;
+        // Check if the word is already in the dictionary.
+        if (dictionary.find(inputWord) != null)
+            return inputWord;
 
-        // Generate words with an edit distance of 1.
-        Set<String> editDistanceOneWords = generateEditDistanceOne(lowerInput);
+        // Create and initialize a set to hold generatedWords
+        Set<String> generatedWords = new HashSet<>();
+        generatedWords.add(inputWord);
 
-        // Create variables to keep track of the best suggestion and frequency
         String bestSuggestion = null;
-        int maxFrequency = -1;
 
-        // Find the best suggestion from words with an edit distance of 1
-        bestSuggestion = findBestSuggestion(editDistanceOneWords, bestSuggestion, maxFrequency);
+        // Loop to find suggestions at edit distances 1 and 2.
+        for (int distance = 1; distance <= 2; distance++) {
+            Set<String> newGeneratedWords = new HashSet<>();
 
-        if (bestSuggestion != null)
-            return bestSuggestion;
+            // Generate new words based on current generatedWords set.
+            for (String word : generatedWords)
+                newGeneratedWords.addAll(generateEditDistanceOne(word));
 
-        // Generate words with an edit distance of 2.
-        Set<String> editDistanceTwoWords = new HashSet<>();
-        for (String word : editDistanceOneWords)
-            editDistanceTwoWords.addAll(generateEditDistanceOne(word));
+            // Find the best suggestion among the newly generated words.
+            if ((bestSuggestion = findBestSuggestion(newGeneratedWords, bestSuggestion)) != null)
+                return bestSuggestion;
 
-        // Find the best suggestion from words with an edit distance of 2
-        bestSuggestion = findBestSuggestion(editDistanceTwoWords, bestSuggestion, maxFrequency);
-
-        return bestSuggestion;  // Returns null if no similar word is found.
-    }
-
-    private String findBestSuggestion(Set<String> words, String bestSuggestion, int maxFrequency) {
-        for (String word : words) {
-            INode node = dictionary.find(word);
-            if (node != null) {
-                int freq = node.getValue();
-                if (freq > maxFrequency || (freq == maxFrequency && word.compareTo(Optional.ofNullable(bestSuggestion).orElse("")) < 0)) {
-                    bestSuggestion = word;
-                    maxFrequency = freq;
-                }
-            }
+            // Prepare for the next iteration by updating the generatedWords set.
+            generatedWords = newGeneratedWords;
         }
+
         return bestSuggestion;
     }
 
+    // In the findBestSuggestion method, before and inside the for loop:
+    private String findBestSuggestion(Set<String> words, String currentBest) {
+        int maxFrequency = -1;  // Initialize max frequency.
+
+        // Iterate through each word in the set to identify possible matches.
+        for (String word : words) {
+            // Look up the word in the dictionary.
+            INode node = dictionary.find(word);
+            if (node == null)
+                continue;
+
+            // Update current best suggestion if the found word has higher frequency,
+            // or if frequencies are equal but the new word is lexicographically smaller (comes first alphabetically).
+            int freq = node.getValue();
+            if (freq > maxFrequency || (freq == maxFrequency && word.compareTo(Optional.ofNullable(currentBest).orElse("")) < 0)) {
+                currentBest = word;
+                maxFrequency = freq;
+            }
+        }
+        return currentBest;
+    }
 
 
+
+    // Generate a list of all the words one letter/distance/mistake away from the original
     private Set<String> generateEditDistanceOne(String word) {
         Set<String> result = new HashSet<>();
 
@@ -84,13 +102,13 @@ public class SpellCorrector implements ISpellCorrector {
 
         // Alterations
         for (int i = 0; i < word.length(); i++)
-            for (char c = 'a'; c <= 'z'; c++)
-                result.add(word.substring(0, i) + c + word.substring(i + 1));
+            for (char chr = 'a'; chr <= 'z'; chr++)
+                result.add(word.substring(0, i) + chr + word.substring(i + 1));
 
         // Insertions
         for (int i = 0; i <= word.length(); i++)
-            for (char c = 'a'; c <= 'z'; c++)
-                result.add(word.substring(0, i) + c + word.substring(i));
+            for (char chr = 'a'; chr <= 'z'; chr++)
+                result.add(word.substring(0, i) + chr + word.substring(i));
 
         return result;
     }

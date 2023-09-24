@@ -2,10 +2,12 @@ package spell;
 
 /**
  * Note: Create your Trie class based on this interface.
- * 
+ * <p>
  * You can add to the interface, but do not you alter or remove anything.
  */
 public interface ITrie {
+
+	int NUM_LETTERS = 26;
 
 	/**
 	 * Adds the specified word to the trie (if necessary) and increments the word's

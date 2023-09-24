@@ -11,8 +11,7 @@ public interface ISpellCorrector {
 
 	/**
 	 * Tells this <code>SpellCorrector</code> to use the given file as its
-	 * dictionary
-	 * for generating suggestions.
+	 * dictionary for generating suggestions.
 	 * 
 	 * @pre SpellCorrector will have had empty-param constructor called, but
 	 *      dictionary has nothing in it.
