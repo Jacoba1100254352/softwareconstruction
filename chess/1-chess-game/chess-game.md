@@ -8,9 +8,9 @@ In this part of the Chess Project, you will create the base Chess Game behavior.
 
 ## Code Class Structure
 
-![Class structure](class-structure.jpg)
+![Class structure](class-structure.png)
 
-**NOTE**: You are not limited to these functions. These functions are required to be able to run the automated tests. You will likely need to create additional methods.
+**NOTE**: You are not limited to this representation. These functions are required to be able to run the automated tests. You will likely need to add new methods to these interfaces, create new interfaces, and classes.
 
 ## Class Summaries
 
@@ -64,7 +64,7 @@ The Tests in ChessExtraCredit are for the `Castling` and `En Passant` moves. Suc
 
 To run the tests, you can click the play icon next to an individual test, or you can right click on a package or class and select `Run` or `Run Tests in …`
 
-NOTE: In order for the tests to pass, you are required to override the .equals() and .hashCode() methods in your ChessMove implementation and your ChessPosition implementation. To do this automatically in IntelliJ, select Code > Generate... > Override Methods and then select equals and hashCode. The default methods provided by IntelliJ should suffice.
+NOTE: In order for the tests to pass, you are required to override the `.equals()` and `.hashCode()` methods in your ChessMove implementation and your ChessPosition implementation. To do this automatically in IntelliJ, select Code > Generate... > Override Methods and then select equals and hashCode. The default methods provided by IntelliJ should suffice AS LONG AS you choose 'Generate...' from the Code menu rather than 'Override Methods...'. The `.equals()` and `.hashCode()` methods need to be more than merely a call to `super()`, and using 'Generate...' should fix that.
 
 NOTE: Debugging is often easier if you override the .toString() method in your ChessMove implementation (and possibly ChessPosition implementation). This is not required, but you may want to consider it. The default methods provided by IntelliJ are better than nothing, but you may wish to write your own .toString() method for easiest debugging.
 
@@ -152,3 +152,11 @@ To Castle, the King moves 2 spaces towards the Rook, and the Rook "jumps" the ki
 **`En Passant`**
 
 This is a special move taken by a Pawn in response to your opponent double moving a Pawn. If your opponent double moves a pawn so it ends next to yours (skipping the position where your pawn could have captured their pawn), then on your immediately following turn your pawn may capture their pawn as if their pawn had only moved 1 square. This is as if your pawn is capturing their pawn mid motion, or `In Passing`.
+
+# Grading Rubric
+
+- **100%** - All `starter code` tests pass.
+
+# Go Celebrate
+
+Phase #1, done! You are one your way to mastering software construction. Go and celebrate with some ice cream 🍦.

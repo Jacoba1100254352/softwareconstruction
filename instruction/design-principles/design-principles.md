@@ -118,70 +118,21 @@ Programming languages themselves utilize decomposition to represent different pa
 
 Using decomposition at the program level helps you so that you don't have to keep the whole code base on your screen at the same time. You just need to open the files that represent the current task.
 
-## Names
+## High Cohesion and Low Coupling
 
-You should give appropriate consideration to the names that you use for your classes, methods, and variables. A good name will convey meaning that makes your code more maintainable and less of a cognitive load to read. Consider the following example where you have to read the docs in order to know what is happening.
+High cohesion means that an object only represents highly related data and functionality. You don't include tangentially related methods or fields in an object. Instead you create a cohesive object that executes in concert with other related objects.
 
-```java
-/**
- * Compute the mean of the numbers and
- * ignore any values that are outliers.
- */
-public int calc(int[] x, boolean ignore);
-```
+Low coupling means that objects do not strongly rely on each other. High coupling occurs when an object that cannot be used without understanding the specific implementation details of another object, or when two objects require each other to operate. Generally, low coupling means that you are using interfaces appropriately and that objects do not have bidirectional bindings.
 
-Because the names are terse and nondescript it encourages the reader to trust the docs, which might not actually reflect what the code actually does. It also means that as the code is altered, the programmer may feel no responsibility to be true to the original intent of the name. Before long this function may be doing much more than `calc` and the meaning of `ignore` may stray far from excluding outliers.
+## Prefer Aggregation Over Inheritance
 
-Instead, if reasonable function and parameter names were chosen, the code becomes self documenting and a future programmer will think twice before changing the obvious intent conveyed by the name.
-
-```java
-public int calculateMean(int[] numbers, boolean ignoreOutliers);
-```
-
-There are standard conventions that should be followed when choosing names. These conventions include the following.
-
-1. Object names are nouns
-1. Method names are verbs
-1. Objects begin with uppercase
-1. Methods begin with lowercase
-1. Variables begin with lowercase
-1. Package names begin with lowercase and should be separated by dots.
-1. Constants are all uppercase
-1. CamelCase should be used for all names, except constants.
-
-## Aggregation Vs Inheritance
-
-When you are creating your classes you need to carefully consider the different meanings and implications of using inheritance instead of aggregation. We often simplify the concepts of inheritance and aggregation to represent `is-a` and `has-a` relationships respectively. However, by favoring aggregation you can create composable objects that have the benefits of multiple inheritance without all of the complexity the multiple inheritance incurs. Aggregated objects can demonstrate polymorphic behavior by exposing interfaces that are implemented by the contained objects. As long as interfaces are used to access the aggregations, the containing class can replace the aggregated objects without impacting any users of the objects. In short, when combined with interfaces, aggregation can provide:
+When you are creating your classes you need to carefully consider the different meanings and implications of using inheritance instead of aggregation. We often simplify the concepts of inheritance and aggregation to represent `is-a` and `has-a` relationships respectively. However, by favoring aggregation you can create composable objects that have the benefits of multiple inheritance without all of the complexity that multiple inheritance incurs. Aggregated objects can demonstrate polymorphic behavior by exposing interfaces that are implemented by the contained objects. As long as interfaces are used to access the aggregations, the containing class can replace the aggregated objects without impacting any users of the objects. In short, when combined with interfaces, aggregation can provide:
 
 1. `has-a` and `is-a` relationships
 1. The benefits of multiple inheritance
 1. Encapsulation
 
-## Core Technologies
-
-Even though you want to design for your domain first, that does not mean that you give no thought to your technology infrastructure. Carefully consider core technologies that are expensive to change once an application is deployed. This includes things such as programming languages, data schemas, protocols, databases, deployment processes, and hosting locations. Some criteria that you should consider when choosing core technology includes:
-
-1. Security
-1. Cost
-1. Availability
-1. Redundancy
-1. Stability
-1. Market acceptance
-1. Support
-1. Performance
-1. Elasticity
-
-### Data Structures
-
-Likewise you should be thoughtful about choosing a data structure that fits the situation. It is sometimes easy to fall back on the same old data structure for every situation. After all you can represent anything with a sufficiently convoluted `String` class. You just start encoding your data structure into the string characters separated by delimiting control characters. Instead you should spend time becoming familiar with the strengths and weaknesses of different data structures and pick the one with the proper characteristics.
-
-Consider factors such as:
-
-1. **Similarity to the data it models** - Don't use a list to represent a tree.
-1. **Space complexity** - If memory is abundant then favor this characteristic.
-1. **Time complexity** - If speed is important then favor this characteristic
-1. **Algorithmic complexity** - Are you willing to sacrifice readability and maintainability?
-1. **Compatibility with interface and persistence layers** - Some data structures are easier to serialize.
+This suggests that in many cases Aggregation should be preferred over inheritance.
 
 ## SOLID
 
@@ -207,7 +158,7 @@ Let's look at each of these in detail.
 
 ### Single Responsibility Principle
 
-One form of simplicity is represented by the [Single Responsibility Principle](https://en.wikipedia.org/wiki/Single-responsibility_principle). The idea here is that an object does one thing and does it well. You don't have a `Person` class that represents everything associated with a person. You have a `Person` class that represents the distinct attributes of a person such as `name` and `brithDate`, and then you have other classes that represent things associated with a Person.
+The [Single Responsibility Principle](https://en.wikipedia.org/wiki/Single-responsibility_principle) represents the desirability of high cohesion. The idea here is that an object does one thing and does it well. You don't have a `Person` class that represents everything associated with a person. You have a `Person` class that represents the distinct attributes of a person such as `name` and `brithDate`, and then you have other classes that represent things associated with a Person.
 
 ![single responsibility](single-responsibility.png)
 
@@ -250,38 +201,65 @@ public interface SOPViolation {
 
 ### Open Closed Principle
 
-Classes should be open to extension and closed for modification. Meaning that you want to encourage additions to a class as appropriate, but modifying existing functionality is discouraged due to its tendency to disrupt the existing code base.
+Classes should be open to extension and closed for modification. The core concept is that you should generalize the functionality of a class so that you don't have to internally modify it in order to provide a desired extension of its functionality.
+
+A common example for the open closed principle involves passing in interfaces that control how the class works. This is in contrast to modifying the classes methods to provide new functionality.
 
 #### Violation Example
 
-A simple example of violating the open closed principle is prohibiting the ability to extend a class by including the `final` keyword on a method.
+As an example, the following code forces you to create a new method for every different type of format that you want the class to support. Additionally, the class has a constructor that represents a specific type of data. If you want to provide a different type of data, you must modify the class to include an additional constructor and internal data type.
 
 ```java
-public class UnableToExtend {
-    @Override
-    final public String toString() {
-        return super.toString();
-    }
-}
+public static class OpenForModificationList {
+    final private String[] items;
 
-// This will not compile because toString is final
-public class Rejected extends OpenClosedExample {
-    public String toString() {
-        return super.toString();
+    public OpenForModificationList(String[] items) {
+        this.items = items;
+    }
+
+    public String formatCommaSeparated() {
+        return String.join(",", items);
+    }
+
+    public String formatQuotedCommaSeparated() {
+        var formattedItems = new ArrayList<String>();
+        for (var item : items) {
+            formattedItems.add(String.format("'%s'", item));
+        }
+
+        return String.join(",", formattedItems);
     }
 }
 ```
 
-```java
-public class AbleToModify {
-    // Allowing global changes to how the core algorithm works
-    public static String prefix = "";
+### Correct Example
 
-    public void log(String message) {
-        System.out.println(prefix + message);
+We can improve the previous code by using interface parameters and Java generics to open the class to extension without ever modifying the code.
+
+```java
+public interface Formatter<T> {
+    String format(T s);
+}
+
+public static class OpenForExtensionList<T> {
+    final private List<T> items;
+
+    public OpenForExtensionList(List<T> items) {
+        this.items = items;
+    }
+
+    public String format(Formatter formatter, String separator) {
+        var formattedItems = new ArrayList<String>();
+        for (var item : items) {
+            formattedItems.add(formatter.format(item));
+        }
+
+        return String.join(separator, formattedItems);
     }
 }
 ```
+
+In this example the `Formatter` interface extends how the class formats and the generic type extends the supported types.
 
 ### Liskov Substitution Principle
 
@@ -336,25 +314,102 @@ public interface InterfaceSegregationExample {
 
 ### Dependency Inversion Principle
 
-The dependency inversion principle suggests the you should expose interfaces and not concrete classes. Interfaces enable the core abstraction necessary to make code extensible and maintainable. Whenever to expose a concrete class implementation you expose unintended coupling with the class. At very least you are exposing a specific implementation and potentially extraneous methods that are unnecessary to the use of the interface that should represent the class.
+The dependency inversion principle suggests the you should expose and use interfaces and not concrete classes. Interfaces enable the core abstraction necessary to make code extensible and maintainable. Whenever you expose a concrete class implementation you expose unintended coupling with the class. At very least you are exposing a specific implementation, constructor, and potentially extraneous methods that are unnecessary to the use of the interface that should represent the class.
 
-Put another way, the principle says that dependencies are made on aspects of functionality, not on implementations of the functionality.
+Put another way, the principle says that dependencies are made on aspects of functionality, not on implementations of the functionality. In the following example the high level `Route` class is highly coupled with the instantiation and use of the low level `Honda` object.
 
 #### Violation Example
 
 ```java
-public class DependencyInversionExample {
-    private int[] items;
+class Violation {
+    public static void main(String[] args) {
+        Honda honda = new Honda();
 
-    List getItemsGood() {
-        return List.of(items);
+        new Route().drive(honda);
     }
 
-    int[] getItemsBad() {
-        return items;
+    static class Route {
+        /**
+         * Highly coupled with lower class implementation.
+         */
+        void drive(Honda car) {
+            car.go();
+        }
+
+    }
+
+    static class Honda {
+        void go() {
+            System.out.println("put put");
+        }
     }
 }
 ```
+
+#### Correct Example
+
+In order to properly apply the dependency inversion principle you invert the use of low level concrete classes and expose low level interfaces instead. The following example we use a factory method that uses reflection to load the constructor that is specified as a command line argument. The factory returns a `Vehicle` interface rather than a concrete class. Now the `Route` doesn't know know anything about the vehicle that is being used. It just calls `go`. This breaks the coupling between the objects and moves the decision about what vehicle is actually used to be completely out of the code.
+
+```java
+class Correct {
+    public static void main(String[] args) {
+        var vehicleMakerClass = args.length == 1 ? args[0] : "Honda";
+        var factory = new VehicleFactory(vehicleMakerClass);
+
+        Vehicle vehicle = factory.createVehicle();
+
+        new Route().drive(vehicle);
+    }
+
+    interface Vehicle {
+        void go();
+    }
+
+    static class Route {
+        void drive(Vehicle vehicle) {
+            vehicle.go();
+        }
+    }
+
+    static class VehicleFactory {
+        private Constructor<Vehicle> vehicleConstructor;
+
+        VehicleFactory(String vehicleMakerClass) {
+            try {
+                vehicleMakerClass = "design.DependencyInversionExample$Correct$" + vehicleMakerClass;
+                var vehicleClass = Class.forName(vehicleMakerClass);
+                vehicleConstructor = (Constructor<Vehicle>) vehicleClass.getDeclaredConstructor();
+            } catch (Exception ignored) {
+            }
+        }
+
+        Vehicle createVehicle() {
+            if (vehicleConstructor != null) {
+                try {
+                    return vehicleConstructor.newInstance();
+                } catch (Exception ignored) {
+                }
+            }
+            return new Honda();
+        }
+    }
+
+    static class Honda implements Vehicle {
+        public void go() {
+            System.out.println("put put");
+        }
+    }
+
+    static class BMW implements Vehicle {
+        public void go() {
+            System.out.println("vroom");
+        }
+    }
+}
+
+```
+
+By inverting the dependencies, you can decouple the code and move the commitment to an algorithm to a higher level. Now you can execute the code with different parameters and completely modify how it works.
 
 ## Avoiding Code Duplication
 
@@ -371,7 +426,6 @@ You can reduce duplicated code by:
 - The goals of software design
 - Design is an iterative process
 - Abstraction
-- Good naming
 - Single Responsibility Principle
 - Decomposition
 - Good algorithm and data structure selection
