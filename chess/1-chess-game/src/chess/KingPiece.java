@@ -59,14 +59,12 @@ public record KingPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
      */
     private void addCastlingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
         // Check and add king-side castling move
-        if (canCastleKingSide(board, myPosition)) {
+        if (canCastleKingSide(board, myPosition))
             moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() + 2), null));
-        }
 
         // Check and add queen-side castling move
-        if (canCastleQueenSide(board, myPosition)) {
+        if (canCastleQueenSide(board, myPosition))
             moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() - 2), null));
-        }
     }
 
     /**
@@ -93,15 +91,11 @@ public record KingPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
             ChessPiece piece = board.getPiece(pos);
             if (piece != null && piece.teamColor() == enemyColor) {
                 Collection<ChessMove> moves;
-                if (piece instanceof KingPiece) {
-                    moves = ((KingPiece) piece).nonCastlingMoves(board, pos);
-                } else {
-                    moves = piece.pieceMoves(board, pos);
-                }
+                moves = (piece instanceof KingPiece) ? ((KingPiece) piece).nonCastlingMoves(board, pos) :
+                                                        piece.pieceMoves(board, pos);
 
-                if (moves.stream().anyMatch(move -> move.getEndPosition().equals(position))) {
+                if (moves.stream().anyMatch(move -> move.getEndPosition().equals(position)))
                     return true;  // Found an attacking move on the position
-                }
             }
         }
         return false;  // No attacks found on the position
@@ -119,11 +113,9 @@ public record KingPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
         ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), 8));
         if (rook == null || rook.getPieceType() != PieceType.ROOK) return false;
 
-        for (int i = 1; i <= 2; i++) {
-            if (board.getPiece(new ChessPositionImpl(position.row(), position.column() + i)) != null || isSquareUnderAttack(board, new ChessPositionImpl(position.row(), position.column() + i))) {
+        for (int i = 1; i <= 2; i++)
+            if (board.getPiece(new ChessPositionImpl(position.row(), position.column() + i)) != null || isSquareUnderAttack(board, new ChessPositionImpl(position.row(), position.column() + i)))
                 return false;
-            }
-        }
         return true;
     }
 

@@ -24,9 +24,7 @@ public class ChessPieceImpl implements ChessPiece {
     }
 
     @Override
-    public ChessGame.TeamColor teamColor() {
-        return teamColor;
-    }
+    public ChessGame.TeamColor teamColor() { return teamColor; }
 
     @Override
     public PieceType getPieceType() {
@@ -37,4 +35,5 @@ public class ChessPieceImpl implements ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return actualPiece.pieceMoves(board, myPosition);
     }
+
 }

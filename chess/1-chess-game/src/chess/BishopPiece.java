@@ -25,10 +25,9 @@ public record BishopPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
                 row += direction[0];
                 col += direction[1];
 
-                if (row < 1 || row > 8 || col < 1 || col > 8) {
-                    // Out of board bounds
+                // Out of board bounds
+                if (row < 1 || row > 8 || col < 1 || col > 8)
                     break;
-                }
 
                 ChessPosition newPosition = new ChessPositionImpl(row, col);
                 ChessPiece pieceAtNewPosition = board.getPiece(newPosition);

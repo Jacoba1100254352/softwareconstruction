@@ -25,10 +25,8 @@ public record QueenPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
                 row += direction[0];
                 col += direction[1];
 
-                if (row < 1 || row > 8 || col < 1 || col > 8) {
-                    // Out of board bounds
-                    break;
-                }
+                if (row < 1 || row > 8 || col < 1 || col > 8)
+                    break; // Out of board bounds
 
                 ChessPosition newPosition = new ChessPositionImpl(row, col);
                 ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
@@ -40,10 +38,8 @@ public record QueenPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
                     // Opponent's piece, capture it and break
                     moves.add(new ChessMoveImpl(myPosition, newPosition, null));
                     break;
-                } else {
-                    // Own piece, block the path
-                    break;
-                }
+                } else break; // Own piece, block the path
+
             }
         }
 

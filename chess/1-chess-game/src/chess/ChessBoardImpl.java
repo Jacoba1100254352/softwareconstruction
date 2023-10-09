@@ -66,9 +66,8 @@ public class ChessBoardImpl implements ChessBoard {
     @Override
     public void removePiece(ChessPosition position) {
         ChessPiece removedPiece = board.get(position);
-        if (removedPiece != null) {
+        if (removedPiece != null)
             lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType());
-        }
         board.remove(position);
     }
 

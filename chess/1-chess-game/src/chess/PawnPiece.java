@@ -5,6 +5,8 @@ import java.util.Collection;
 
 public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
 
+    private static final int BOARD_SIZE = 8;
+
     @Override
     public PieceType getPieceType() {
         return PieceType.PAWN;
@@ -14,72 +16,83 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         int direction = (teamColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
-
-// Check for simple forward move
         int newRow = myPosition.row() + direction;
-        if (newRow >= 1 && newRow <= 8) {
-            ChessPosition forwardOne = new ChessPositionImpl(newRow, myPosition.column());
-            if (board.getPiece(forwardOne) == null) {
 
-                // Check for promotion
-                if (forwardOne.row() == 1 || forwardOne.row() == 8)
-                    promote(myPosition, moves, forwardOne); // Add all promotions
-                else moves.add(new ChessMoveImpl(myPosition, forwardOne, null));
-
-                // Check for double move for pawns on their starting rows
-                if ((teamColor == ChessGame.TeamColor.WHITE && myPosition.row() == 2) ||
-                        (teamColor == ChessGame.TeamColor.BLACK && myPosition.row() == 7)) {
-                    ChessPosition forwardTwo = new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column());
-                    if (board.getPiece(forwardTwo) == null)
-                        moves.add(new ChessMoveImpl(myPosition, forwardTwo, null));
-                }
-            }
+        if (isValidRow(newRow)) {
+            checkForwardMoves(board, myPosition, newRow, moves, direction);
+            checkDiagonalCaptures(board, myPosition, newRow, moves);
+            checkEnPassantCaptures(board, myPosition, moves, direction);
         }
 
-        // Check for diagonal captures
+        return moves;
+    }
+
+    private boolean isValidRow(int row) {
+        return row >= 1 && row <= BOARD_SIZE;
+    }
+
+    private boolean isValidColumn(int col) {
+        return col >= 1 && col <= BOARD_SIZE;
+    }
+
+    private void checkForwardMoves(ChessBoard board, ChessPosition myPosition, int newRow, Collection<ChessMove> moves, int direction) {
+        ChessPosition forwardOne = new ChessPositionImpl(newRow, myPosition.column());
+        if (board.getPiece(forwardOne) == null) {
+            addMoveWithPromotion(myPosition, forwardOne, moves);
+
+            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column())) == null) {
+                moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column()), null));
+            }
+        }
+    }
+
+    private boolean isNewPawnPosition(ChessPosition position) {
+        return (teamColor == ChessGame.TeamColor.WHITE && position.row() == 2) || (teamColor == ChessGame.TeamColor.BLACK && position.row() == 7);
+    }
+
+    private void checkDiagonalCaptures(ChessBoard board, ChessPosition myPosition, int newRow, Collection<ChessMove> moves) {
         for (int diagDirection : new int[]{-1, 1}) {
-            newRow = myPosition.row() + direction;
             int newCol = myPosition.column() + diagDirection;
 
-            if (1 <= newRow && newRow <= 8 && 1 <= newCol && newCol <= 8) {
+            if (isValidColumn(newCol)) {
                 ChessPosition diagonal = new ChessPositionImpl(newRow, newCol);
                 ChessPiece pieceAtDiagonal = board.getPiece(diagonal);
                 if (pieceAtDiagonal != null && pieceAtDiagonal.teamColor() != this.teamColor) {
-                    // Check for promotion on capture
-                    if (newRow == 1 || newRow == 8)
-                        promote(myPosition, moves, diagonal);
-                    else moves.add(new ChessMoveImpl(myPosition, diagonal, null));
+                    addMoveWithPromotion(myPosition, diagonal, moves);
                 }
             }
         }
+    }
 
-
-        // Check for en passant captures
+    private void checkEnPassantCaptures(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int direction) {
         for (int sideDirection : new int[]{-1, 1}) {
             int newCol = myPosition.column() + sideDirection;
-            if (newCol < 1 || newCol > 8) {
-                continue;  // Skip this iteration if the column is out of bounds
-            }
 
-            ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
-            ChessPiece pieceAtSide = board.getPiece(side);
-            if (pieceAtSide instanceof PawnPiece && pieceAtSide.teamColor() != this.teamColor) {
-                if (board.wasLastMoveTwoSquarePawnMove()) {
-                    ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, myPosition.column() + sideDirection);
+            if (isValidColumn(newCol)) {
+                ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
+                ChessPiece pieceAtSide = board.getPiece(side);
+
+                if (pieceAtSide instanceof PawnPiece && pieceAtSide.teamColor() != this.teamColor && board.wasLastMoveTwoSquarePawnMove()) {
+                    ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);
                     if (board.getPiece(capturePos) == null) {
                         moves.add(new ChessMoveImpl(myPosition, capturePos, null));
                     }
                 }
             }
         }
-
-        return moves;
     }
 
-    private void promote(ChessPosition myPosition, Collection<ChessMove> moves, ChessPosition forwardOne) {
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.QUEEN));
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.BISHOP));
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.ROOK));
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.KNIGHT));
+    private void addMoveWithPromotion(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
+        if (end.row() == 1 || end.row() == BOARD_SIZE) {
+            promote(start, end, moves);
+        } else {
+            moves.add(new ChessMoveImpl(start, end, null));
+        }
+    }
+
+    private void promote(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
+        for (PieceType type : new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT}) {
+            moves.add(new ChessMoveImpl(start, end, type));
+        }
     }
 }

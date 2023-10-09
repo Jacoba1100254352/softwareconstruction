@@ -24,10 +24,8 @@ public record KnightPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
             int newRow = myPosition.row() + direction[0];
             int newCol = myPosition.column() + direction[1];
 
-            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-                // Move is outside the bounds of the board
-                continue;
-            }
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8)
+                continue; // Move is outside the bounds of the board
 
             ChessPosition newPosition = new ChessPositionImpl(newRow, newCol);
             ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
