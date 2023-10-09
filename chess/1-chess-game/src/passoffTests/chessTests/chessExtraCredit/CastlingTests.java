@@ -80,14 +80,14 @@ public class CastlingTests {
         Assertions.assertNotNull(foundKing, "After castling move, no piece found at king's new position");
         Assertions.assertEquals(ChessPiece.PieceType.KING, foundKing.getPieceType(),
                 "Found piece at king's position is not a king");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundKing.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundKing.teamColor(),
                 "Found piece at king's position is the wrong team color");
 
         ChessPiece foundRook = game.getBoard().getPiece(TestFactory.getNewPosition(1, 4));
         Assertions.assertNotNull(foundRook, "After castling move, no piece found at rook's new position");
         Assertions.assertEquals(ChessPiece.PieceType.ROOK, foundRook.getPieceType(),
                 "Found piece at rook's position is not a rook");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundRook.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundRook.teamColor(),
                 "Found piece at rook's position is the wrong team color");
 
 
@@ -113,14 +113,14 @@ public class CastlingTests {
         Assertions.assertNotNull(foundKing, "After castling move, no piece found at king's new position");
         Assertions.assertEquals(ChessPiece.PieceType.KING, foundKing.getPieceType(),
                 "Found piece at king's position is not a king");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundKing.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundKing.teamColor(),
                 "Found piece at king's position is the wrong team color");
 
         foundRook = game.getBoard().getPiece(TestFactory.getNewPosition(1, 6));
         Assertions.assertNotNull(foundRook, "After castling move, no piece found at rook's new position");
         Assertions.assertEquals(ChessPiece.PieceType.ROOK, foundRook.getPieceType(),
                 "Found piece at rook's position is not a rook");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundRook.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundRook.teamColor(),
                 "Found piece at rook's position is the wrong team color");
     }
 
@@ -186,14 +186,14 @@ public class CastlingTests {
         Assertions.assertNotNull(foundKing, "After castling move, no piece found at king's new position");
         Assertions.assertEquals(ChessPiece.PieceType.KING, foundKing.getPieceType(),
                 "Found piece at king's position is not a king");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundKing.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundKing.teamColor(),
                 "Found piece at king's position is the wrong team color");
 
         ChessPiece foundRook = game.getBoard().getPiece(TestFactory.getNewPosition(8, 4));
         Assertions.assertNotNull(foundRook, "After castling move, no piece found at rook's new position");
         Assertions.assertEquals(ChessPiece.PieceType.ROOK, foundRook.getPieceType(),
                 "Found piece at rook's position is not a rook");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundRook.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundRook.teamColor(),
                 "Found piece at rook's position is the wrong team color");
 
 
@@ -225,14 +225,14 @@ public class CastlingTests {
         Assertions.assertNotNull(foundKing, "After castling move, no piece found at king's new position");
         Assertions.assertEquals(ChessPiece.PieceType.KING, foundKing.getPieceType(),
                 "Found piece at king's position is not a king");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundKing.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundKing.teamColor(),
                 "Found piece at king's position is the wrong team color");
 
         foundRook = game.getBoard().getPiece(TestFactory.getNewPosition(8, 6));
         Assertions.assertNotNull(foundRook, "After castling move, no piece found at rook's new position");
         Assertions.assertEquals(ChessPiece.PieceType.ROOK, foundRook.getPieceType(),
                 "Found piece at rook's position is not a rook");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundRook.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundRook.teamColor(),
                 "Found piece at rook's position is the wrong team color");
     }
 

@@ -72,7 +72,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(king, "After move, no piece found at the end position");
         Assertions.assertEquals(ChessPiece.PieceType.KING, king.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, king.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, king.teamColor(),
                 "Found piece at end position is the wrong team color");
 
         /*
@@ -96,7 +96,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(queen, "After move, no piece found at the end position");
         Assertions.assertEquals(ChessPiece.PieceType.QUEEN, queen.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, queen.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, queen.teamColor(),
                 "Found piece at end position is the wrong team color");
 
         /*
@@ -120,7 +120,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(rook, "After move, no piece found at the end position");
         Assertions.assertEquals(ChessPiece.PieceType.ROOK, rook.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, rook.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, rook.teamColor(),
                 "Found piece at end position is the wrong team color");
 
         /*
@@ -144,7 +144,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(knight, "After move, no piece found at the end position");
         Assertions.assertEquals(ChessPiece.PieceType.KNIGHT, knight.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, knight.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, knight.teamColor(),
                 "Found piece at end position is the wrong team color");
 
         /*
@@ -168,7 +168,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(bishop, "After move, no piece found at the end position");
         Assertions.assertEquals(ChessPiece.PieceType.BISHOP, bishop.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, bishop.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, bishop.teamColor(),
                 "Found piece at end position is the wrong team color");
 
         /*
@@ -192,7 +192,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(pawn, "After move, no piece found at the end position");
         Assertions.assertEquals(ChessPiece.PieceType.PAWN, pawn.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, pawn.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, pawn.teamColor(),
                 "Found piece at end position is the wrong team color");
 
         /*
@@ -443,7 +443,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(whiteEndPiece, "After move, no piece found at the end position");
         Assertions.assertEquals(promotionType, whiteEndPiece.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, whiteEndPiece.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, whiteEndPiece.teamColor(),
                 "Found piece at end position is the wrong team color");
 
 
@@ -458,7 +458,7 @@ public class ChessGameTests {
         Assertions.assertNotNull(blackEndPiece, "After move, no piece found at the end position");
         Assertions.assertEquals(promotionType, blackEndPiece.getPieceType(),
                 "Found piece at end position is not the correct piece type");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, blackEndPiece.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, blackEndPiece.teamColor(),
                 "Found piece at end position is the wrong team color");
     }
 

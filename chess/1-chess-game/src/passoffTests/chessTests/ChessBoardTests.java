@@ -32,7 +32,7 @@ public class ChessBoardTests {
 
         Assertions.assertEquals(piece.getPieceType(), foundPiece.getPieceType(),
                 "ChessPiece returned by getPiece had the wrong piece type");
-        Assertions.assertEquals(piece.getTeamColor(), foundPiece.getTeamColor(),
+        Assertions.assertEquals(piece.teamColor(), foundPiece.teamColor(),
                 "ChessPiece returned by getPiece had the wrong team color");
     }
 
@@ -122,18 +122,18 @@ public class ChessBoardTests {
         for (int column = 1; column <= 8; ++column) {
             //white team
             Assertions.assertEquals(ChessGame.TeamColor.WHITE,
-                    board.getPiece(TestFactory.getNewPosition(1, column)).getTeamColor(),
+                    board.getPiece(TestFactory.getNewPosition(1, column)).teamColor(),
                     "Piece at starting position was incorrect color");
             Assertions.assertEquals(ChessGame.TeamColor.WHITE,
-                    board.getPiece(TestFactory.getNewPosition(2, column)).getTeamColor(),
+                    board.getPiece(TestFactory.getNewPosition(2, column)).teamColor(),
                     "Piece at starting position was incorrect color");
 
             //black team
             Assertions.assertEquals(ChessGame.TeamColor.BLACK,
-                    board.getPiece(TestFactory.getNewPosition(7, column)).getTeamColor(),
+                    board.getPiece(TestFactory.getNewPosition(7, column)).teamColor(),
                     "Piece at starting position was incorrect color");
             Assertions.assertEquals(ChessGame.TeamColor.BLACK,
-                    board.getPiece(TestFactory.getNewPosition(8, column)).getTeamColor(),
+                    board.getPiece(TestFactory.getNewPosition(8, column)).teamColor(),
                     "Piece at starting position was incorrect color");
         }
 

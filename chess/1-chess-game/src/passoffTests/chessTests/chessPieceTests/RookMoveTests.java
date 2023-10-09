@@ -67,8 +67,12 @@ public class RookMoveTests {
 
         //check
         Set<ChessMove> pieceMoves = new HashSet<>(rook.pieceMoves(board, position));
-        Assertions.assertEquals(validMoves, pieceMoves,
-                "ChessPiece pieceMoves did not return the correct moves");
+        if (!validMoves.equals(pieceMoves)) {
+            System.out.println("Expected Moves: " + validMoves);
+            System.out.println("Actual Moves: " + pieceMoves);
+        }
+        Assertions.assertEquals(validMoves, pieceMoves, "ChessPiece pieceMoves did not return the correct moves");
+
     }
 
 

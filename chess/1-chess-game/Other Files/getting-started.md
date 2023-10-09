@@ -1,6 +1,6 @@
 # Chess Game - Getting Started
 
-📁 [Starter code](starter-code)
+📁 [Starter code](../src)
 
 Take the following steps to setup your Chess project.
 
@@ -26,8 +26,8 @@ Take the following steps to setup your Chess project.
 1. In the `src` folder, create a subfolder named `main`. Right-click on `main` and select `Mark Directory as`->`Mark as Sources Root`. This folder will contain your chess game Java source code.
 1. In the `src` folder, create a subfolder named `starter`. Right-click on `starter` and select `Mark Directory as`->`Mark as Sources Root`. This folder will contain the starter Java code that we provide to you.
 1. In the `src` folder, create a subfolder named `test`. Right-click on `test` and select `Mark Directory as`->`Mark as Test Sources Root`. This folder will contain all Junit test cases, including the pass off test cases.
-1. In a File Explorer (outside of IntelliJ), copy the `chess` folder from the provided [starter code](starter-code) into the `src/starter` folder.
-1. In a File Explorer (outside of IntelliJ), copy the `passoffTests` folder from the provided [starter code](starter-code) into the `src/test` folder.
+1. In a File Explorer (outside of IntelliJ), copy the `chess` folder from the provided [starter code](../src) into the `src/starter` folder.
+1. In a File Explorer (outside of IntelliJ), copy the `passoffTests` folder from the provided [starter code](../src) into the `src/test` folder.
 
 ## Adding Dependencies
 

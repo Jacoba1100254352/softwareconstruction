@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * Represents a single chess piece
- * 
+ * <p>
  * Note: You can add to this interface, but you should not alter the existing
  * methods.
  */
@@ -25,7 +25,7 @@ public interface ChessPiece {
     /**
      * @return Which team this chess piece belongs to
      */
-    ChessGame.TeamColor getTeamColor();
+    ChessGame.TeamColor teamColor();
 
     /**
      * @return which type of chess piece this piece is

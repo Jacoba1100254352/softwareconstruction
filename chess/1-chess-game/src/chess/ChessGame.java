@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * For a class that can manage a chess game, making moves on a board
- * 
+ * <p>
  * Note: You can add to this interface, but you should not alter the existing
  * methods.
  */

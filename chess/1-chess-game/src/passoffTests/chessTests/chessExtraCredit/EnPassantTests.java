@@ -83,7 +83,7 @@ public class EnPassantTests {
         Assertions.assertNotNull(foundPawn, "After En Passant move, no piece present at final position");
         Assertions.assertEquals(ChessPiece.PieceType.PAWN, foundPawn.getPieceType(),
                 "Found piece at pawn's position is not a pawn");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundPawn.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundPawn.teamColor(),
                 "Found piece at pawn's position is the wrong team color");
     }
 
@@ -146,7 +146,7 @@ public class EnPassantTests {
         Assertions.assertNotNull(foundPawn, "After En Passant move, no piece present at final position");
         Assertions.assertEquals(ChessPiece.PieceType.PAWN, foundPawn.getPieceType(),
                 "Found piece at pawn's position is not a pawn");
-        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundPawn.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.WHITE, foundPawn.teamColor(),
                 "Found piece at pawn's position is the wrong team color");
     }
 
@@ -209,7 +209,7 @@ public class EnPassantTests {
         Assertions.assertNotNull(foundPawn, "After En Passant move, no piece present at final position");
         Assertions.assertEquals(ChessPiece.PieceType.PAWN, foundPawn.getPieceType(),
                 "Found piece at pawn's position is not a pawn");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundPawn.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundPawn.teamColor(),
                 "Found piece at pawn's position is the wrong team color");
     }
 
@@ -272,7 +272,7 @@ public class EnPassantTests {
         Assertions.assertNotNull(foundPawn, "After En Passant move, no piece present at final position");
         Assertions.assertEquals(ChessPiece.PieceType.PAWN, foundPawn.getPieceType(),
                 "Found piece at pawn's position is not a pawn");
-        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundPawn.getTeamColor(),
+        Assertions.assertEquals(ChessGame.TeamColor.BLACK, foundPawn.teamColor(),
                 "Found piece at pawn's position is the wrong team color");
     }
 

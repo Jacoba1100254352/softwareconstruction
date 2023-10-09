@@ -2,7 +2,7 @@ package chess;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
- * 
+ * <p>
  * Note: You can add to this interface, but you should not alter the existing
  * methods.
  */
@@ -30,4 +30,18 @@ public interface ChessBoard {
      * (How the game of chess normally starts)
      */
     void resetBoard();
+
+    /**
+     * Removes a chess piece from the chessboard.
+     *
+     * @param position where to remove the piece from
+     */
+    void removePiece(ChessPosition position);
+
+    /**
+     * Checks if the last move made on the board was a two-square move by a pawn.
+     *
+     * @return true if the last move was a two-square pawn move, false otherwise
+     */
+    boolean wasLastMoveTwoSquarePawnMove();
 }
