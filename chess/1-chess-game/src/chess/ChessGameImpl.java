@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class ChessGameImpl implements ChessGame {
@@ -26,10 +27,61 @@ public class ChessGameImpl implements ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null || piece.teamColor() != currentTeamTurn) {
-            return null;
+            return new ArrayList<>();
         }
-        return piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+        // Filter out moves that would place the king in check
+        Collection<ChessMove> filteredMoves = new ArrayList<>();
+
+        // Find the position of the king for the current team
+        ChessPosition kingPosition = null;
+        for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
+            ChessPiece otherPiece = board.getPiece(position);
+            if (otherPiece != null && otherPiece.teamColor() == currentTeamTurn && otherPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                kingPosition = position;
+                break;
+            }
+        }
+
+        for (ChessMove move : moves) {
+            // Simulate the move
+            ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+            board.removePiece(move.getStartPosition());
+            board.addPiece(move.getEndPosition(), piece);
+
+            boolean isCheck = false;
+
+            // Check if the king would be under attack after the move
+            for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
+                ChessPiece attackingPiece = board.getPiece(position);
+                if (attackingPiece != null && attackingPiece.teamColor() != currentTeamTurn) {
+                    Collection<ChessMove> attackingMoves = attackingPiece.pieceMoves(board, position);
+                    for (ChessMove attackingMove : attackingMoves) {
+                        if (attackingMove.getEndPosition().equals(kingPosition)) {
+                            isCheck = true;
+                            break;
+                        }
+                    }
+                }
+                if (isCheck) break;
+            }
+
+            // Revert the move
+            board.removePiece(move.getEndPosition());
+            if (capturedPiece != null) {
+                board.addPiece(move.getEndPosition(), capturedPiece);
+            }
+            board.addPiece(move.getStartPosition(), piece);
+
+            if (!isCheck) {
+                filteredMoves.add(move);
+            }
+        }
+
+        return filteredMoves;
     }
+
 
     @Override
     public void makeMove(ChessMove move) throws InvalidMoveException {

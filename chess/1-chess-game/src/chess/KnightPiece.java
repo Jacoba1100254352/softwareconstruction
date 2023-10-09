@@ -14,23 +14,30 @@ public record KnightPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        int[][] knightMoves = {
-                {2, 1}, {1, 2}, {-1, 2}, {-2, 1},
-                {-2, -1}, {-1, -2}, {1, -2}, {2, -1}
+        // Potential moves for a knight, representing the "L" shape movement
+        int[][] directions = {
+                {2, 1}, {1, 2}, {-2, 1}, {-1, 2},
+                {2, -1}, {1, -2}, {-2, -1}, {-1, -2}
         };
 
-        for (int[] move : knightMoves) {
-            int newRow = myPosition.row() + move[0];
-            int newCol = myPosition.column() + move[1];
+        for (int[] direction : directions) {
+            int newRow = myPosition.row() + direction[0];
+            int newCol = myPosition.column() + direction[1];
 
-            if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8) {
-                ChessPosition newPos = new ChessPositionImpl(newRow, newCol);
-                ChessPiece pieceAtNewPos = board.getPiece(newPos);
-                if (pieceAtNewPos == null || pieceAtNewPos.teamColor() != teamColor) {
-                    moves.add(new ChessMoveImpl(myPosition, newPos, null, board));
-                }
+            if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
+                // Move is outside the bounds of the board
+                continue;
+            }
+
+            ChessPosition newPosition = new ChessPositionImpl(newRow, newCol);
+            ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
+
+            if (pieceAtNewPosition == null || pieceAtNewPosition.teamColor() != this.teamColor()) {
+                // Either the square is empty, or there's an opponent's piece that can be captured
+                moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
             }
         }
+
         return moves;
     }
 }

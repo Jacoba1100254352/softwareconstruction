@@ -14,28 +14,35 @@ public record RookPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        // Rook can move horizontally or vertically.
-        // Check each direction until a piece is encountered or the edge of the board is reached.
-        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        // Directions: North, East, South, West
+        int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
-        for (int[] dir : directions) {
-            for (int i = 1; i <= 8; i++) {
-                int newRow = myPosition.row() + dir[0] * i;
-                int newCol = myPosition.column() + dir[1] * i;
+        for (int[] direction : directions) {
+            int row = myPosition.row();
+            int col = myPosition.column();
 
-                if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) {
-                    break;  // Outside of board bounds
+            while (true) {
+                row += direction[0];
+                col += direction[1];
+
+                if (row < 1 || row > 8 || col < 1 || col > 8) {
+                    // Out of board bounds
+                    break;
                 }
 
-                ChessPosition newPos = new ChessPositionImpl(newRow, newCol);
-                ChessPiece pieceAtNewPos = board.getPiece(newPos);
-                if (pieceAtNewPos != null) {
-                    if (pieceAtNewPos.teamColor() != this.teamColor) {
-                        moves.add(new ChessMoveImpl(myPosition, newPos, null, board));
-                    }
-                    break;  // Rook's path is blocked
+                ChessPosition newPosition = new ChessPositionImpl(row, col);
+                ChessPiece pieceAtNewPosition = board.getPiece(newPosition);
+
+                if (pieceAtNewPosition == null) {
+                    // Empty square, add as a possible move
+                    moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
+                } else if (pieceAtNewPosition.teamColor() != this.teamColor()) {
+                    // Opponent's piece, capture it and break
+                    moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
+                    break;
                 } else {
-                    moves.add(new ChessMoveImpl(myPosition, newPos, null, board));
+                    // Own piece, block the path
+                    break;
                 }
             }
         }
