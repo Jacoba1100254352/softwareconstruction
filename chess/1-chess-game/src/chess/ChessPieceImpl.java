@@ -13,26 +13,13 @@ public class ChessPieceImpl implements ChessPiece {
         this.pieceType = pieceType;
 
         switch (pieceType) {
-            case KING:
-                this.actualPiece = new KingPiece(teamColor);
-                break;
-            case QUEEN:
-                this.actualPiece = new QueenPiece(teamColor);
-                break;
-            case BISHOP:
-                this.actualPiece = new BishopPiece(teamColor);
-                break;
-            case KNIGHT:
-                this.actualPiece = new KnightPiece(teamColor);
-                break;
-            case ROOK:
-                this.actualPiece = new RookPiece(teamColor);
-                break;
-            case PAWN:
-                this.actualPiece = new PawnPiece(teamColor);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown piece type: " + pieceType);
+            case KING -> this.actualPiece = new KingPiece(teamColor);
+            case QUEEN -> this.actualPiece = new QueenPiece(teamColor);
+            case BISHOP -> this.actualPiece = new BishopPiece(teamColor);
+            case KNIGHT -> this.actualPiece = new KnightPiece(teamColor);
+            case ROOK -> this.actualPiece = new RookPiece(teamColor);
+            case PAWN -> this.actualPiece = new PawnPiece(teamColor);
+            default -> throw new IllegalArgumentException("Unknown piece type: " + pieceType);
         }
     }
 

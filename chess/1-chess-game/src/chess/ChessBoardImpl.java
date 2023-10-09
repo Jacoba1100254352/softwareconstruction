@@ -10,7 +10,6 @@ public class ChessBoardImpl implements ChessBoard {
 
     public ChessBoardImpl() {
         board = new HashMap<>();
-        resetBoard();
     }
 
     // To keep track of the last move
@@ -83,12 +82,9 @@ public class ChessBoardImpl implements ChessBoard {
         return Math.abs(startPos.row() - endPos.row()) == 2;
     }
 
-
-    public ChessMove getLastMove() {
-        return lastMove;
-    }
-
-    public void setLastMove(ChessMove lastMove) {
-        this.lastMove = lastMove;
-    }
+    // New method to clear the board without setting up default pieces
+/*    private void clearBoard() {
+        board.clear();
+        lastMove = null;
+    }*/
 }
