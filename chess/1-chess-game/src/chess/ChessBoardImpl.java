@@ -17,7 +17,7 @@ public class ChessBoardImpl implements ChessBoard {
 
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType(), this);
+        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType());
         board.put(position, piece);
     }
 
@@ -67,7 +67,7 @@ public class ChessBoardImpl implements ChessBoard {
     public void removePiece(ChessPosition position) {
         ChessPiece removedPiece = board.get(position);
         if (removedPiece != null) {
-            lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType(), this);
+            lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType());
         }
         board.remove(position);
     }
@@ -81,10 +81,4 @@ public class ChessBoardImpl implements ChessBoard {
         if (startPos == null || endPos == null) return false;  // Added this check
         return Math.abs(startPos.row() - endPos.row()) == 2;
     }
-
-    // New method to clear the board without setting up default pieces
-/*    private void clearBoard() {
-        board.clear();
-        lastMove = null;
-    }*/
 }

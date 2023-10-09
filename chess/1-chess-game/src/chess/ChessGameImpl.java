@@ -184,7 +184,7 @@ public class ChessGameImpl implements ChessGame {
 
     @Override
     public boolean isInStalemate(TeamColor teamColor) {
-        // If it's the given team's turn and they have no valid moves and they aren't in check, then it's a stalemate.
+        // If it's the given team's turn, and they have no valid moves, and they aren't in check, then it's a stalemate.
         if (teamColor != currentTeamTurn) {
             return false;
         }

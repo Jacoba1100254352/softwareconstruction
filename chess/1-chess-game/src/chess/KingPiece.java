@@ -49,7 +49,7 @@ public record KingPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
 
             // Add move if target square is empty or contains opponent's piece
             if (targetPiece == null || targetPiece.teamColor() != this.teamColor()) {
-                moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
+                moves.add(new ChessMoveImpl(myPosition, newPosition, null));
             }
         }
     }
@@ -60,12 +60,12 @@ public record KingPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
     private void addCastlingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
         // Check and add king-side castling move
         if (canCastleKingSide(board, myPosition)) {
-            moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() + 2), null, board));
+            moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() + 2), null));
         }
 
         // Check and add queen-side castling move
         if (canCastleQueenSide(board, myPosition)) {
-            moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() - 2), null, board));
+            moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() - 2), null));
         }
     }
 

@@ -35,10 +35,10 @@ public record BishopPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
 
                 if (pieceAtNewPosition == null) {
                     // Empty square, add as a possible move
-                    moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
+                    moves.add(new ChessMoveImpl(myPosition, newPosition, null));
                 } else if (pieceAtNewPosition.teamColor() != this.teamColor()) {
                     // Opponent's piece, capture it and break
-                    moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
+                    moves.add(new ChessMoveImpl(myPosition, newPosition, null));
                     break;
                 } else {
                     // Own piece, block the path

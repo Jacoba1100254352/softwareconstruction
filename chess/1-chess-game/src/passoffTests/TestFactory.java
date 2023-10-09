@@ -27,7 +27,7 @@ public class TestFactory {
     }
 
     public static ChessMove getNewMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece){
-        return new ChessMoveImpl(startPosition, endPosition, promotionPiece, getNewBoard());
+        return new ChessMoveImpl(startPosition, endPosition, promotionPiece);
     }
     //------------------------------------------------------------------------------------------------------------------
 

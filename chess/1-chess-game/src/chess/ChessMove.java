@@ -2,7 +2,7 @@ package chess;
 
 /**
  * Represents moving a chess piece on a chessboard
- * 
+ * <p>
  * Note: You can add to this interface, but you should not alter the existing
  * methods.
  */

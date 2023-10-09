@@ -34,7 +34,7 @@ public record KnightPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
 
             if (pieceAtNewPosition == null || pieceAtNewPosition.teamColor() != this.teamColor()) {
                 // Either the square is empty, or there's an opponent's piece that can be captured
-                moves.add(new ChessMoveImpl(myPosition, newPosition, null, board));
+                moves.add(new ChessMoveImpl(myPosition, newPosition, null));
             }
         }
 

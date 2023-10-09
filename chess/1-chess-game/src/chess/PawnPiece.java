@@ -23,15 +23,15 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
 
                 // Check for promotion
                 if (forwardOne.row() == 1 || forwardOne.row() == 8)
-                    promote(board, myPosition, moves, forwardOne); // Add all promotions
-                else moves.add(new ChessMoveImpl(myPosition, forwardOne, null, board));
+                    promote(myPosition, moves, forwardOne); // Add all promotions
+                else moves.add(new ChessMoveImpl(myPosition, forwardOne, null));
 
                 // Check for double move for pawns on their starting rows
                 if ((teamColor == ChessGame.TeamColor.WHITE && myPosition.row() == 2) ||
                         (teamColor == ChessGame.TeamColor.BLACK && myPosition.row() == 7)) {
                     ChessPosition forwardTwo = new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column());
                     if (board.getPiece(forwardTwo) == null)
-                        moves.add(new ChessMoveImpl(myPosition, forwardTwo, null, board));
+                        moves.add(new ChessMoveImpl(myPosition, forwardTwo, null));
                 }
             }
         }
@@ -47,8 +47,8 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
                 if (pieceAtDiagonal != null && pieceAtDiagonal.teamColor() != this.teamColor) {
                     // Check for promotion on capture
                     if (newRow == 1 || newRow == 8)
-                        promote(board, myPosition, moves, diagonal);
-                    else moves.add(new ChessMoveImpl(myPosition, diagonal, null, board));
+                        promote(myPosition, moves, diagonal);
+                    else moves.add(new ChessMoveImpl(myPosition, diagonal, null));
                 }
             }
         }
@@ -67,7 +67,7 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
                 if (board.wasLastMoveTwoSquarePawnMove()) {
                     ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, myPosition.column() + sideDirection);
                     if (board.getPiece(capturePos) == null) {
-                        moves.add(new ChessMoveImpl(myPosition, capturePos, null, board));
+                        moves.add(new ChessMoveImpl(myPosition, capturePos, null));
                     }
                 }
             }
@@ -76,10 +76,10 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
         return moves;
     }
 
-    private void promote(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, ChessPosition forwardOne) {
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.QUEEN, board));
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.BISHOP, board));
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.ROOK, board));
-        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.KNIGHT, board));
+    private void promote(ChessPosition myPosition, Collection<ChessMove> moves, ChessPosition forwardOne) {
+        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.QUEEN));
+        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.BISHOP));
+        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.ROOK));
+        moves.add(new ChessMoveImpl(myPosition, forwardOne, PieceType.KNIGHT));
     }
 }

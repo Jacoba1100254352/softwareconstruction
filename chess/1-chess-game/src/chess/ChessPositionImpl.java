@@ -11,19 +11,6 @@ public record ChessPositionImpl(int row, int column) implements ChessPosition {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ChessPosition other)) return false;
-
-        return row == other.row() && column == other.column();
-    }
-
-    @Override
-    public String toString() {
-        return "ChessPositionImpl[row=" + row + ", column=" + column + "]";
-    }
-
     // Utility method to generate all possible positions on a chessboard.
     public static List<ChessPosition> getAllPositions() {
         List<ChessPosition> allPositions = new ArrayList<>();
