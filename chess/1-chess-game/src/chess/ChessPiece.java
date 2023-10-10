@@ -40,4 +40,7 @@ public interface ChessPiece {
      * @return Collection of valid moves
      */
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
+
+    boolean hasMoved();
+    void markAsMoved();
 }

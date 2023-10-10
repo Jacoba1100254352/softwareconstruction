@@ -3,7 +3,27 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
+public class PawnPiece implements ChessPiece {
+    private final ChessGame.TeamColor teamColor;
+    private boolean hasMoved = false;
+
+    public PawnPiece(ChessGame.TeamColor teamColor) {
+        this.teamColor = teamColor;
+    }
+
+    public ChessGame.TeamColor teamColor() {
+        return teamColor;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    public void markAsMoved() {
+        hasMoved = true;
+    }
 
     private static final int BOARD_SIZE = 8;
 
@@ -40,9 +60,8 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
         if (board.getPiece(forwardOne) == null) {
             addMoveWithPromotion(myPosition, forwardOne, moves);
 
-            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column())) == null) {
+            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column())) == null)
                 moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column()), null));
-            }
         }
     }
 
@@ -57,9 +76,8 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
             if (isValidColumn(newCol)) {
                 ChessPosition diagonal = new ChessPositionImpl(newRow, newCol);
                 ChessPiece pieceAtDiagonal = board.getPiece(diagonal);
-                if (pieceAtDiagonal != null && pieceAtDiagonal.teamColor() != this.teamColor) {
+                if (pieceAtDiagonal != null && pieceAtDiagonal.teamColor() != this.teamColor)
                     addMoveWithPromotion(myPosition, diagonal, moves);
-                }
             }
         }
     }
@@ -74,25 +92,21 @@ public record PawnPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
 
                 if (pieceAtSide instanceof PawnPiece && pieceAtSide.teamColor() != this.teamColor && board.wasLastMoveTwoSquarePawnMove()) {
                     ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);
-                    if (board.getPiece(capturePos) == null) {
+                    if (board.getPiece(capturePos) == null)
                         moves.add(new ChessMoveImpl(myPosition, capturePos, null));
-                    }
                 }
             }
         }
     }
 
     private void addMoveWithPromotion(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
-        if (end.row() == 1 || end.row() == BOARD_SIZE) {
+        if (end.row() == 1 || end.row() == BOARD_SIZE)
             promote(start, end, moves);
-        } else {
-            moves.add(new ChessMoveImpl(start, end, null));
-        }
+        else moves.add(new ChessMoveImpl(start, end, null));
     }
 
     private void promote(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
-        for (PieceType type : new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT}) {
+        for (PieceType type : new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT})
             moves.add(new ChessMoveImpl(start, end, type));
-        }
     }
 }

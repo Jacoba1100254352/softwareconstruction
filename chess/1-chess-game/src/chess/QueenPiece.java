@@ -4,6 +4,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public record QueenPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
+    private static boolean hasMoved;
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    public void markAsMoved() {
+        hasMoved = true;
+    }
 
     @Override
     public PieceType getPieceType() {

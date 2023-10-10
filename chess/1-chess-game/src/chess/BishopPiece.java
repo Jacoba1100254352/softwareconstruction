@@ -3,7 +3,27 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record BishopPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
+public class BishopPiece implements ChessPiece {
+    private final ChessGame.TeamColor teamColor;
+    private boolean hasMoved = false;
+
+    public BishopPiece(ChessGame.TeamColor teamColor) {
+        this.teamColor = teamColor;
+    }
+
+    public ChessGame.TeamColor teamColor() {
+        return teamColor;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    public void markAsMoved() {
+        hasMoved = true;
+    }
 
     @Override
     public PieceType getPieceType() {

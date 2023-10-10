@@ -7,6 +7,17 @@ public class ChessPieceImpl implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
     private final PieceType pieceType;
     private final ChessPiece actualPiece;
+    private boolean hasMoved = false;
+
+    @Override
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    public void markAsMoved() {
+        this.hasMoved = true;
+    }
 
     public ChessPieceImpl(ChessGame.TeamColor teamColor, PieceType pieceType) {
         this.teamColor = teamColor;
