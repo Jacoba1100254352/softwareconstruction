@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.IntStream;
 
 public class KingPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
@@ -88,10 +87,7 @@ public class KingPiece implements ChessPiece {
             moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() - 2), null));
     }
 
-    /**
-     * Return all valid moves for the king excluding castling moves.
-     */
-    public Collection<ChessMove> nonCastlingMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> basicPieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
         // Add standard moves for the king
@@ -103,102 +99,56 @@ public class KingPiece implements ChessPiece {
     /**
      * Checks if a given square on the board is under attack by opponent's pieces.
      */
-    private boolean isSquareUnderAttack(ChessBoard board, ChessPosition position) {
-        // Determine the enemy's color
-        ChessGame.TeamColor enemyColor = (teamColor == ChessGame.TeamColor.WHITE) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-
-        // Iterate through all board positions to find attacking pieces
+    private boolean isSquareThreatened(ChessBoard board, ChessPosition position) {
         for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
             ChessPiece piece = board.getPiece(pos);
-            if (piece != null && piece.teamColor() == enemyColor) {
-                Collection<ChessMove> moves;
-                moves = (piece instanceof KingPiece) ? ((KingPiece) piece).nonCastlingMoves(board, pos) :
-                                                        piece.pieceMoves(board, pos);
 
-                if (moves.stream().anyMatch(move -> move.getEndPosition().equals(position)))
-                    return true;  // Found an attacking move on the position
-            }
-        }
-        return false;  // No attacks found on the position
-    }
-
-    // In KingPiece class
-    private boolean rookHasMoved(ChessBoard board, ChessPosition kingPosition, boolean kingSide) {
-        ChessPosition rookPosition = kingSide ?
-                new ChessPositionImpl(kingPosition.row(), 8) :  // King-side rook
-                new ChessPositionImpl(kingPosition.row(), 1);  // Queen-side rook
-
-        ChessPiece rook = board.getPiece(rookPosition);
-        return rook == null || rook.getPieceType() != PieceType.ROOK || rook.hasMoved();
-    }
-
-    /**
-     * Checks if the king has moved from its original starting position.
-     */
-    private boolean hasMoved(ChessPosition position) {
-        return (teamColor == ChessGame.TeamColor.WHITE && (position.row() != 1 || position.column() != 5))
-                || (teamColor == ChessGame.TeamColor.BLACK && (position.row() != 8 || position.column() != 5));
-    }
-
-    /**
-     * Checks if king-side castling is possible from a given position.
-     */
-    private boolean canCastleKingSide(ChessBoard board, ChessPosition position) {
-        System.out.println("Start k");
-        for (ChessPosition position2 : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(position2);
-            if (piece != null)// Do something with the piece
-                System.out.println("Position: " + position2 + ", Piece: " + piece + ", Piece type = " + piece.getPieceType() + ", Piece has moved = " + piece.hasMoved());
-        }
-        System.out.println("End k");
-
-        // Preliminary check: If king is close to the edge, castling is not possible
-        if (position.column() >= 7 || hasMoved(position)) return false;
-
-        // Check if the path for castling is clear and safe
-        ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), 8));
-        if (rook == null || rook.getPieceType() != PieceType.ROOK) return false;
-
-        System.out.println("K RookHasMoved = " + rookHasMoved(board, position, true) + ", rook.hasMoved() = " + rook.hasMoved() + ", Rook = " + rook);
-
-        // Check if rook has moved
-        if (rookHasMoved(board, position, true)) return false;
-
-        for (int i = 1; i <= 2; i++)
-            if (board.getPiece(new ChessPositionImpl(position.row(), position.column() + i)) != null || isSquareUnderAttack(board, new ChessPositionImpl(position.row(), position.column() + i)))
+            if (piece == null)
                 return false;
-        return true;
+
+            Collection<ChessMove> moves = (piece instanceof KingPiece) ?
+                 ((KingPiece) piece).basicPieceMoves(board, pos) :
+                    piece.pieceMoves(board, pos);
+
+
+            for (ChessMove move : moves)
+                if (move.getEndPosition().equals(position))
+                    return true; // Found an attacking move on the position
+        }
+        return false; // No attacks found on the position
     }
 
+    private boolean canCastleKingSide(ChessBoard board, ChessPosition position) {
+        if (position.column() >= 7 || hasMoved) return false;
 
+        // Check if squares between the king and rook are free
+        for (int col = position.column() + 1; col <= 7; col++)
+            if (board.getPiece(new ChessPositionImpl(position.row(), col)) != null)
+                return false;
 
-    /**
-     * Checks if queen-side castling is possible from a given position.
-     */
+        // Check if the squares between the king and rook are not under attack
+        for (int col = position.column(); col <= 7; col++)
+            if (isSquareThreatened(board, new ChessPositionImpl(position.row(), col)))
+                return false;
+
+        ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), 8));
+        return rook != null && rook.getPieceType() == PieceType.ROOK && !rook.hasMoved();
+    }
+
     private boolean canCastleQueenSide(ChessBoard board, ChessPosition position) {
-        System.out.println("Start q");
-        for (ChessPosition position2 : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(position2);
-            if (piece != null)// Do something with the piece
-                System.out.println("Position: " + position2 + ", Piece: " + piece + ", Piece type = " + piece.getPieceType() + ", Piece has moved = " + piece.hasMoved());
-        }
-        System.out.println("End q");
+        if (position.column() <= 2 || hasMoved) return false;
 
-        // Preliminary check: If king is close to the edge, castling is not possible
-        if (position.column() <= 2 || hasMoved(position)) return false;
+        // Check if squares between the king and rook are free
+        for (int col = position.column() - 1; col >= 2; col--)
+            if (board.getPiece(new ChessPositionImpl(position.row(), col)) != null)
+                return false;
 
-        // Check if the path for castling is clear and safe
+        // Check if the squares between the king and rook are not under attack
+        for (int col = position.column(); col >= 2; col--)
+            if (isSquareThreatened(board, new ChessPositionImpl(position.row(), col)))
+                return false;
+
         ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), 1));
-        if (rook == null || rook.getPieceType() != PieceType.ROOK) return false;
-
-        System.out.println("Q RookHasMoved = " + rookHasMoved(board, position, false) + ", rook.hasMoved() = " + rook.hasMoved() + ", Rook = " + rook);
-
-        // Check if rook has moved
-        if (rookHasMoved(board, position, false)) return false;
-
-        return IntStream.range(1, 4)
-                .allMatch(i -> board.getPiece(new ChessPositionImpl(position.row(), position.column() - i)) == null
-                        && !isSquareUnderAttack(board, new ChessPositionImpl(position.row(), position.column() - i)));
-
+        return rook != null && rook.getPieceType() == PieceType.ROOK && !rook.hasMoved();
     }
 }

@@ -38,10 +38,7 @@ public interface ChessBoard {
      */
     void removePiece(ChessPosition position);
 
-    /**
-     * Checks if the last move made on the board was a two-square move by a pawn.
-     *
-     * @return true if the last move was a two-square pawn move, false otherwise
-     */
-    boolean wasLastMoveTwoSquarePawnMove();
+    ChessPosition getLastMoveStartPosition();
+
+    ChessPosition getLastMoveEndPosition();
 }

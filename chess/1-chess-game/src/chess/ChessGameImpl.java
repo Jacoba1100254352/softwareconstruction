@@ -42,11 +42,11 @@ public class ChessGameImpl implements ChessGame {
 
     private boolean doesMoveResultInCheck(ChessMove move, ChessPosition kingPosition, ChessPiece piece) {
         ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
-        board.removePiece(move.getStartPosition());
-        board.addPiece(move.getEndPosition(), piece);
+        simulateMove(move);
 
-        if (piece.getPieceType() == ChessPiece.PieceType.KING)
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             kingPosition = move.getEndPosition();
+        }
 
         boolean isCheck = isPositionUnderAttack(kingPosition, currentTeamTurn);
 
@@ -83,10 +83,60 @@ public class ChessGameImpl implements ChessGame {
     @Override
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (validMoves(move.getStartPosition()).contains(move)) {
+            ChessPiece pieceBeingMoved = board.getPiece(move.getStartPosition());
+
+            // Mark the piece as moved if it hasn't moved before.
+            if (pieceBeingMoved != null && !pieceBeingMoved.hasMoved())
+                pieceBeingMoved.markAsMoved();
+
             executeMove(move);
             switchTeam();
         } else throw new InvalidMoveException("Invalid move.");
     }
+
+
+    private void simulateMove(ChessMove move) {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        board.removePiece(move.getStartPosition());
+
+        // Detect if the move is a castling move
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            int colDiff = move.getEndPosition().column() - move.getStartPosition().column();
+            if (Math.abs(colDiff) == 2) {
+                ChessPosition rookOriginalPosition;
+                ChessPosition rookNewPosition;
+                if (colDiff == 2) {
+                    rookOriginalPosition = new ChessPositionImpl(move.getStartPosition().row(), 8);  // Rook's original position
+                    rookNewPosition = new ChessPositionImpl(move.getStartPosition().row(), 6);  // Rook's new position
+                } else {
+                    rookOriginalPosition = new ChessPositionImpl(move.getStartPosition().row(), 1);  // Rook's original position
+                    rookNewPosition = new ChessPositionImpl(move.getStartPosition().row(), 4);  // Rook's new position
+                }
+
+                ChessPiece rook = board.getPiece(rookOriginalPosition);
+                board.removePiece(rookOriginalPosition);  // Remove rook from its original position
+                board.addPiece(rookNewPosition, rook);
+            }
+        }
+
+        // Check for pawn promotion
+        pawnPromotion(move, piece);
+    }
+
+    private void pawnPromotion(ChessMove move, ChessPiece piece) {
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+            piece = switch (move.getPromotionPiece()) {
+                case QUEEN -> new QueenPiece(currentTeamTurn);
+                case ROOK -> new RookPiece(currentTeamTurn);
+                case BISHOP -> new BishopPiece(currentTeamTurn);
+                case KNIGHT -> new KnightPiece(currentTeamTurn);
+                default -> piece;
+            };
+        }
+
+        board.addPiece(move.getEndPosition(), piece);
+    }
+
 
     private void executeMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
@@ -102,8 +152,6 @@ public class ChessGameImpl implements ChessGame {
             if (Math.abs(colDiff) == 2) {
                 ChessPosition rookOriginalPosition;
                 ChessPosition rookNewPosition;
-
-
 
                 // If moving 2 squares to the right, it's king-side castling
                 if (colDiff == 2) {
@@ -123,28 +171,7 @@ public class ChessGameImpl implements ChessGame {
         }
 
         // Check for pawn promotion
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
-            piece = switch (move.getPromotionPiece()) {
-                case QUEEN -> new QueenPiece(currentTeamTurn);
-                case ROOK -> new RookPiece(currentTeamTurn);
-                case BISHOP -> new BishopPiece(currentTeamTurn);
-                case KNIGHT -> new KnightPiece(currentTeamTurn);
-                default -> piece;
-            };
-        }
-
-        // Place the moving piece (king, pawn after promotion, or any other piece) at its new position
-        board.addPiece(move.getEndPosition(), piece);
-
-        System.out.println("Start Move");
-        for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
-            piece = board.getPiece(position);
-            if (piece != null)// Do something with the piece
-                System.out.println("Position: " + position + ", Piece: " + piece + ", Piece type = " + piece.getPieceType() + ", Piece has moved = " + piece.hasMoved());
-        }
-        System.out.println("End Move");
-
-
+        pawnPromotion(move, piece);
     }
 
 

@@ -5,19 +5,20 @@ import java.util.Map;
 
 public class ChessBoardImpl implements ChessBoard {
 
-    // Using a HashMap to store the position and corresponding piece
     private final Map<ChessPosition, ChessPiece> board;
+
+    // Store the start and end positions of the last move
+    private ChessPosition lastMoveStartPosition;
+    private ChessPosition lastMoveEndPosition;
 
     public ChessBoardImpl() {
         board = new HashMap<>();
     }
 
-    // To keep track of the last move
-    private ChessMove lastMove;
-
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType());
+        lastMoveStartPosition = lastMoveEndPosition;  // Update start position with the previous end position
+        lastMoveEndPosition = position;               // Update end position with the current position
         board.put(position, piece);
     }
 
@@ -65,19 +66,20 @@ public class ChessBoardImpl implements ChessBoard {
 
     @Override
     public void removePiece(ChessPosition position) {
-        ChessPiece removedPiece = board.get(position);
-        if (removedPiece != null)
-            lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType());
-        board.remove(position);
+        ChessPiece removedPiece = board.remove(position);
+        if (removedPiece != null) {
+            lastMoveStartPosition = position;
+            lastMoveEndPosition = null;  // No end position for a removed piece
+        }
     }
 
-    // New method to check for two-square pawn move
-    public boolean wasLastMoveTwoSquarePawnMove() {
-        if (lastMove == null) return false;
-        if (lastMove.getPromotionPiece() != ChessPiece.PieceType.PAWN) return false;
-        ChessPosition startPos = lastMove.getStartPosition();
-        ChessPosition endPos = lastMove.getEndPosition();
-        if (startPos == null || endPos == null) return false;  // Added this check
-        return Math.abs(startPos.row() - endPos.row()) == 2;
+    @Override
+    public ChessPosition getLastMoveStartPosition() {
+        return lastMoveStartPosition;
+    }
+
+    @Override
+    public ChessPosition getLastMoveEndPosition() {
+        return lastMoveEndPosition;
     }
 }

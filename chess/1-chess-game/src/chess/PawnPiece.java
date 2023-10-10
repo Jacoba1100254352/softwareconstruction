@@ -90,7 +90,9 @@ public class PawnPiece implements ChessPiece {
                 ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
                 ChessPiece pieceAtSide = board.getPiece(side);
 
-                if (pieceAtSide instanceof PawnPiece && pieceAtSide.teamColor() != this.teamColor && board.wasLastMoveTwoSquarePawnMove()) {
+                if (pieceAtSide instanceof PawnPiece && pieceAtSide.teamColor() != this.teamColor &&
+                        board.getLastMoveStartPosition().equals(side) &&
+                        Math.abs(board.getLastMoveStartPosition().row() - board.getLastMoveEndPosition().row()) == 2) {
                     ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);
                     if (board.getPiece(capturePos) == null)
                         moves.add(new ChessMoveImpl(myPosition, capturePos, null));
@@ -98,6 +100,7 @@ public class PawnPiece implements ChessPiece {
             }
         }
     }
+
 
     private void addMoveWithPromotion(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
         if (end.row() == 1 || end.row() == BOARD_SIZE)
