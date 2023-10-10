@@ -17,11 +17,5 @@ public interface ChessMove {
      */
     ChessPosition getEndPosition();
 
-    /**
-     * Gets the type of piece to promote a pawn to if pawn promotion is part of this
-     * chess move
-     * 
-     * @return Type of piece to promote a pawn to, or null if no promotion
-     */
-    ChessPiece.PieceType getPromotionPiece();
+    boolean doesMoveResultInCheck(ChessPosition start, ChessPiece piece, ChessBoard board);
 }

@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Collection;
 
-public class ChessPieceImpl implements ChessPiece {
+public class ChessPieceImpl implements ChessPiece, Cloneable {
 
     private final ChessGame.TeamColor teamColor;
     private final PieceType pieceType;
@@ -33,6 +33,16 @@ public class ChessPieceImpl implements ChessPiece {
             default -> throw new IllegalArgumentException("Unknown piece type: " + pieceType);
         }
     }
+
+    @Override
+    public ChessPiece clone() {
+        try {
+            return (ChessPiece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();  // Should never happen
+        }
+    }
+
 
     @Override
     public ChessGame.TeamColor teamColor() { return teamColor; }
