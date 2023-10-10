@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PawnPiece implements ChessPiece {
+public class PawnPiece implements ChessPiece, Cloneable {
     private final ChessGame.TeamColor teamColor;
     private boolean hasMoved = false;
 
@@ -14,6 +14,16 @@ public class PawnPiece implements ChessPiece {
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }
+
+    @Override
+    public PawnPiece clone() {
+        try {
+            return (PawnPiece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();  // Should never happen
+        }
+    }
+
 
     @Override
     public boolean hasMoved() {
@@ -90,7 +100,7 @@ public class PawnPiece implements ChessPiece {
                 ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
                 ChessPiece pieceAtSide = board.getPiece(side);
 
-                if (pieceAtSide instanceof PawnPiece && pieceAtSide.teamColor() != this.teamColor &&
+                if (pieceAtSide != null && pieceAtSide.getPieceType() == PieceType.PAWN && pieceAtSide.teamColor() != this.teamColor &&
                         board.getLastMoveStartPosition().equals(side) &&
                         Math.abs(board.getLastMoveStartPosition().row() - board.getLastMoveEndPosition().row()) == 2) {
                     ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);

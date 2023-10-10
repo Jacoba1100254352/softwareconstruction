@@ -41,6 +41,8 @@ public interface ChessPiece {
      */
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 
+    ChessPiece clone();
+
     boolean hasMoved();
     void markAsMoved();
 }

@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KingPiece implements ChessPiece {
+public class KingPiece implements ChessPiece, Cloneable {
     private final ChessGame.TeamColor teamColor;
     private boolean hasMoved = false;
 
@@ -14,6 +14,17 @@ public class KingPiece implements ChessPiece {
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }
+
+    @Override
+    public KingPiece clone() {
+        try {
+            return (KingPiece) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();  // Should never happen
+        }
+    }
+
+
 
     @Override
     public boolean hasMoved() {
@@ -34,15 +45,20 @@ public class KingPiece implements ChessPiece {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece king = board.getPiece(new ChessPositionImpl(myPosition.row(), myPosition.column()));
+        if (king == null)
+            return moves;
 
         // Add standard moves for the king
         addStandardMoves(board, myPosition, moves);
 
         // Add special moves for the king: castling
-        addCastlingMoves(board, myPosition, moves);
+        addCastlingMoves(board, myPosition, moves, king.teamColor());
 
         return moves;
     }
+
+
 
     /**
      * Adds the standard moves for the king (one step in all directions)
@@ -66,59 +82,31 @@ public class KingPiece implements ChessPiece {
             ChessPosition newPosition = new ChessPositionImpl(newRow, newCol);
             ChessPiece targetPiece = board.getPiece(newPosition);
 
-            // Add move if target square is empty or contains opponent's piece
-            if (targetPiece == null || targetPiece.teamColor() != this.teamColor()) {
-                moves.add(new ChessMoveImpl(myPosition, newPosition, null));
+            // Only add the move if target square is empty or contains opponent's piece and doesn't result in a check
+            ChessMoveImpl move = new ChessMoveImpl(myPosition, newPosition, null);
+            if ((targetPiece == null || targetPiece.teamColor() != this.teamColor()) &&
+                    !move.doesMoveResultInCheck(myPosition, this, board)) {
+                moves.add(move);
             }
+
         }
     }
 
     /**
      * Adds the castling moves for the king (if valid) to the given moves collection.
      */
-    private void addCastlingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves) {
+    private void addCastlingMoves(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, ChessGame.TeamColor color) {
 
         // Check and add king-side castling move
-        if (canCastleKingSide(board, myPosition))
+        if (canCastleKingSide(board, myPosition, color))
             moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() + 2), null));
 
         // Check and add queen-side castling move
-        if (canCastleQueenSide(board, myPosition))
+        if (canCastleQueenSide(board, myPosition, color))
             moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row(), myPosition.column() - 2), null));
     }
 
-    public Collection<ChessMove> basicPieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> moves = new ArrayList<>();
-
-        // Add standard moves for the king
-        addStandardMoves(board, myPosition, moves);
-
-        return moves;
-    }
-
-    /**
-     * Checks if a given square on the board is under attack by opponent's pieces.
-     */
-    private boolean isSquareThreatened(ChessBoard board, ChessPosition position) {
-        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(pos);
-
-            if (piece == null)
-                return false;
-
-            Collection<ChessMove> moves = (piece instanceof KingPiece) ?
-                 ((KingPiece) piece).basicPieceMoves(board, pos) :
-                    piece.pieceMoves(board, pos);
-
-
-            for (ChessMove move : moves)
-                if (move.getEndPosition().equals(position))
-                    return true; // Found an attacking move on the position
-        }
-        return false; // No attacks found on the position
-    }
-
-    private boolean canCastleKingSide(ChessBoard board, ChessPosition position) {
+    private boolean canCastleKingSide(ChessBoard board, ChessPosition position, ChessGame.TeamColor color) {
         if (position.column() >= 7 || hasMoved) return false;
 
         // Check if squares between the king and rook are free
@@ -128,14 +116,14 @@ public class KingPiece implements ChessPiece {
 
         // Check if the squares between the king and rook are not under attack
         for (int col = position.column(); col <= 7; col++)
-            if (isSquareThreatened(board, new ChessPositionImpl(position.row(), col)))
+            if (board.isSquareUnderThreat(new ChessPositionImpl(position.row(), col), color))
                 return false;
 
         ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), 8));
         return rook != null && rook.getPieceType() == PieceType.ROOK && !rook.hasMoved();
     }
 
-    private boolean canCastleQueenSide(ChessBoard board, ChessPosition position) {
+    private boolean canCastleQueenSide(ChessBoard board, ChessPosition position, ChessGame.TeamColor color) {
         if (position.column() <= 2 || hasMoved) return false;
 
         // Check if squares between the king and rook are free
@@ -145,7 +133,7 @@ public class KingPiece implements ChessPiece {
 
         // Check if the squares between the king and rook are not under attack
         for (int col = position.column(); col >= 2; col--)
-            if (isSquareThreatened(board, new ChessPositionImpl(position.row(), col)))
+            if (board.isSquareUnderThreat(new ChessPositionImpl(position.row(), col), color))
                 return false;
 
         ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), 1));

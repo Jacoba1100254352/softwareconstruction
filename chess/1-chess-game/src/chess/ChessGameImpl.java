@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class ChessGameImpl implements ChessGame {
-
     private ChessBoard board;
     private TeamColor currentTeamTurn;
 
     public ChessGameImpl() {
         board = new ChessBoardImpl();
-        currentTeamTurn = TeamColor.WHITE;  // White always starts the game
+        currentTeamTurn = TeamColor.WHITE;
     }
 
     @Override
@@ -30,40 +29,37 @@ public class ChessGameImpl implements ChessGame {
             return new ArrayList<>();
 
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        ChessPosition kingPosition = findKingPosition(currentTeamTurn);
         Collection<ChessMove> validMoves = new ArrayList<>();
 
-        for (ChessMove move : moves)
-            if (!doesMoveResultInCheck(move, kingPosition, piece))
-                validMoves.add(move);
+        for (ChessMove move : moves) {
+            if (moveWouldPutOwnKingInCheck(move, piece))
+                continue;
+            validMoves.add(move);
+        }
 
         return validMoves;
     }
 
-    private boolean doesMoveResultInCheck(ChessMove move, ChessPosition kingPosition, ChessPiece piece) {
-        ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
-        simulateMove(move);
+    private boolean moveWouldPutOwnKingInCheck(ChessMove move, ChessPiece piece) {
+        ChessBoard clonedBoard = board.clone();
+        ChessPiece clonedPiece = piece.clone();
+        clonedBoard.removePiece(move.getStartPosition());
+        clonedBoard.addPiece(move.getEndPosition(), clonedPiece);
 
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            kingPosition = move.getEndPosition();
-        }
-
-        boolean isCheck = isPositionUnderAttack(kingPosition, currentTeamTurn);
-
-        board.removePiece(move.getEndPosition());
-        if (capturedPiece != null) board.addPiece(move.getEndPosition(), capturedPiece);
-        board.addPiece(move.getStartPosition(), piece);
-
-        return isCheck;
+        ChessPosition kingPosition = findKingPosition(clonedBoard, clonedPiece.teamColor());
+        return isPositionUnderAttack(kingPosition, clonedPiece.teamColor());
     }
 
-    private ChessPosition findKingPosition(TeamColor teamColor) {
-        for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(position);
-            if (piece != null && piece.teamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING)
-                return position;
+    private ChessPosition findKingPosition(ChessBoard board, TeamColor color) {
+        for (int rank = 1; rank <= 8; rank++) {
+            for (int file = 1; file <= 8; file++) {
+                ChessPosition position = new ChessPositionImpl(rank, file);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.teamColor() == color && piece.getPieceType() == ChessPiece.PieceType.KING)
+                    return position;
+            }
         }
-        return null;  // This should never happen
+        throw new IllegalStateException("King not found on the board!");
     }
 
     private boolean isPositionUnderAttack(ChessPosition position, TeamColor defendingTeam) {
@@ -84,96 +80,14 @@ public class ChessGameImpl implements ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (validMoves(move.getStartPosition()).contains(move)) {
             ChessPiece pieceBeingMoved = board.getPiece(move.getStartPosition());
-
-            // Mark the piece as moved if it hasn't moved before.
             if (pieceBeingMoved != null && !pieceBeingMoved.hasMoved())
                 pieceBeingMoved.markAsMoved();
 
-            executeMove(move);
+            board.removePiece(move.getStartPosition());
+            board.addPiece(move.getEndPosition(), pieceBeingMoved);
             switchTeam();
         } else throw new InvalidMoveException("Invalid move.");
     }
-
-
-    private void simulateMove(ChessMove move) {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
-        board.removePiece(move.getStartPosition());
-
-        // Detect if the move is a castling move
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            int colDiff = move.getEndPosition().column() - move.getStartPosition().column();
-            if (Math.abs(colDiff) == 2) {
-                ChessPosition rookOriginalPosition;
-                ChessPosition rookNewPosition;
-                if (colDiff == 2) {
-                    rookOriginalPosition = new ChessPositionImpl(move.getStartPosition().row(), 8);  // Rook's original position
-                    rookNewPosition = new ChessPositionImpl(move.getStartPosition().row(), 6);  // Rook's new position
-                } else {
-                    rookOriginalPosition = new ChessPositionImpl(move.getStartPosition().row(), 1);  // Rook's original position
-                    rookNewPosition = new ChessPositionImpl(move.getStartPosition().row(), 4);  // Rook's new position
-                }
-
-                ChessPiece rook = board.getPiece(rookOriginalPosition);
-                board.removePiece(rookOriginalPosition);  // Remove rook from its original position
-                board.addPiece(rookNewPosition, rook);
-            }
-        }
-
-        // Check for pawn promotion
-        pawnPromotion(move, piece);
-    }
-
-    private void pawnPromotion(ChessMove move, ChessPiece piece) {
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
-            piece = switch (move.getPromotionPiece()) {
-                case QUEEN -> new QueenPiece(currentTeamTurn);
-                case ROOK -> new RookPiece(currentTeamTurn);
-                case BISHOP -> new BishopPiece(currentTeamTurn);
-                case KNIGHT -> new KnightPiece(currentTeamTurn);
-                default -> piece;
-            };
-        }
-
-        board.addPiece(move.getEndPosition(), piece);
-    }
-
-
-    private void executeMove(ChessMove move) {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
-
-        // Mark the piece as having moved
-        piece.markAsMoved();
-
-        board.removePiece(move.getStartPosition());
-
-        // Detect if the move is a castling move
-        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            int colDiff = move.getEndPosition().column() - move.getStartPosition().column();
-            if (Math.abs(colDiff) == 2) {
-                ChessPosition rookOriginalPosition;
-                ChessPosition rookNewPosition;
-
-                // If moving 2 squares to the right, it's king-side castling
-                if (colDiff == 2) {
-                    rookOriginalPosition = new ChessPositionImpl(move.getStartPosition().row(), 8);  // Rook's original position
-                    rookNewPosition = new ChessPositionImpl(move.getStartPosition().row(), 6);  // Rook's new position
-                } else {
-                    rookOriginalPosition = new ChessPositionImpl(move.getStartPosition().row(), 1);  // Rook's original position
-                    rookNewPosition = new ChessPositionImpl(move.getStartPosition().row(), 4);  // Rook's new position
-                }
-
-
-                ChessPiece rook = board.getPiece(rookOriginalPosition);
-                board.removePiece(rookOriginalPosition);  // Remove rook from its original position
-                board.addPiece(rookNewPosition, rook);  // Place rook at its new position
-                rook.markAsMoved();
-            }
-        }
-
-        // Check for pawn promotion
-        pawnPromotion(move, piece);
-    }
-
 
     private void switchTeam() {
         currentTeamTurn = (currentTeamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
@@ -181,22 +95,8 @@ public class ChessGameImpl implements ChessGame {
 
     @Override
     public boolean isInCheck(TeamColor teamColor) {
-        ChessPosition kingPosition = findKingPosition(teamColor);
-        return kingPosition != null && isPositionUnderAttack(kingPosition, teamColor);
-    }
-
-    @Override
-    public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) return false;
-
-        for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(position);
-            if (piece != null && piece.teamColor() == teamColor && !validMoves(position).isEmpty()) {
-                return false;
-            }
-        }
-
-        return true;
+        ChessPosition kingPosition = findKingPosition(board, teamColor);
+        return isPositionUnderAttack(kingPosition, teamColor);
     }
 
     @Override
@@ -213,6 +113,20 @@ public class ChessGameImpl implements ChessGame {
         return true;
     }
 
+
+    @Override
+    public boolean isInCheckmate(TeamColor teamColor) {
+        if (!isInCheck(teamColor)) return false;
+
+        for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
+            ChessPiece piece = board.getPiece(position);
+            if (piece != null && piece.teamColor() == teamColor && !validMoves(position).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void setBoard(ChessBoard board) {
         // Add validation here if needed
@@ -221,7 +135,6 @@ public class ChessGameImpl implements ChessGame {
 
     @Override
     public ChessBoard getBoard() {
-        // Return a deep copy or read-only view if needed
-        return board;
+        return board.clone();
     }
 }

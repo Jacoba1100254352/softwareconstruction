@@ -9,7 +9,6 @@ import java.util.Collection;
  * methods.
  */
 public interface ChessGame {
-
     /**
      * @return Which team's turn it is
      */

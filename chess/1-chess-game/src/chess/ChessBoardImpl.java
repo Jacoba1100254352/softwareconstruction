@@ -1,11 +1,12 @@
 package chess;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChessBoardImpl implements ChessBoard {
+public class ChessBoardImpl implements ChessBoard, Cloneable {
 
-    private final Map<ChessPosition, ChessPiece> board;
+    private Map<ChessPosition, ChessPiece> board;
 
     // Store the start and end positions of the last move
     private ChessPosition lastMoveStartPosition;
@@ -14,6 +15,24 @@ public class ChessBoardImpl implements ChessBoard {
     public ChessBoardImpl() {
         board = new HashMap<>();
     }
+
+    @Override
+    public ChessBoardImpl clone() {
+        try {
+            ChessBoardImpl clonedBoard = (ChessBoardImpl) super.clone();
+            clonedBoard.board = new HashMap<>();
+            for (Map.Entry<ChessPosition, ChessPiece> entry : this.board.entrySet()) {
+                ChessPosition clonedPosition = new ChessPositionImpl(entry.getKey().row(), entry.getKey().column());
+                ChessPiece clonedPiece = entry.getValue().clone();
+                clonedBoard.addPiece(clonedPosition, clonedPiece);
+            }
+            return clonedBoard;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();  // Should never happen
+        }
+    }
+
+
 
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
@@ -82,4 +101,34 @@ public class ChessBoardImpl implements ChessBoard {
     public ChessPosition getLastMoveEndPosition() {
         return lastMoveEndPosition;
     }
+
+
+
+    @Override
+    public boolean isSquareUnderThreat(ChessPosition position, ChessGame.TeamColor teamColor) {
+        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
+            ChessPiece checkingPiece = getPiece(pos);
+            if (checkingPiece != null && checkingPiece.teamColor() != teamColor) {
+                Collection<ChessMove> threateningMoves = checkingPiece.pieceMoves(this, pos);
+                for (ChessMove move : threateningMoves) {
+                    if (move.getEndPosition().equals(position)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
+        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
+            ChessPiece piece = getPiece(pos);
+            if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.teamColor() == teamColor) {
+                return pos;
+            }
+        }
+        return null; // This should never be reached unless something is wrong with the board state.
+    }
+
 }
