@@ -78,7 +78,9 @@ public class ChessGameImpl implements ChessGame {
 
     @Override
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        // Validate and execute the move
         if (validMoves(move.getStartPosition()).contains(move)) {
+<<<<<<< Updated upstream
             ChessPiece pieceBeingMoved = board.getPiece(move.getStartPosition());
             if (pieceBeingMoved != null && !pieceBeingMoved.hasMoved())
                 pieceBeingMoved.markAsMoved();
@@ -86,6 +88,14 @@ public class ChessGameImpl implements ChessGame {
             board.removePiece(move.getStartPosition());
             board.addPiece(move.getEndPosition(), pieceBeingMoved);
             switchTeam();
+=======
+            executeMove(move);
+
+            // Only switch the team if the next piece to move is not from the current team
+            ChessPiece nextPiece = board.getPiece(move.getEndPosition());
+            if (nextPiece == null || nextPiece.teamColor() != currentTeamTurn)
+                switchTeam();
+>>>>>>> Stashed changes
         } else throw new InvalidMoveException("Invalid move.");
     }
 
