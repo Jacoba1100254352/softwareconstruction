@@ -7,115 +7,93 @@ public class PawnPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
     private boolean hasMoved = false;
 
+    // Constructor initializes the pawn's color
     public PawnPiece(ChessGame.TeamColor teamColor) {
         this.teamColor = teamColor;
     }
 
+    // Getter for the pawn's team color
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }
 
+    // Check if the pawn has moved before
     @Override
     public boolean hasMoved() {
         return hasMoved;
     }
 
+    // Mark the pawn as having moved
     @Override
     public void markAsMoved() {
         hasMoved = true;
     }
 
-    private static final int BOARD_SIZE = 8;
-
+    // Return the pawn's piece type
     @Override
     public PieceType getPieceType() {
         return PieceType.PAWN;
     }
 
+    // Compute all valid moves for the pawn from its current position
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         int direction = (teamColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
         int newRow = myPosition.row() + direction;
 
-        if (isValidRow(newRow)) {
+        if (newRow >= 1 && newRow <= 8) {
             checkForwardMoves(board, myPosition, newRow, moves, direction);
             checkDiagonalCaptures(board, myPosition, newRow, moves);
-            checkEnPassantCaptures(board, myPosition, moves, direction);
         }
 
         return moves;
     }
 
-    private boolean isValidRow(int row) {
-        return row >= 1 && row <= BOARD_SIZE;
-    }
-
-    private boolean isValidColumn(int col) {
-        return col >= 1 && col <= BOARD_SIZE;
-    }
-
+    // Check and add valid forward moves for the pawn
     private void checkForwardMoves(ChessBoard board, ChessPosition myPosition, int newRow, Collection<ChessMove> moves, int direction) {
         ChessPosition forwardOne = new ChessPositionImpl(newRow, myPosition.column());
+
+        // If the forward square is empty
         if (board.getPiece(forwardOne) == null) {
             addMoveWithPromotion(myPosition, forwardOne, moves);
 
-            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column())) == null)
+            // Check for double move from starting position
+            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column())) == null) {
                 moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column()), null));
+            }
         }
     }
 
+    // Check if the pawn is on its initial row
     private boolean isNewPawnPosition(ChessPosition position) {
         return (teamColor == ChessGame.TeamColor.WHITE && position.row() == 2) || (teamColor == ChessGame.TeamColor.BLACK && position.row() == 7);
     }
 
+    // Check and add valid diagonal capture moves for the pawn
     private void checkDiagonalCaptures(ChessBoard board, ChessPosition myPosition, int newRow, Collection<ChessMove> moves) {
         for (int diagDirection : new int[]{-1, 1}) {
             int newCol = myPosition.column() + diagDirection;
 
-            if (isValidColumn(newCol)) {
-                ChessPosition diagonal = new ChessPositionImpl(newRow, newCol);
-                ChessPiece pieceAtDiagonal = board.getPiece(diagonal);
-                if (pieceAtDiagonal != null && pieceAtDiagonal.teamColor() != this.teamColor)
-                    addMoveWithPromotion(myPosition, diagonal, moves);
-            }
+            // Check if the new column is within valid bounds (1 to 8)
+            if (newCol < 1 || newCol > 8)
+                continue;
+
+            ChessPosition diagonal = new ChessPositionImpl(newRow, newCol);
+
+            // If there's an opponent piece on the diagonal
+            ChessPiece pieceAtDiagonal = board.getPiece(diagonal);
+            if (pieceAtDiagonal != null && pieceAtDiagonal.teamColor() != teamColor)
+                addMoveWithPromotion(myPosition, diagonal, moves);
         }
     }
 
-    private void checkEnPassantCaptures(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int direction) {
-        ChessMove lastMove = board.getLastMove();
-        if (lastMove == null) return;
-
-        ChessPiece lastPieceMoved = board.getPiece(lastMove.getEndPosition());
-        if (lastPieceMoved == null || lastPieceMoved.getPieceType() != PieceType.PAWN) return;
-
-        int doubleMoveRow = (teamColor == ChessGame.TeamColor.WHITE) ? 5 : 4;
-        if (myPosition.row() != doubleMoveRow) return;
-
-        for (int sideDirection : new int[]{-1, 1}) {
-            int newCol = myPosition.column() + sideDirection;
-
-            if (isValidColumn(newCol)) {
-                ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
-                ChessPiece pieceAtSide = board.getPiece(side);
-
-                if (pieceAtSide != null && pieceAtSide.equals(lastPieceMoved)) {
-                    ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);
-                    if (board.getPiece(capturePos) == null)
-                        moves.add(new ChessMoveImpl(myPosition, capturePos, null));
-                }
-            }
-        }
-    }
-
+    // Check for pawn promotion and add valid moves accordingly
     private void addMoveWithPromotion(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
-        if (end.row() == 1 || end.row() == BOARD_SIZE)
-            promote(start, end, moves);
+        if (end.row() == 1 || end.row() == 8)
+            // Add promotion moves for the pawn
+            for (PieceType type : new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT})
+                moves.add(new ChessMoveImpl(start, end, type));
         else moves.add(new ChessMoveImpl(start, end, null));
-    }
-
-    private void promote(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
-        for (PieceType type : new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT})
-            moves.add(new ChessMoveImpl(start, end, type));
     }
 }

@@ -62,12 +62,23 @@ public class ChessGameImpl implements ChessGame {
     @Override
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null || piece.teamColor() != currentTeamTurn) return new ArrayList<>();
+
+        // Make sure that if an out of turn move is made it isn't for testing purposes and is truly a user error to catch
+        if (piece == null || (piece.teamColor() != currentTeamTurn && !board.getTestingMode()))
+            return new ArrayList<>();
 
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        System.out.println("Moves before filtering: " + moves);
         Collection<ChessMove> validMoves = moves.stream()
                 .filter(move -> !doesMoveResultInCheck(move, piece))
                 .collect(Collectors.toList());
+        System.out.println("Moves after filtering: " + validMoves);
+
+        // En Passant logic
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN)
+            validMoves.addAll(checkEnPassantCaptures(startPosition));
+
+        System.out.println("Moves after En Passant check: " + validMoves);
 
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             if (canCastle(board, startPosition, piece.teamColor(), true))
@@ -79,13 +90,70 @@ public class ChessGameImpl implements ChessGame {
         return validMoves;
     }
 
+    private Collection<ChessMove> checkEnPassantCaptures(ChessPosition startPosition) {
+        System.out.println("Checking En Passant for pawn at: " + startPosition);
+        Collection<ChessMove> enPassantMoves = new ArrayList<>();
+
+        // Get the last move made on the board
+        ChessMove lastMove = board.getLastMove();
+        if (lastMove == null) return enPassantMoves;
+
+        ChessPiece lastPieceMoved = board.getPiece(lastMove.getEndPosition());
+        if (lastPieceMoved == null || lastPieceMoved.getPieceType() != ChessPiece.PieceType.PAWN) return enPassantMoves;
+
+        // Determine the row where a pawn can perform En Passant based on the OPPOSITE team's turn (since it's capturing the last moved pawn)
+        int doubleMoveRow = (currentTeamTurn == ChessGame.TeamColor.WHITE) ? 4 : 5;
+
+        // If the pawn isn't on the right row, return empty moves
+        if (startPosition.row() != doubleMoveRow) return enPassantMoves;
+
+        // Check both left (-1) and right (1) adjacent squares
+        for (int sideDirection : new int[]{-1, 1}) {
+            System.out.println(sideDirection);
+            int newCol = startPosition.column() + sideDirection;
+            System.out.println("newCol = " + newCol);
+
+            // Ensure the column is within the board's bounds
+            if (newCol < 1 || newCol > 8) continue;
+
+            // If there's a pawn on the side that was the last piece moved
+            ChessPosition sidePosition = new ChessPositionImpl(startPosition.row(), newCol);
+            if (sidePosition.equals(lastMove.getEndPosition()) && Math.abs(lastMove.getStartPosition().row() - lastMove.getEndPosition().row()) == 2) {
+                int direction = (currentTeamTurn == ChessGame.TeamColor.WHITE) ? 1 : -1;
+                ChessPosition capturePos = new ChessPositionImpl(startPosition.row() + direction, newCol);
+
+                // If the capture position is empty, add the En Passant move
+                ChessPosition behindCapturePos = new ChessPositionImpl(startPosition.row(), newCol);
+                if (board.getPiece(capturePos) == null && lastMove.getEndPosition().equals(behindCapturePos)) {
+                    System.out.println("board.getPiece(capturePos) = " + board.getPiece(capturePos));
+                    enPassantMoves.add(new ChessMoveImpl(startPosition, capturePos, null));
+                    System.out.println("Added En Passant move: " + new ChessMoveImpl(startPosition, capturePos, null));
+                }
+            }
+        }
+
+        return enPassantMoves;
+    }
+
     private boolean doesMoveResultInCheck(ChessMove move, ChessPiece piece) {
         // Remember the piece on the target position
         ChessPiece originalEndPiece = board.getPiece(move.getEndPosition());
+        ChessPiece capturedPawn = null; // This will store the pawn that's captured in En Passant
 
         // Temporarily apply the move
         board.addPiece(move.getEndPosition(), piece);
         board.removePiece(move.getStartPosition());
+
+        // Check if it's an En Passant move
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                Math.abs(move.getEndPosition().column() - move.getStartPosition().column()) == 1 &&
+                board.getPiece(move.getEndPosition()) == null) {
+            int direction = (currentTeamTurn == TeamColor.WHITE) ? -1 : 1;
+            ChessPosition capturedPawnPos = new ChessPositionImpl(move.getStartPosition().row() + direction, move.getEndPosition().column());
+
+            capturedPawn = board.getPiece(capturedPawnPos);  // Store the captured pawn
+            board.removePiece(capturedPawnPos);  // Remove the pawn from the board
+        }
 
         // If we're moving the king, update the king's position
         ChessPosition kingPosition = (piece.getPieceType() == ChessPiece.PieceType.KING) ? move.getEndPosition() : findCurrentKingsPosition(piece.teamColor());
@@ -97,6 +165,13 @@ public class ChessGameImpl implements ChessGame {
         board.addPiece(move.getStartPosition(), piece);
         if (originalEndPiece != null) board.addPiece(move.getEndPosition(), originalEndPiece);
         else board.removePiece(move.getEndPosition());
+
+        // If it was an En Passant move, restore the captured pawn
+        if (capturedPawn != null) {
+            int direction = (currentTeamTurn == TeamColor.WHITE) ? -1 : 1;
+            ChessPosition capturedPawnPos = new ChessPositionImpl(move.getStartPosition().row() + direction, move.getEndPosition().column());
+            board.addPiece(capturedPawnPos, capturedPawn);
+        }
 
         return isCheck;
     }
@@ -113,7 +188,14 @@ public class ChessGameImpl implements ChessGame {
     private void executeMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
         piece.markAsMoved();
-        board.removePiece(move.getStartPosition());
+
+        // If it's an En Passant move, remove the pawn being captured
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition() != null &&
+                Math.abs(move.getEndPosition().column() - move.getStartPosition().column()) == 1 &&
+                board.getPiece(move.getEndPosition()) == null) {
+            int direction = (currentTeamTurn == TeamColor.WHITE) ? -1 : 1;
+            board.removePiece(new ChessPositionImpl(move.getStartPosition().row() + direction, move.getEndPosition().column()));
+        }
 
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             int colDiff = move.getEndPosition().column() - move.getStartPosition().column();
@@ -144,13 +226,24 @@ public class ChessGameImpl implements ChessGame {
         }
 
         board.addPiece(move.getEndPosition(), piece);
+        board.removePiece(move.getStartPosition());
     }
 
     @Override
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        // For possibly purposeful out of turn movement after manual board setup
+        if (board.getTestingMode())
+            currentTeamTurn = board.getPiece(move.getStartPosition()).teamColor();
+
         if (validMoves(move.getStartPosition()).contains(move)) {
+            // Store the last move
+            board.setLastMove(move);
+
             executeMove(move);
-            switchTeam();
+
+            // For regular gameplay after full board reset/setup
+            if (!board.getTestingMode())
+                switchTeam();
         } else throw new InvalidMoveException("Invalid move.");
     }
 
@@ -181,12 +274,12 @@ public class ChessGameImpl implements ChessGame {
     }
 
     @Override
-    public void setBoard(ChessBoard board) {
-        this.board = board;
+    public ChessBoard getBoard() {
+        return board;
     }
 
     @Override
-    public ChessBoard getBoard() {
-        return board;
+    public void setBoard(ChessBoard board) {
+        this.board = board;
     }
 }

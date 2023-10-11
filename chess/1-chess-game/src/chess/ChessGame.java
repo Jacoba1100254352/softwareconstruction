@@ -16,31 +16,23 @@ public interface ChessGame {
 
     /**
      * Set's which teams turn it is
-     * 
+     *
      * @param team the team whose turn it is
      */
     void setTeamTurn(TeamColor team);
 
     /**
-     * Enum identifying the 2 possible teams in a chess game
-     */
-    enum TeamColor {
-        WHITE,
-        BLACK
-    }
-
-    /**
      * Gets a valid moves for a piece at the given location
-     * 
+     *
      * @param startPosition the piece to get valid moves for
      * @return Set of valid moves for requested piece, or null if no piece at
-     *         startPosition
+     * startPosition
      */
     Collection<ChessMove> validMoves(ChessPosition startPosition);
 
     /**
      * Makes a move in a chess game
-     * 
+     *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
@@ -72,16 +64,24 @@ public interface ChessGame {
     boolean isInStalemate(TeamColor teamColor);
 
     /**
+     * Gets the current chessboard
+     *
+     * @return the chessboard
+     */
+    ChessBoard getBoard();
+
+    /**
      * Sets this game's chessboard with a given board
-     * 
+     *
      * @param board the new board to use
      */
     void setBoard(ChessBoard board);
 
     /**
-     * Gets the current chessboard
-     * 
-     * @return the chessboard
+     * Enum identifying the 2 possible teams in a chess game
      */
-    ChessBoard getBoard();
+    enum TeamColor {
+        WHITE,
+        BLACK
+    }
 }

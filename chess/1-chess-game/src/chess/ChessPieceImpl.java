@@ -9,16 +9,6 @@ public class ChessPieceImpl implements ChessPiece, Cloneable {
     private final ChessPiece actualPiece;
     private boolean hasMoved = false;
 
-    @Override
-    public boolean hasMoved() {
-        return hasMoved;
-    }
-
-    @Override
-    public void markAsMoved() {
-        this.hasMoved = true;
-    }
-
     public ChessPieceImpl(ChessGame.TeamColor teamColor, PieceType pieceType) {
         this.teamColor = teamColor;
         this.pieceType = pieceType;
@@ -35,6 +25,16 @@ public class ChessPieceImpl implements ChessPiece, Cloneable {
     }
 
     @Override
+    public boolean hasMoved() {
+        return hasMoved;
+    }
+
+    @Override
+    public void markAsMoved() {
+        this.hasMoved = true;
+    }
+
+    @Override
     public ChessPiece clone() {
         try {
             return (ChessPiece) super.clone();
@@ -43,9 +43,10 @@ public class ChessPieceImpl implements ChessPiece, Cloneable {
         }
     }
 
-
     @Override
-    public ChessGame.TeamColor teamColor() { return teamColor; }
+    public ChessGame.TeamColor teamColor() {
+        return teamColor;
+    }
 
     @Override
     public PieceType getPieceType() {

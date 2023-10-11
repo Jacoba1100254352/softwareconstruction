@@ -9,13 +9,13 @@ package chess;
 public interface ChessPosition {
     /**
      * @return which row this position is in
-     *         1 codes for the bottom row
+     * 1 codes for the bottom row
      */
     int row();
 
     /**
      * @return which column this position is in
-     *         1 codes for the left row
+     * 1 codes for the left row
      */
     int column();
 }

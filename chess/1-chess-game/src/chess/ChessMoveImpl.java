@@ -1,6 +1,7 @@
 package chess;
 
-public record ChessMoveImpl(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) implements ChessMove {
+public record ChessMoveImpl(ChessPosition startPosition, ChessPosition endPosition,
+                            ChessPiece.PieceType promotionPiece) implements ChessMove {
 
     @Override
     public ChessPosition getStartPosition() {

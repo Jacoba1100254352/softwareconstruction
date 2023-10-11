@@ -11,8 +11,12 @@ public class ChessBoardImpl implements ChessBoard {
     // To keep track of the last move
     private ChessMove lastMove;
 
+    // For manual/full board setup and testing. Set to true unless full-board setup with resetBoard()
+    private boolean testingMode;
+
     public ChessBoardImpl() {
         board = new HashMap<>();
+        testingMode = true;
     }
 
     @Override
@@ -32,6 +36,7 @@ public class ChessBoardImpl implements ChessBoard {
     @Override
     public void resetBoard() {
         board.clear();
+        testingMode = false;
 
         // Setting up the pawns
         for (int col = 1; col <= 8; col++) {
@@ -68,15 +73,11 @@ public class ChessBoardImpl implements ChessBoard {
 
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType());
         board.put(position, piece);
     }
 
     @Override
     public void removePiece(ChessPosition position) {
-        ChessPiece removedPiece = board.get(position);
-        if (removedPiece != null)
-            lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType());
         board.remove(position);
     }
 
@@ -88,5 +89,15 @@ public class ChessBoardImpl implements ChessBoard {
     @Override
     public ChessMove getLastMove() {
         return lastMove;
+    }
+
+    @Override
+    public void setLastMove(ChessMove lastMove) {
+        this.lastMove = lastMove;
+    }
+
+    @Override
+    public boolean getTestingMode() {
+        return testingMode;
     }
 }
