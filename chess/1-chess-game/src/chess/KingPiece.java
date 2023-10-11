@@ -5,13 +5,13 @@ import java.util.Collection;
 
 public class KingPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
-    private boolean hasMoved;
+    private boolean hasMoved = false;
 
     public KingPiece(ChessGame.TeamColor teamColor) {
         this.teamColor = teamColor;
-        this.hasMoved = false;
     }
 
+    @Override
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }

@@ -17,5 +17,8 @@ public interface ChessMove {
      */
     ChessPosition getEndPosition();
 
+    /**
+     * @return Represented piece to promote to or promoted to
+     */
     ChessPiece.PieceType getPromotionPiece();
 }

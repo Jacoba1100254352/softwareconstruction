@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Collection;
 
-public class ChessPieceImpl implements ChessPiece, Cloneable {
+public class ChessPieceImpl implements ChessPiece {
 
     private final ChessGame.TeamColor teamColor;
     private final PieceType pieceType;
@@ -32,15 +32,6 @@ public class ChessPieceImpl implements ChessPiece, Cloneable {
     @Override
     public void markAsMoved() {
         this.hasMoved = true;
-    }
-
-    @Override
-    public ChessPiece clone() {
-        try {
-            return (ChessPiece) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();  // Should never happen
-        }
     }
 
     @Override

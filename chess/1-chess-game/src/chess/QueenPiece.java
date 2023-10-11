@@ -3,8 +3,18 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public record QueenPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
-    private static boolean hasMoved;
+public class QueenPiece implements ChessPiece {
+    private final ChessGame.TeamColor teamColor;
+    private boolean hasMoved = false;
+
+    public QueenPiece(ChessGame.TeamColor teamColor) {
+        this.teamColor = teamColor;
+    }
+
+    @Override
+    public ChessGame.TeamColor teamColor() {
+        return teamColor;
+    }
 
     @Override
     public boolean hasMoved() {

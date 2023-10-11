@@ -13,6 +13,7 @@ public class PawnPiece implements ChessPiece {
     }
 
     // Getter for the pawn's team color
+    @Override
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }

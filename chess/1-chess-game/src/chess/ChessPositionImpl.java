@@ -10,7 +10,7 @@ public record ChessPositionImpl(int row, int column) implements ChessPosition {
             throw new IllegalArgumentException("Row and column values must be between 1 and 8.");
     }
 
-    // Utility method to generate all possible positions on a chessboard.
+    // Helper function to generate all possible positions on a chessboard.
     public static List<ChessPosition> getAllPositions() {
         List<ChessPosition> allPositions = new ArrayList<>();
         for (int row = 1; row <= 8; row++)

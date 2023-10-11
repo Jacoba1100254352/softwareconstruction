@@ -11,6 +11,7 @@ public class RookPiece implements ChessPiece {
         this.teamColor = teamColor;
     }
 
+    @Override
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }

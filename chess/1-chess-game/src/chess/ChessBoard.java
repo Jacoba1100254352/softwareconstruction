@@ -39,9 +39,23 @@ public interface ChessBoard {
     void removePiece(ChessPosition position);
 
 
+    /**
+     *
+     * @return lastMove that was made in the game
+     */
     ChessMove getLastMove();
 
+    /**
+     * Save the last move made in the game
+     *
+     * @param lastMove sets the private variable lastMove
+     */
     void setLastMove(ChessMove lastMove);
 
+    /**
+     * Private variable for managing test cases depending on manual board setup or default setup
+     *
+     * @return testingMode for toggling turn-based game play
+     */
     boolean getTestingMode();
 }

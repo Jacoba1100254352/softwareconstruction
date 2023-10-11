@@ -29,8 +29,14 @@ public interface ChessPiece {
      */
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 
+    /**
+     * @return whether the piece has been moved yet
+     */
     boolean hasMoved();
 
+    /**
+     * Mark whether the pieces has been moved yet
+     */
     void markAsMoved();
 
     /**

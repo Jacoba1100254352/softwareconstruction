@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightPiece implements ChessPiece, Cloneable {
+public class KnightPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
     private boolean hasMoved = false;
 
@@ -11,19 +11,10 @@ public class KnightPiece implements ChessPiece, Cloneable {
         this.teamColor = teamColor;
     }
 
+    @Override
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }
-
-    @Override
-    public KnightPiece clone() {
-        try {
-            return (KnightPiece) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();  // Should never happen
-        }
-    }
-
 
     @Override
     public boolean hasMoved() {
