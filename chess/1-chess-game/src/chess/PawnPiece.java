@@ -47,19 +47,6 @@ public class PawnPiece implements ChessPiece {
         return moves;
     }
 
-    @Override
-    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
-        int rowDiff = to.row() - from.row();
-        int colDiff = to.column() - from.column();
-
-        if (teamColor == ChessGame.TeamColor.WHITE) {
-            return rowDiff == -1 && Math.abs(colDiff) == 1;
-        } else {
-            return rowDiff == 1 && Math.abs(colDiff) == 1;
-        }
-    }
-
-
     private boolean isValidRow(int row) {
         return row >= 1 && row <= BOARD_SIZE;
     }

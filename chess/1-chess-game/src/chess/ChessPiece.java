@@ -41,9 +41,6 @@ public interface ChessPiece {
      */
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 
-    boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to);
-
-
     boolean hasMoved();
     void markAsMoved();
 }

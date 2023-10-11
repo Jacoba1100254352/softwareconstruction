@@ -17,15 +17,6 @@ public record QueenPiece(ChessGame.TeamColor teamColor) implements ChessPiece {
     }
 
     @Override
-    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
-        RookPiece rook = new RookPiece(teamColor);
-        BishopPiece bishop = new BishopPiece(teamColor);
-
-        return rook.canAttack(board, from, to) || bishop.canAttack(board, from, to);
-    }
-
-
-    @Override
     public PieceType getPieceType() {
         return PieceType.QUEEN;
     }

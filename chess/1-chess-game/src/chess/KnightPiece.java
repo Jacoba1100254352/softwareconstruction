@@ -36,15 +36,6 @@ public class KnightPiece implements ChessPiece, Cloneable {
     }
 
     @Override
-    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
-        int rowDiff = Math.abs(to.row() - from.row());
-        int colDiff = Math.abs(to.column() - from.column());
-
-        return (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
-    }
-
-
-    @Override
     public PieceType getPieceType() {
         return PieceType.KNIGHT;
     }

@@ -5,11 +5,10 @@ import java.util.Collection;
 
 public class RookPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
-    private boolean hasMoved;
+    private boolean hasMoved = false;
 
     public RookPiece(ChessGame.TeamColor teamColor) {
         this.teamColor = teamColor;
-        this.hasMoved = false;
     }
 
     public ChessGame.TeamColor teamColor() {
@@ -25,27 +24,6 @@ public class RookPiece implements ChessPiece {
     public void markAsMoved() {
         hasMoved = true;
     }
-
-    @Override
-    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
-        if (from.row() == to.row()) {
-            int start = Math.min(from.column(), to.column()) + 1;
-            int end = Math.max(from.column(), to.column());
-            for (int col = start; col < end; col++) {
-                if (board.getPiece(new ChessPositionImpl(from.row(), col)) != null) return false;
-            }
-            return true;
-        } else if (from.column() == to.column()) {
-            int start = Math.min(from.row(), to.row()) + 1;
-            int end = Math.max(from.row(), to.row());
-            for (int row = start; row < end; row++) {
-                if (board.getPiece(new ChessPositionImpl(row, from.column())) != null) return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
 
     @Override
     public PieceType getPieceType() {

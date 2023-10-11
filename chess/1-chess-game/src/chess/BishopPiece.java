@@ -26,30 +26,6 @@ public class BishopPiece implements ChessPiece {
     }
 
     @Override
-    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
-        int rowDiff = Math.abs(to.row() - from.row());
-        int colDiff = Math.abs(to.column() - from.column());
-
-        if (rowDiff == colDiff) {
-            int rowIncrement = (to.row() > from.row()) ? 1 : -1;
-            int colIncrement = (to.column() > from.column()) ? 1 : -1;
-
-            int row = from.row() + rowIncrement;
-            int col = from.column() + colIncrement;
-
-            while (row != to.row() && col != to.column()) {
-                if (board.getPiece(new ChessPositionImpl(row, col)) != null) return false;
-
-                row += rowIncrement;
-                col += colIncrement;
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-    @Override
     public PieceType getPieceType() {
         return PieceType.BISHOP;
     }
