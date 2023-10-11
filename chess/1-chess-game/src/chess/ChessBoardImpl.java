@@ -11,10 +11,6 @@ public class ChessBoardImpl implements ChessBoard {
     // To keep track of the last move
     private ChessMove lastMove;
 
-    enum ActionType {
-        ADD, REMOVE, MOVE
-    }
-
     public ChessBoardImpl() {
         board = new HashMap<>();
     }
@@ -89,13 +85,8 @@ public class ChessBoardImpl implements ChessBoard {
         return board.get(position);
     }
 
-    // New method to check for two-square pawn move
-    public boolean wasLastMoveTwoSquarePawnMove() {
-        if (lastMove == null) return false;
-        if (lastMove.getPromotionPiece() != ChessPiece.PieceType.PAWN) return false;
-        ChessPosition startPos = lastMove.getStartPosition();
-        ChessPosition endPos = lastMove.getEndPosition();
-        if (startPos == null || endPos == null) return false;  // Added this check
-        return Math.abs(startPos.row() - endPos.row()) == 2;
+    @Override
+    public ChessMove getLastMove() {
+        return lastMove;
     }
 }

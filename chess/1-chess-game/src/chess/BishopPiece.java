@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class BishopPiece implements ChessPiece, Cloneable {
+public class BishopPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
     private boolean hasMoved = false;
 
@@ -26,12 +26,26 @@ public class BishopPiece implements ChessPiece, Cloneable {
     }
 
     @Override
-    public BishopPiece clone() {
-        try {
-            return (BishopPiece) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();  // Should never happen
+    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
+        int rowDiff = Math.abs(to.row() - from.row());
+        int colDiff = Math.abs(to.column() - from.column());
+
+        if (rowDiff == colDiff) {
+            int rowIncrement = (to.row() > from.row()) ? 1 : -1;
+            int colIncrement = (to.column() > from.column()) ? 1 : -1;
+
+            int row = from.row() + rowIncrement;
+            int col = from.column() + colIncrement;
+
+            while (row != to.row() && col != to.column()) {
+                if (board.getPiece(new ChessPositionImpl(row, col)) != null) return false;
+
+                row += rowIncrement;
+                col += colIncrement;
+            }
+            return true;
         }
+        return false;
     }
 
 

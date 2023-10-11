@@ -27,6 +27,15 @@ public class KingPiece implements ChessPiece {
     }
 
     @Override
+    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
+        int rowDiff = Math.abs(to.row() - from.row());
+        int colDiff = Math.abs(to.column() - from.column());
+
+        return (rowDiff <= 1 && colDiff <= 1) && (rowDiff != 0 || colDiff != 0);
+    }
+
+
+    @Override
     public PieceType getPieceType() {
         return PieceType.KING;
     }

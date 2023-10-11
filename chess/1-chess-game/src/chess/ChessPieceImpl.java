@@ -48,6 +48,11 @@ public class ChessPieceImpl implements ChessPiece, Cloneable {
     public ChessGame.TeamColor teamColor() { return teamColor; }
 
     @Override
+    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
+        return actualPiece.canAttack(board, from, to);
+    }
+
+    @Override
     public PieceType getPieceType() {
         return pieceType;
     }

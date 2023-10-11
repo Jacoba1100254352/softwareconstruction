@@ -8,8 +8,6 @@ package chess;
  */
 public interface ChessBoard {
 
-    ChessBoardImpl clone();
-
     /**
      * Adds a chess piece to the chessboard
      * 
@@ -40,16 +38,6 @@ public interface ChessBoard {
      */
     void removePiece(ChessPosition position);
 
-    ChessPosition getLastMoveStartPosition();
 
-    ChessPosition getLastMoveEndPosition();
-
-    boolean isSquareUnderThreat(ChessPosition position, ChessGame.TeamColor teamColor);
-
-    /**
-     * Returns the position of the king of the given color.
-     * @param teamColor The color of the king to find.
-     * @return The position of the king, or null if not found.
-     */
-    ChessPosition getKingPosition(ChessGame.TeamColor teamColor);
+    ChessMove getLastMove();
 }

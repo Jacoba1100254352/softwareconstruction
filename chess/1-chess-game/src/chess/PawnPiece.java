@@ -47,6 +47,19 @@ public class PawnPiece implements ChessPiece {
         return moves;
     }
 
+    @Override
+    public boolean canAttack(ChessBoard board, ChessPosition from, ChessPosition to) {
+        int rowDiff = to.row() - from.row();
+        int colDiff = to.column() - from.column();
+
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            return rowDiff == -1 && Math.abs(colDiff) == 1;
+        } else {
+            return rowDiff == 1 && Math.abs(colDiff) == 1;
+        }
+    }
+
+
     private boolean isValidRow(int row) {
         return row >= 1 && row <= BOARD_SIZE;
     }
@@ -83,6 +96,15 @@ public class PawnPiece implements ChessPiece {
     }
 
     private void checkEnPassantCaptures(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, int direction) {
+        ChessMove lastMove = board.getLastMove();
+        if (lastMove == null) return;
+
+        ChessPiece lastPieceMoved = board.getPiece(lastMove.getEndPosition());
+        if (lastPieceMoved == null || lastPieceMoved.getPieceType() != PieceType.PAWN) return;
+
+        int doubleMoveRow = (teamColor == ChessGame.TeamColor.WHITE) ? 5 : 4;
+        if (myPosition.row() != doubleMoveRow) return;
+
         for (int sideDirection : new int[]{-1, 1}) {
             int newCol = myPosition.column() + sideDirection;
 
@@ -90,7 +112,7 @@ public class PawnPiece implements ChessPiece {
                 ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
                 ChessPiece pieceAtSide = board.getPiece(side);
 
-                if (pieceAtSide != null && pieceAtSide.getPieceType() == PieceType.PAWN && pieceAtSide.teamColor() != this.teamColor && board.wasLastMoveTwoSquarePawnMove()) {
+                if (pieceAtSide != null && pieceAtSide.equals(lastPieceMoved)) {
                     ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);
                     if (board.getPiece(capturePos) == null)
                         moves.add(new ChessMoveImpl(myPosition, capturePos, null));

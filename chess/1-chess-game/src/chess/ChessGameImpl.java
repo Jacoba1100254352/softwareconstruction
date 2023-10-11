@@ -24,26 +24,9 @@ public class ChessGameImpl implements ChessGame {
         currentTeamTurn = team;
     }
 
-    private boolean isSquareUnderAttack(ChessPosition position, TeamColor teamColor) {
-        TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-
-        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(pos);
-            if (piece != null && piece.teamColor() == enemyColor) {
-                Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    moves.removeIf(move -> Math.abs(move.getEndPosition().column() - move.getStartPosition().column()) > 1);
-                }
-                if (moves.stream().anyMatch(move -> move.getEndPosition().equals(position)))
-                    return true;
-            }
-        }
-        return false;
-    }
-
     private boolean canCastle(ChessBoard board, ChessPosition position, TeamColor color, boolean kingSide) {
         ChessPiece king = board.getPiece(findKingPosition(color));
-        if (king == null || king.getPieceType() != ChessPiece.PieceType.KING || king.teamColor() != color || position.column() >= 7 || king.hasMoved())
+        if (king == null || king.getPieceType() != ChessPiece.PieceType.KING || king.teamColor() != color || king.hasMoved())
             return false;
 
         ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), kingSide ? 8 : 1));
@@ -81,6 +64,7 @@ public class ChessGameImpl implements ChessGame {
     }
 
     private boolean doesMoveResultInCheck(ChessMove move, ChessPosition kingPosition, ChessPiece piece) {
+        ChessPiece originalEndPiece = board.getPiece(move.getEndPosition()); // Save the piece at the end position
         board.addPiece(move.getEndPosition(), piece);
         board.removePiece(move.getStartPosition());
 
@@ -89,19 +73,70 @@ public class ChessGameImpl implements ChessGame {
         boolean isCheck = isSquareUnderAttack(kingPosition, currentTeamTurn);
 
         board.addPiece(move.getStartPosition(), piece);
-        board.removePiece(move.getEndPosition());
+        if (originalEndPiece != null) board.addPiece(move.getEndPosition(), originalEndPiece); // Restore original piece
+        else board.removePiece(move.getEndPosition());
 
         return isCheck;
     }
 
+    // Fields to store the position of the kings to optimize the findKingPosition method
+    private ChessPosition whiteKingPosition;
+    private ChessPosition blackKingPosition;
+
     private ChessPosition findKingPosition(TeamColor teamColor) {
-        for (ChessPosition position : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = board.getPiece(position);
-            if (piece != null && piece.teamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING)
-                return position;
+        if (teamColor == TeamColor.WHITE) {
+            return whiteKingPosition;
+        } else {
+            return blackKingPosition;
         }
-        return null;
     }
+
+    private void updateKingPosition(ChessPosition position, ChessPiece piece) {
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (piece.teamColor() == TeamColor.WHITE) {
+                whiteKingPosition = position;
+            } else {
+                blackKingPosition = position;
+            }
+        }
+    }
+
+    private boolean isSquareUnderAttack(ChessPosition position, TeamColor teamColor) {
+        TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+        if (position == null)
+            return false;
+
+        // Directly check for pawns
+        if (teamColor == TeamColor.WHITE) {
+            if (position.row() > 1 && position.column() > 1 && position.column() < 8) {
+                if (board.getPiece(new ChessPositionImpl(position.row() - 1, position.column() - 1)) instanceof PawnPiece
+                        || board.getPiece(new ChessPositionImpl(position.row() - 1, position.column() + 1)) instanceof PawnPiece) {
+                    return true;
+                }
+            }
+        } else {
+            if (position.row() < 8 && position.column() > 1 && position.column() < 8) {
+                if (board.getPiece(new ChessPositionImpl(position.row() + 1, position.column() - 1)) instanceof PawnPiece
+                        || board.getPiece(new ChessPositionImpl(position.row() + 1, position.column() + 1)) instanceof PawnPiece) {
+                    return true;
+                }
+            }
+        }
+
+        // Check other pieces in a more optimized manner
+        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
+            ChessPiece piece = board.getPiece(pos);
+            if (piece != null && piece.teamColor() == enemyColor) {
+                if (piece.canAttack(board, pos, position)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     private void executeMove(ChessMove move) {
         ChessPiece piece = board.getPiece(move.getStartPosition());
@@ -109,6 +144,7 @@ public class ChessGameImpl implements ChessGame {
         board.removePiece(move.getStartPosition());
 
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            updateKingPosition(move.getEndPosition(), piece);
             int colDiff = move.getEndPosition().column() - move.getStartPosition().column();
             if (Math.abs(colDiff) == 2) {
                 ChessPosition rookOriginalPosition = (colDiff == 2) ?
@@ -157,17 +193,17 @@ public class ChessGameImpl implements ChessGame {
     }
 
     @Override
-    public boolean isInCheckmate(TeamColor teamColor) {
-        return isInCheck(teamColor) && ChessPositionImpl.getAllPositions().stream().noneMatch(pos -> {
+    public boolean isInStalemate(TeamColor teamColor) {
+        if (teamColor != currentTeamTurn) return false;
+        return ChessPositionImpl.getAllPositions().stream().noneMatch(pos -> {
             ChessPiece piece = board.getPiece(pos);
             return piece != null && piece.teamColor() == teamColor && !validMoves(pos).isEmpty();
         });
     }
 
     @Override
-    public boolean isInStalemate(TeamColor teamColor) {
-        if (teamColor != currentTeamTurn || isInCheck(teamColor)) return false;
-        return ChessPositionImpl.getAllPositions().stream().noneMatch(pos -> {
+    public boolean isInCheckmate(TeamColor teamColor) {
+        return isInCheck(teamColor) && ChessPositionImpl.getAllPositions().stream().noneMatch(pos -> {
             ChessPiece piece = board.getPiece(pos);
             return piece != null && piece.teamColor() == teamColor && !validMoves(pos).isEmpty();
         });
