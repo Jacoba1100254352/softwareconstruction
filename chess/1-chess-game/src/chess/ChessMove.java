@@ -17,5 +17,5 @@ public interface ChessMove {
      */
     ChessPosition getEndPosition();
 
-    boolean doesMoveResultInCheck(ChessPosition start, ChessPiece piece, ChessBoard board);
+    ChessPiece.PieceType getPromotionPiece();
 }
