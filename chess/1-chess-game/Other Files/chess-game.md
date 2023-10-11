@@ -4,6 +4,8 @@
 - [Getting Started](getting-started.md)
 - [Starter Code](../src)
 
+- 🖥️ [Design Principles (Chess Examples)](https://docs.google.com/presentation/d/1dncxSAgnIqjV9RNzGR94EWVltJiCApqC3EvNPqz97-E/edit?usp=sharing)
+
 In this part of the Chess Project, you will create the base Chess Game behavior. To do this you will create the following 10 implementation classes that implement the provided interfaces: A Chess Game class, a Chess Board class, a Chess Position class, a Chess Move class, and 6 Chess Piece classes. In later assignments you will use this code to create a fully playable game.
 
 ## Code Class Structure
@@ -64,7 +66,7 @@ The Tests in ChessExtraCredit are for the `Castling` and `En Passant` moves. Suc
 
 To run the tests, you can click the play icon next to an individual test, or you can right click on a package or class and select `Run` or `Run Tests in …`
 
-NOTE: In order for the tests to pass, you are required to override the `.equals()` and `.hashCode()` methods in your ChessMove implementation and your ChessPosition implementation. To do this automatically in IntelliJ, select Code > Generate... > Override Methods and then select equals and hashCode. The default methods provided by IntelliJ should suffice AS LONG AS you choose 'Generate...' from the Code menu rather than 'Override Methods...'. The `.equals()` and `.hashCode()` methods need to be more than merely a call to `super()`, and using 'Generate...' should fix that.
+In order for the tests to pass, you are required to override the `.equals()` and `.hashCode()` methods in your ChessMove implementation and your ChessPosition implementation. To do this automatically in IntelliJ, select Code > Generate... > equals() and hashCode(). The default methods provided by IntelliJ should suffice. The `.equals()` and `.hashCode()` methods need to be more than merely a call to `super()`, and using 'Generate...' should do this correctly. Note, you must have already have finished implementing these classes before IntelliJ will be able to generate these methods.
 
 NOTE: Debugging is often easier if you override the .toString() method in your ChessMove implementation (and possibly ChessPosition implementation). This is not required, but you may want to consider it. The default methods provided by IntelliJ are better than nothing, but you may wish to write your own .toString() method for easiest debugging.
 
@@ -159,7 +161,7 @@ To pass off this assignment, meet with a TA and demonstrate that your code passe
 
 ### Grading Rubric
 
-| Category | Criteria | Points |
-| --- | --- | ---: |
-| Functionality | All pass off test cases succeed | 125 |
-| | Total | 125 |
+| Category      | Criteria                        | Points |
+| ------------- | ------------------------------- | -----: |
+| Functionality | All pass off test cases succeed |    125 |
+|               | Total                           |    125 |

@@ -16,7 +16,7 @@ In this part of the Chess Project, you will create your Chess server and impleme
 
 ## Required Web APIs
 
-An API is a command a server makes available to the public. For your server these API’s will be accessed via the Hypertext Transfer Protocol (HTTP). Often the server requires some data when a client uses an API. For an HTTP request this data can be stored in HTTP Headers, in the URL, and/or in the request body. The Server then sends back data to the client, including a value in the HTTP Response Code (indicating if command was completed successfully), and any needed information in the HTTP Response Body. For your server, you will use JSON strings for the Request and Response bodies.
+An API is a command a server makes available to the public. For your server these API’s will be accessed via the Hypertext Transfer Protocol (HTTP). Often the server requires some data when a client uses an API. For an HTTP request this data can be stored in HTTP Headers, in the URL, and/or in the request body. The Server then sends back data to the client, including a value in the HTTP Response Code (indicating if the command was completed successfully), and any needed information in the HTTP Response Body. For your server, you will use JSON strings for the Request and Response bodies.
 
 ## API Details
 
@@ -188,7 +188,7 @@ As described in the previous section, Service class methods receive Request obje
 ```java
 {
     "username":"your_username",
-    "password": `your_password`
+    "password": "your_password"
 }
 ```
 
@@ -274,9 +274,9 @@ After you pass off your project with a TA, you should immediately submit your pr
 
 ### Grading Rubric
 
-| Category | Criteria | Points |
-| --- | --- | ---: |
-| Functionality | All pass off test cases succeed | 125 |
-| Code Quality | [Rubric](../code-quality-rubric.md) | 30 |
-| Unit Tests | All test cases pass<br/>Each public method on Service classes has two test cases, one positive test and one negative test<br/>Every test case includes an Assert statement of some type | 25 |
-| | Total | 180 |
+| Category      | Criteria                                                                                                                                                                                | Points |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -----: |
+| Functionality | All pass off test cases succeed                                                                                                                                                         |    125 |
+| Code Quality  | [Rubric](../code-quality-rubric.md)                                                                                                                                                     |     30 |
+| Unit Tests    | All test cases pass<br/>Each public method on Service classes has two test cases, one positive test and one negative test<br/>Every test case includes an Assert statement of some type |     25 |
+|               | Total                                                                                                                                                                                   |    180 |
