@@ -1,43 +1,38 @@
 package chess;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChessBoardImpl implements ChessBoard, Cloneable {
+public class ChessBoardImpl implements ChessBoard {
 
-    private Map<ChessPosition, ChessPiece> board;
-
-    // Store the start and end positions of the last move
-    private ChessPosition lastMoveStartPosition;
-    private ChessPosition lastMoveEndPosition;
+    // Using a HashMap to store the position and corresponding piece
+    private final Map<ChessPosition, ChessPiece> board;
 
     public ChessBoardImpl() {
         board = new HashMap<>();
     }
 
     @Override
-    public ChessBoardImpl clone() {
-        try {
-            ChessBoardImpl clonedBoard = (ChessBoardImpl) super.clone();
-            clonedBoard.board = new HashMap<>();
-            for (Map.Entry<ChessPosition, ChessPiece> entry : this.board.entrySet()) {
-                ChessPosition clonedPosition = new ChessPositionImpl(entry.getKey().row(), entry.getKey().column());
-                ChessPiece clonedPiece = entry.getValue().clone();
-                clonedBoard.addPiece(clonedPosition, clonedPiece);
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPiece piece = getPiece(new ChessPositionImpl(row, col));
+                sb.append((piece == null) ? "." : piece.getPieceType().toString().charAt(0));
+                sb.append(" ");
             }
-            return clonedBoard;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();  // Should never happen
+            sb.append("\n");
         }
+        return sb.toString();
     }
 
 
+    // To keep track of the last move
+    private ChessMove lastMove;
 
     @Override
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        lastMoveStartPosition = lastMoveEndPosition;  // Update start position with the previous end position
-        lastMoveEndPosition = position;               // Update end position with the current position
+        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType());
         board.put(position, piece);
     }
 
@@ -85,51 +80,19 @@ public class ChessBoardImpl implements ChessBoard, Cloneable {
 
     @Override
     public void removePiece(ChessPosition position) {
-        ChessPiece removedPiece = board.remove(position);
-        if (removedPiece != null) {
-            lastMoveStartPosition = position;
-            lastMoveEndPosition = null;  // No end position for a removed piece
-        }
+        ChessPiece removedPiece = board.get(position);
+        if (removedPiece != null)
+            lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType());
+        board.remove(position);
     }
 
-    @Override
-    public ChessPosition getLastMoveStartPosition() {
-        return lastMoveStartPosition;
+    // New method to check for two-square pawn move
+    public boolean wasLastMoveTwoSquarePawnMove() {
+        if (lastMove == null) return false;
+        if (lastMove.getPromotionPiece() != ChessPiece.PieceType.PAWN) return false;
+        ChessPosition startPos = lastMove.getStartPosition();
+        ChessPosition endPos = lastMove.getEndPosition();
+        if (startPos == null || endPos == null) return false;  // Added this check
+        return Math.abs(startPos.row() - endPos.row()) == 2;
     }
-
-    @Override
-    public ChessPosition getLastMoveEndPosition() {
-        return lastMoveEndPosition;
-    }
-
-
-    public boolean isSquareUnderThreat(ChessPosition position, ChessGame.TeamColor teamColor) {
-        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
-            ChessPiece checkingPiece = getPiece(pos);
-            if (checkingPiece != null && checkingPiece.teamColor() != teamColor) {
-                if (checkingPiece.getPieceType() != ChessPiece.PieceType.KING) {
-                    Collection<ChessMove> threateningMoves = checkingPiece.pieceMoves(this, pos);
-                    for (ChessMove move : threateningMoves) {
-                        if (move.getEndPosition().equals(position)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-
-    @Override
-    public ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
-        for (ChessPosition pos : ChessPositionImpl.getAllPositions()) {
-            ChessPiece piece = getPiece(pos);
-            if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.teamColor() == teamColor) {
-                return pos;
-            }
-        }
-        return null; // This should never be reached unless something is wrong with the board state.
-    }
-
 }

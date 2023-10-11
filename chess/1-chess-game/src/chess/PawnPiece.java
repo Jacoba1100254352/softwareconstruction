@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class PawnPiece implements ChessPiece, Cloneable {
+public class PawnPiece implements ChessPiece {
     private final ChessGame.TeamColor teamColor;
     private boolean hasMoved = false;
 
@@ -14,16 +14,6 @@ public class PawnPiece implements ChessPiece, Cloneable {
     public ChessGame.TeamColor teamColor() {
         return teamColor;
     }
-
-    @Override
-    public PawnPiece clone() {
-        try {
-            return (PawnPiece) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();  // Should never happen
-        }
-    }
-
 
     @Override
     public boolean hasMoved() {
@@ -100,9 +90,7 @@ public class PawnPiece implements ChessPiece, Cloneable {
                 ChessPosition side = new ChessPositionImpl(myPosition.row(), newCol);
                 ChessPiece pieceAtSide = board.getPiece(side);
 
-                if (pieceAtSide != null && pieceAtSide.getPieceType() == PieceType.PAWN && pieceAtSide.teamColor() != this.teamColor &&
-                        board.getLastMoveStartPosition().equals(side) &&
-                        Math.abs(board.getLastMoveStartPosition().row() - board.getLastMoveEndPosition().row()) == 2) {
+                if (pieceAtSide != null && pieceAtSide.getPieceType() == PieceType.PAWN && pieceAtSide.teamColor() != this.teamColor && board.wasLastMoveTwoSquarePawnMove()) {
                     ChessPosition capturePos = new ChessPositionImpl(myPosition.row() + direction, newCol);
                     if (board.getPiece(capturePos) == null)
                         moves.add(new ChessMoveImpl(myPosition, capturePos, null));
@@ -110,7 +98,6 @@ public class PawnPiece implements ChessPiece, Cloneable {
             }
         }
     }
-
 
     private void addMoveWithPromotion(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
         if (end.row() == 1 || end.row() == BOARD_SIZE)

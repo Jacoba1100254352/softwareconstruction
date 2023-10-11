@@ -5,10 +5,11 @@ import java.util.Collection;
 
 public class RookPiece implements ChessPiece, Cloneable {
     private final ChessGame.TeamColor teamColor;
-    private boolean hasMoved = false;
+    private boolean hasMoved;
 
     public RookPiece(ChessGame.TeamColor teamColor) {
         this.teamColor = teamColor;
+        this.hasMoved = false;
     }
 
     public ChessGame.TeamColor teamColor() {
