@@ -8,6 +8,13 @@ public class ChessBoardImpl implements ChessBoard {
     // Using a HashMap to store the position and corresponding piece
     private final Map<ChessPosition, ChessPiece> board;
 
+    // To keep track of the last move
+    private ChessMove lastMove;
+
+    enum ActionType {
+        ADD, REMOVE, MOVE
+    }
+
     public ChessBoardImpl() {
         board = new HashMap<>();
     }
@@ -24,21 +31,6 @@ public class ChessBoardImpl implements ChessBoard {
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-
-    // To keep track of the last move
-    private ChessMove lastMove;
-
-    @Override
-    public void addPiece(ChessPosition position, ChessPiece piece) {
-        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType());
-        board.put(position, piece);
-    }
-
-    @Override
-    public ChessPiece getPiece(ChessPosition position) {
-        return board.get(position);
     }
 
     @Override
@@ -79,11 +71,22 @@ public class ChessBoardImpl implements ChessBoard {
     }
 
     @Override
+    public void addPiece(ChessPosition position, ChessPiece piece) {
+        lastMove = new ChessMoveImpl(lastMove != null ? lastMove.getEndPosition() : null, position, piece.getPieceType());
+        board.put(position, piece);
+    }
+
+    @Override
     public void removePiece(ChessPosition position) {
         ChessPiece removedPiece = board.get(position);
         if (removedPiece != null)
             lastMove = new ChessMoveImpl(position, null, removedPiece.getPieceType());
         board.remove(position);
+    }
+
+    @Override
+    public ChessPiece getPiece(ChessPosition position) {
+        return board.get(position);
     }
 
     // New method to check for two-square pawn move
