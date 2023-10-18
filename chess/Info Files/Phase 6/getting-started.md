@@ -1,6 +1,6 @@
 # Getting Started
 
-📁 [Starter code](starter-code)
+📁 [Starter code](../../6-gameplay/starter-code)
 
 The Starter Code should have 2 folders, `serverTests` and `webSocketMessages`. Do the following:
 

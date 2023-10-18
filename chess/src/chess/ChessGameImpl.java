@@ -27,7 +27,7 @@ public class ChessGameImpl implements ChessGame {
     /**
      * Checks if a given square is under attack by the enemy team.
      *
-     * @param position The position to check.
+     * @param position  The position to check.
      * @param teamColor The current team color.
      * @return true if the square is under attack, false otherwise.
      */
@@ -59,9 +59,9 @@ public class ChessGameImpl implements ChessGame {
     /**
      * Checks if a given team can castle.
      *
-     * @param board The current chess board.
+     * @param board    The current chess board.
      * @param position The king's position.
-     * @param color The king's color.
+     * @param color    The king's color.
      * @param kingSide true if checking king-side castling, false if queen-side.
      * @return true if castling is possible, false otherwise.
      */
@@ -154,7 +154,7 @@ public class ChessGameImpl implements ChessGame {
     /**
      * Checks if executing a given move would result in a check for the current team.
      *
-     * @param move The move to check.
+     * @param move  The move to check.
      * @param piece The piece being moved.
      * @return true if the move results in check, false otherwise.
      */

@@ -1,6 +1,6 @@
 # Getting Started
 
-📁 [Starter code](starter-code)
+📁 [Starter code](../../5-pregame/starter-code)
 
 ## Create Client Module
 

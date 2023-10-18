@@ -1,6 +1,6 @@
 # Getting Started
 
-📁 [Starter code](../src)
+📁 [Starter code](../../2-server-design/src)
 
 The starter code for this part of the project contains one folder named `dataAccess`.
 

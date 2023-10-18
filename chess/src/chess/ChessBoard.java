@@ -40,7 +40,6 @@ public interface ChessBoard {
 
 
     /**
-     *
      * @return lastMove that was made in the game
      */
     ChessMove getLastMove();

@@ -1,6 +1,6 @@
 # Getting Started
 
-📁 [Starter code](starter-code)
+📁 [Starter code](../../3-web-api/starter-code)
 
 The Starter Code should have three folders: `libs`, `serverTests`, and `web`. Do the following:
 

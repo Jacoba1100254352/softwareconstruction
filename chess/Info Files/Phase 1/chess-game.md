@@ -2,7 +2,7 @@
 
 - [Chess Application Overview](../../chess.md)
 - [Getting Started](getting-started.md)
-- [Starter Code](../src)
+- [Starter Code](../../1-chess-game/src)
 
 - 🖥️ [Design Principles (Chess Examples)](https://docs.google.com/presentation/d/1dncxSAgnIqjV9RNzGR94EWVltJiCApqC3EvNPqz97-E/edit?usp=sharing)
 

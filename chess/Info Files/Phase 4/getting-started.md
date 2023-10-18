@@ -1,6 +1,6 @@
 # Getting Started
 
-📁 [Starter code](starter-code)
+📁 [Starter code](../../4-database/starter-code)
 
 The Starter Code has two folders, `dataAccess` and `serverTests`. Do the following:
 
