@@ -13,6 +13,11 @@ public class Game {
     private ChessGame game;
 
     /**
+     * Default constructor.
+     */
+    public Game() { }
+
+    /**
      * Constructs a game with the specified values.
      *
      * @param gameID The game ID.
@@ -33,7 +38,7 @@ public class Game {
     /**
      * Gets the game ID.
      *
-     * @return An int representing the game ID.
+     * @return The game ID.
      */
     public int getGameID() {
         return this.gameID;
@@ -42,7 +47,7 @@ public class Game {
     /**
      * Sets the game ID.
      *
-     * @param gameID An int representing the game ID to be set.
+     * @param gameID The game ID to be set.
      */
     public void setGameID(int gameID) {
         this.gameID = gameID;
@@ -51,7 +56,7 @@ public class Game {
     /**
      * Retrieves the username of the white player in the game.
      *
-     * @return A string representing the username of the white player.
+     * @return The username of the white player.
      */
     public String getWhiteUsername() {
         return whiteUsername;
@@ -60,7 +65,7 @@ public class Game {
     /**
      * Sets the username for the white player in the game.
      *
-     * @param whiteUsername A string representing the username to be set for the white player.
+     * @param whiteUsername The username to be set for the white player.
      */
     public void setWhiteUsername(String whiteUsername) {
         this.whiteUsername = whiteUsername;
@@ -69,7 +74,7 @@ public class Game {
     /**
      * Retrieves the username of the black player in the game.
      *
-     * @return A string representing the username of the black player.
+     * @return The username of the black player.
      */
     public String getBlackUsername() {
         return blackUsername;
@@ -78,7 +83,7 @@ public class Game {
     /**
      * Sets the username for the black player in the game.
      *
-     * @param blackUsername A string representing the username to be set for the black player.
+     * @param blackUsername The username to be set for the black player.
      */
     public void setBlackUsername(String blackUsername) {
         this.blackUsername = blackUsername;
@@ -87,7 +92,7 @@ public class Game {
     /**
      * Retrieves the name of the game.
      *
-     * @return A string representing the game's name.
+     * @return The game's name.
      */
     public String getGameName() {
         return gameName;
@@ -96,7 +101,7 @@ public class Game {
     /**
      * Sets the name for the game.
      *
-     * @param gameName A string representing the name to be set for the game.
+     * @param gameName The name to be set for the game.
      */
     public void setGameName(String gameName) {
         this.gameName = gameName;

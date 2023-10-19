@@ -41,7 +41,7 @@ public class JoinGameService {
     /**
      * Retrieves the message associated with the user's attempt to join the game.
      *
-     * @return A string representing the message.
+     * @return The message.
      */
     public String getMessage() {
         return message;
@@ -50,7 +50,7 @@ public class JoinGameService {
     /**
      * Sets the message associated with the user's attempt to join the game.
      *
-     * @param message A string representing the message to be set.
+     * @param message The message to be set.
      */
     public void setMessage(String message) {
         this.message = message;

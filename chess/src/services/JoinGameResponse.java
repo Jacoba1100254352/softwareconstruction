@@ -10,7 +10,7 @@ public class JoinGameResponse {
     /**
      * Default constructor.
      */
-    public JoinGameResponse() { }
+    public JoinGameResponse() {}
 
     /**
      * Constructs a new JoinGameResponse.
@@ -47,7 +47,7 @@ public class JoinGameResponse {
     /**
      * Retrieves the message associated with the operation.
      *
-     * @return A string representing the message.
+     * @return The message.
      */
     public String getMessage() {
         return message;
@@ -56,7 +56,7 @@ public class JoinGameResponse {
     /**
      * Sets the message associated with the operation.
      *
-     * @param message A string representing the message to be set.
+     * @param message The message to be set.
      */
     public void setMessage(String message) {
         this.message = message;

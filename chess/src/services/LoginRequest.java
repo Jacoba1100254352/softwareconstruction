@@ -29,7 +29,7 @@ public class LoginRequest {
     /**
      * Retrieves the username of the user.
      *
-     * @return A string representing the username.
+     * @return The username.
      */
     public String getUsername() {
         return username;
@@ -38,7 +38,7 @@ public class LoginRequest {
     /**
      * Sets the username of the user.
      *
-     * @param username A string representing the username to be set.
+     * @param username The username to be set.
      */
     public void setUsername(String username) {
         this.username = username;
@@ -47,7 +47,7 @@ public class LoginRequest {
     /**
      * Retrieves the password of the user.
      *
-     * @return A string representing the password.
+     * @return The password.
      */
     public String getPassword() {
         return password;
@@ -56,7 +56,7 @@ public class LoginRequest {
     /**
      * Sets the password of the user.
      *
-     * @param password A string representing the password to be set.
+     * @param password The password to be set.
      */
     public void setPassword(String password) {
         this.password = password;

@@ -16,7 +16,7 @@ public class JoinGameRequest {
      * JoinGameRequest Explicit Constructor.
      *
      * @param gameId The unique ID of the game.
-     * @param username The username of the player.
+     * @param username The username of the user.
      */
     public JoinGameRequest(String gameId, String username) {
         this.gameId = gameId;
@@ -29,7 +29,7 @@ public class JoinGameRequest {
     /**
      * Retrieves the game ID.
      *
-     * @return A string representing the game ID.
+     * @return The game ID.
      */
     public String getGameId() {
         return gameId;
@@ -38,7 +38,7 @@ public class JoinGameRequest {
     /**
      * Sets the game ID.
      *
-     * @param gameId A string representing the game ID to be set.
+     * @param gameId The game ID to be set.
      */
     public void setGameId(String gameId) {
         this.gameId = gameId;
@@ -47,7 +47,7 @@ public class JoinGameRequest {
     /**
      * Retrieves the username.
      *
-     * @return A string representing the username.
+     * @return The username.
      */
     public String getUsername() {
         return username;
@@ -56,7 +56,7 @@ public class JoinGameRequest {
     /**
      * Sets the username.
      *
-     * @param username A string representing the username to be set.
+     * @param username The username to be set.
      */
     public void setUsername(String username) {
         this.username = username;

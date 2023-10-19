@@ -8,6 +8,11 @@ public class AuthToken {
     private String username;
 
     /**
+     * Default constructor.
+     */
+    public AuthToken() { }
+
+    /**
      * Constructs an authentication token with the specified values.
      *
      * @param authToken The token string.

@@ -40,7 +40,7 @@ public class RegisterService {
     /**
      * Retrieves the message related to the service execution.
      *
-     * @return A string representing the message.
+     * @return The message.
      */
     public String getMessage() {
         return message;
@@ -49,7 +49,7 @@ public class RegisterService {
     /**
      * Sets the message related to the service execution.
      *
-     * @param message A string representing the message to be set.
+     * @param message The message to be set.
      */
     public void setMessage(String message) {
         this.message = message;
@@ -58,7 +58,7 @@ public class RegisterService {
     /**
      * Retrieves the authentication token associated with the service.
      *
-     * @return A string representing the authentication token.
+     * @return The authentication token.
      */
     public String getAuthToken() {
         return authToken;
@@ -67,7 +67,7 @@ public class RegisterService {
     /**
      * Sets the authentication token associated with the service.
      *
-     * @param authToken A string representing the authentication token to be set.
+     * @param authToken The authentication token to be set.
      */
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
@@ -76,7 +76,7 @@ public class RegisterService {
     /**
      * Retrieves the user ID associated with the service.
      *
-     * @return A string representing the user ID.
+     * @return The user ID.
      */
     public String getUserID() {
         return userID;
@@ -85,7 +85,7 @@ public class RegisterService {
     /**
      * Sets the user ID associated with the service.
      *
-     * @param userID A string representing the user ID to be set.
+     * @param userID The user ID to be set.
      */
     public void setUserID(String userID) {
         this.userID = userID;

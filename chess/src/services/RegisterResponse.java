@@ -39,7 +39,7 @@ public class RegisterResponse {
     /**
      * Retrieves the message related to an operation or event.
      *
-     * @return A string representing the message.
+     * @return The message.
      */
     public String getMessage() {
         return message;
@@ -48,7 +48,7 @@ public class RegisterResponse {
     /**
      * Sets the message related to an operation or event.
      *
-     * @param message A string representing the message to be set.
+     * @param message The message to be set.
      */
     public void setMessage(String message) {
         this.message = message;
@@ -57,7 +57,7 @@ public class RegisterResponse {
     /**
      * Retrieves the authentication token associated with a user or session.
      *
-     * @return A string representing the authentication token.
+     * @return The authentication token.
      */
     public String getAuthToken() {
         return authToken;
@@ -66,7 +66,7 @@ public class RegisterResponse {
     /**
      * Sets the authentication token for a user or session.
      *
-     * @param authToken A string representing the authentication token to be set.
+     * @param authToken The authentication token to be set.
      */
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
@@ -75,7 +75,7 @@ public class RegisterResponse {
     /**
      * Retrieves the username of a user.
      *
-     * @return A string representing the username.
+     * @return The username.
      */
     public String getUsername() {
         return username;
@@ -84,7 +84,7 @@ public class RegisterResponse {
     /**
      * Sets the username of a user.
      *
-     * @param username A string representing the username to be set.
+     * @param username The username to be set.
      */
     public void setUsername(String username) {
         this.username = username;

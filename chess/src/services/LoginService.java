@@ -10,6 +10,7 @@ public class LoginService {
 
     /**
      * Logs a user in.
+     *
      * @param request The login request containing user credentials.
      * @return LoginResponse indicating success or failure.
      */
@@ -38,7 +39,7 @@ public class LoginService {
     /**
      * Retrieves the message associated with the login operation.
      *
-     * @return A string representing the message.
+     * @return The message.
      */
     public String getMessage() {
         return message;
@@ -47,7 +48,7 @@ public class LoginService {
     /**
      * Sets the message associated with the login operation.
      *
-     * @param message A string representing the message.
+     * @param message The message.
      */
     public void setMessage(String message) {
         this.message = message;
@@ -56,7 +57,7 @@ public class LoginService {
     /**
      * Retrieves the authentication token of the logged-in user.
      *
-     * @return A string representing the authentication token.
+     * @return The authentication token.
      */
     public String getAuthToken() {
         return authToken;
@@ -65,7 +66,7 @@ public class LoginService {
     /**
      * Sets the authentication token of the logged-in user.
      *
-     * @param authToken A string representing the authentication token.
+     * @param authToken The authentication token.
      */
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
