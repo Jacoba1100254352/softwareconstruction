@@ -4,8 +4,19 @@ package services;
  * Provides services for a user to join a game.
  */
 public class JoinGameService {
+    /**
+     * The success status of the user joining the game.
+     */
     private boolean success;
+    /**
+     * The message associated with the user's attempt to join the game.
+     */
     private String message;
+
+    /**
+     * Default constructor.
+     */
+    public JoinGameService() { }
 
     /**
      * Allows a user to join a game.

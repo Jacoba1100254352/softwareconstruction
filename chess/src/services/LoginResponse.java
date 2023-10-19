@@ -4,12 +4,21 @@ package services;
  * Represents the result of a login request.
  */
 public class LoginResponse {
-    private String message;
+    /**
+     * The authentication token for the logged-in user.
+     */
     private String authToken;
+    /**
+     * The username of the logged-in user.
+     */
     private String username;
+    /**
+     * The error message.
+     */
+    private String message;
 
     /**
-     * Default constructor for deserialization.
+     * Default constructor.
      */
     public LoginResponse() { }
 

@@ -4,9 +4,18 @@ package services;
  * Represents the result of a registration request.
  */
 public class RegisterResponse {
-    private String message;
+    /**
+     * The authentication token for the registered user.
+     */
     private String authToken;
+    /**
+     * The username of the registered user.
+     */
     private String username;
+    /**
+     * The error message.
+     */
+    private String message;
 
     /**
      * Default constructor.

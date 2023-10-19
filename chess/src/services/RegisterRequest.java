@@ -4,11 +4,17 @@ package services;
  * Represents the request data required for registering a user.
  */
 public class RegisterRequest {
+    /**
+     * The username of the user.
+     */
     private String username;
+    /**
+     * The password of the user.
+     */
     private String password;
 
     /**
-     * Default constructor for deserialization.
+     * Default constructor.
      */
     public RegisterRequest() { }
 

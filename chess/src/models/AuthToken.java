@@ -4,7 +4,13 @@ package models;
  * Represents an authentication token with associated attributes.
  */
 public class AuthToken {
+    /**
+     * The token string.
+     */
     private String authToken;
+    /**
+     * The associated username.
+     */
     private String username;
 
     /**

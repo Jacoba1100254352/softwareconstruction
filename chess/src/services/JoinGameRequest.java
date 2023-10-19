@@ -4,7 +4,13 @@ package services;
  * Represents the request data required for a user to join a game.
  */
 public class JoinGameRequest {
+    /**
+     * The unique ID of the game.
+     */
     private String gameId;
+    /**
+     * The username of the user.
+     */
     private String username;
 
     /**

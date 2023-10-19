@@ -4,10 +4,27 @@ package services;
  * Provides services for registering a user.
  */
 public class RegisterService {
+    /**
+     * The success status of the service.
+     */
     private boolean success;
+    /**
+     * The message related to the service execution.
+     */
     private String message;
+    /**
+     * The authentication token associated with the service.
+     */
     private String authToken;
+    /**
+     * The user ID associated with the service.
+     */
     private String userID;
+
+    /**
+     * Default constructor.
+     */
+    public RegisterService() { }
 
     /**
      * Registers a new user.

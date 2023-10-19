@@ -4,11 +4,17 @@ package services;
  * Represents the request data required for logging in a user.
  */
 public class LoginRequest {
+    /**
+     * The username of the user.
+     */
     private String username;
+    /**
+     * The password of the user.
+     */
     private String password;
 
     /**
-     * Default constructor for deserialization.
+     * Default constructor.
      */
     public LoginRequest() { }
 

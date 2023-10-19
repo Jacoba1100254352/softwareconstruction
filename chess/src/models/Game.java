@@ -6,10 +6,25 @@ import chess.ChessGame;
  * Represents a game with associated attributes and players.
  */
 public class Game {
+    /**
+     * The unique ID of the game.
+     */
     private int gameID;
+    /**
+     * The white player's username.
+     */
     private String whiteUsername;
+    /**
+     * The black player's username.
+     */
     private String blackUsername;
+    /**
+     * The name of the game.
+     */
     private String gameName;
+    /**
+     * The chess game.
+     */
     private ChessGame game;
 
     /**
@@ -20,16 +35,18 @@ public class Game {
     /**
      * Constructs a game with the specified values.
      *
-     * @param gameID The game ID.
+     * @param gameID The unique ID of the game.
      * @param whiteUsername The white player's username.
      * @param blackUsername The black player's username.
      * @param gameName The name of the game.
+     * @param game The chess game.
      */
-    public Game(int gameID, String whiteUsername, String blackUsername, String gameName) {
+    public Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
         this.gameName = gameName;
+        this.game = game;
     }
 
 

@@ -4,9 +4,23 @@ package services;
  * Provides services for logging in a user.
  */
 public class LoginService {
+    /**
+     * The success status of the login operation.
+     */
     private boolean success;
+    /**
+     * The message associated with the login operation.
+     */
     private String message;
+    /**
+     * The authentication token of the logged-in user.
+     */
     private String authToken;
+
+    /**
+     * Default constructor.
+     */
+    public LoginService() { }
 
     /**
      * Logs a user in.

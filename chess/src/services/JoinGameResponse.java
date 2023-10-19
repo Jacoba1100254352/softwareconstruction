@@ -4,7 +4,13 @@ package services;
  * Represents the result of a join game request.
  */
 public class JoinGameResponse {
+    /**
+     * Indicates if the operation was successful.
+     */
     private boolean success;
+    /**
+     * A message providing details or an error description.
+     */
     private String message;
 
     /**
