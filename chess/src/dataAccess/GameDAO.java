@@ -3,17 +3,25 @@ package dataAccess;
 import chess.*;
 import models.Game;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for handling game-related data operations.
  */
 public class GameDAO {
 
+    // In-memory storage for games
+    private final Map<Integer, Game> gameMap;
+
     /**
      * Default constructor.
      */
-    public GameDAO() {}
+    public GameDAO() {
+        gameMap = new HashMap<>();
+    }
 
     /**
      * Inserts a new game into the data store.
@@ -22,7 +30,10 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void insertGame(Game game) throws DataAccessException {
-
+        if (gameMap.containsKey(game.getGameID())) {
+            throw new DataAccessException("Game with this ID already exists.");
+        }
+        gameMap.put(game.getGameID(), game);
     }
 
     /**
@@ -33,8 +44,10 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public Game findGameById(String gameID) throws DataAccessException {
-
-        return null;
+        if (!gameMap.containsKey(gameID)) {
+            throw new DataAccessException("Game not found.");
+        }
+        return gameMap.get(gameID);
     }
 
     /**
@@ -44,8 +57,7 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public List<Game> findAllGames() throws DataAccessException {
-
-        return null;
+        return new ArrayList<>(gameMap.values());
     }
 
     /**
@@ -57,7 +69,22 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void claimSpot(String gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
+        if (!gameMap.containsKey(gameID)) {
+            throw new DataAccessException("Game not found.");
+        }
 
+        Game game = gameMap.get(gameID);
+        if (color == ChessGame.TeamColor.WHITE) {
+            if (game.getWhiteUsername() != null) {
+                throw new DataAccessException("White player spot is already taken.");
+            }
+            game.setWhiteUsername(username);
+        } else if (color == ChessGame.TeamColor.BLACK) {
+            if (game.getBlackUsername() != null) {
+                throw new DataAccessException("Black player spot is already taken.");
+            }
+            game.setBlackUsername(username);
+        }
     }
 
     /**
@@ -68,7 +95,12 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void updateGame(String gameID, ChessGame newChessGame) throws DataAccessException {
+        if (!gameMap.containsKey(gameID)) {
+            throw new DataAccessException("Game not found.");
+        }
 
+        Game game = gameMap.get(gameID);
+        game.setGame(newChessGame);
     }
 
     /**
@@ -78,7 +110,10 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void removeGame(String gameID) throws DataAccessException {
-
+        if (!gameMap.containsKey(gameID)) {
+            throw new DataAccessException("Game not found.");
+        }
+        gameMap.remove(gameID);
     }
 
     /**
@@ -87,7 +122,6 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void clearAll() throws DataAccessException {
-
+        gameMap.clear();
     }
 }
-

@@ -1,9 +1,16 @@
 package services;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides services for logging in a user.
  */
 public class LoginService {
+    /**
+     * In-memory storage for the users and their login info
+     */
+    private static final Map<String, String> users = new HashMap<>(); // Username, Password
     /**
      * The success status of the login operation.
      */
@@ -29,7 +36,11 @@ public class LoginService {
      * @return LoginResponse indicating success or failure.
      */
     public LoginResponse login(LoginRequest request) {
-        return null;
+        if (users.containsKey(request.getUsername()) && users.get(request.getUsername()).equals(request.getPassword())) {
+            return new LoginResponse("valid_token", request.getUsername());
+        } else {
+            return new LoginResponse("Invalid username or password.");
+        }
     }
 
     /**

@@ -1,9 +1,16 @@
 package services;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides services for registering a user.
  */
 public class RegisterService {
+    /**
+     * In-memory storage for the users.
+     */
+    private static final Map<String, String> users = new HashMap<>();
     /**
      * The success status of the service.
      */
@@ -33,7 +40,12 @@ public class RegisterService {
      * @return RegisterResponse indicating success or failure.
      */
     public RegisterResponse register(RegisterRequest request) {
-        return null;
+        if (!users.containsKey(request.getUsername())) {
+            users.put(request.getUsername(), request.getPassword());
+            return new RegisterResponse("valid_token", request.getUsername());
+        } else {
+            return new RegisterResponse("Username already exists.");
+        }
     }
 
     /**

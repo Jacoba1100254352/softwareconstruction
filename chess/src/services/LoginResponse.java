@@ -16,6 +16,10 @@ public class LoginResponse {
      * The error message.
      */
     private String message;
+    /**
+     * Indicates if the login operation was successful.
+     */
+    private boolean success;
 
     /**
      * Default constructor.
@@ -97,5 +101,13 @@ public class LoginResponse {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }

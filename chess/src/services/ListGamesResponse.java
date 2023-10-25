@@ -12,6 +12,10 @@ public class ListGamesResponse {
      * A list of games.
      */
     private List<Game> games;
+    /**
+     * A message providing details or an error description.
+     */
+    private String message;
 
     /**
      * Default constructor.
@@ -36,5 +40,13 @@ public class ListGamesResponse {
 
     public void setGames(List<Game> games) {
         this.games = games;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

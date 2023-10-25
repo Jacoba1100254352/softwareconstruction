@@ -1,9 +1,17 @@
 package services;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Provides services for a user to join a game.
  */
 public class JoinGameService {
+    /**
+     * In-memory storage for the players in the games
+     */
+    private static final Map<String, List<String>> playersInGames = new HashMap<>();
     /**
      * The success status of the user joining the game.
      */
@@ -25,7 +33,13 @@ public class JoinGameService {
      * @return JoinGameResponse indicating success or failure.
      */
     public JoinGameResponse joinGame(JoinGameRequest request) {
-        return null;
+        // Check if game exists
+        if (playersInGames.containsKey(request.getGameId())) {
+            playersInGames.get(request.getGameId()).add(request.getUsername());
+            return new JoinGameResponse(true, "Joined game successfully.");
+        } else {
+            return new JoinGameResponse(false, "Game does not exist.");
+        }
     }
 
 
