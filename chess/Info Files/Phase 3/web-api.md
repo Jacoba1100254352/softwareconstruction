@@ -73,15 +73,15 @@ An API is a command a server makes available to the public. For your server thes
 
 Note that `whiteUsername` and `blackUsername` may be `null`.
 
-| property             | value                                                                                        |
-| -------------------- | -------------------------------------------------------------------------------------------- |
-| **Description**      | Gives a list of all games.                                                                   |
-| **URL path**         | `/game`                                                                                      |
-| **HTTP Method**      | `GET`                                                                                        |
-| **Headers**          | `authorization: <authToken>`                                                                 |
+| property             | value                                                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| **Description**      | Gives a list of all games.                                                                    |
+| **URL path**         | `/game`                                                                                       |
+| **HTTP Method**      | `GET`                                                                                         |
+| **Headers**          | `authorization: <authToken>`                                                                  |
 | **Success response** | [200] `{ "games": [{"gameID": 1234, "whiteUsername":"", "blackUsername":"", "gameName:""} ]}` |
-| **Failure response** | [401] `{ "message": "Error: unauthorized" }`                                                 |
-| **Failure response** | [500] `{ "message": "Error: description" }`                                                  |
+| **Failure response** | [401] `{ "message": "Error: unauthorized" }`                                                  |
+| **Failure response** | [500] `{ "message": "Error: description" }`                                                   |
 
 ### Create Game
 
@@ -252,10 +252,9 @@ The Server acts as the director of traffic. It receives HTTP requests and sends 
 
 Good tests extensively show that we get the expected behavior. This could be asserting that data put into the database is really there, or that a function throws an error when it should. Write a positive and a negative JUNIT test case for each public method on your Service classes, except for Clear which only needs a positive test case. A positive test case is one for which the action happens successfully (e.g., successfully claiming a spot in a game). A negative test case is one for which the operation fails (e.g., trying to claim an already claimed spot).
 
-## Example Code 
+## Example Code
 
 You might find it helpful to reference the course instruction topic on how to writing a [web API](../../instruction/web-api/web-api.md) when you are trying to figure out how to get started with the phase of the project.
-
 
 ## Pass Off Tests
 
@@ -269,15 +268,15 @@ For this phase the TAs will grade the quality of your project's source code. The
 
 ## Pass Off, Submission, and Grading
 
-To pass off this assignment, meet with a TA and demonstrate that your code passes the provided test cases.
+To pass off this assignment, meet with a TA and demonstrate that your code passes the provided test cases and that your test web page loads correctly. You must pass this part to recieve credit for any part of the assignment.
+
+After checking the above, the TA will run and review the test cases your wrote for the Services classes and grade them accoridng to the rubric.
 
 After you pass off your project with a TA, you should immediately submit your project source code for grading. Your grade on the project will be determined by the date you submitted your source code after passing off, not the date that you passed off. If we never receive your source code, you will not receive credit for the assignment. Here are the instructions for submitting your project source code:
 
 - In Intellij, navigate to the "Build" menu at the top of the screen and select "Clean Project" to remove auto-generated build files (if this option is not available, you can skip this step).
 - Create a ZIP file containing your whole project folder (not just the Java source files).
 - Submit your ZIP file on Canvas under the `Chess Web API` assignment.
-- To demonstrate that your test cases execute successfully, you should run your unit tests inside Intellij and take a screenshot of the successful test results displayed by Intellij. Please take one screenshot that shows the result of all of your tests passing. The tests used for the screenshot must be the same as the ones submitted in the Code Quality assignment ZIP file.
-- Submit your screenshot under the `Chess Web API` assignment on Canvas. The screenshot is submitted separately from your code ZIP file.
 
 ### Grading Rubric
 
@@ -288,4 +287,3 @@ After you pass off your project with a TA, you should immediately submit your pr
 | Code Quality   | [Rubric](../code-quality-rubric.md)                                                                                                                                                     |     30 |
 | Unit Tests     | All test cases pass<br/>Each public method on Service classes has two test cases, one positive test and one negative test<br/>Every test case includes an Assert statement of some type |     25 |
 |                | Total                                                                                                                                                                                   |    180 |
-
