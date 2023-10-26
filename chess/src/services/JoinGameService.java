@@ -1,8 +1,8 @@
 package services;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import models.Game;
+import storage.GameStorage;
+import storage.StorageManager;
 
 /**
  * Provides services for a user to join a game.
@@ -11,7 +11,8 @@ public class JoinGameService {
     /**
      * In-memory storage for the players in the games
      */
-    private static final Map<String, List<String>> playersInGames = new HashMap<>();
+    GameStorage gameStorage = StorageManager.getInstance().getGameStorage();
+
     /**
      * The success status of the user joining the game.
      */
@@ -33,12 +34,26 @@ public class JoinGameService {
      * @return JoinGameResponse indicating success or failure.
      */
     public JoinGameResponse joinGame(JoinGameRequest request) {
+        Integer gameId = Integer.parseInt(request.getGameId());
+        Game game = gameStorage.getGames().get(gameId);
+        // NOTE: Consider: Game game = gameStorage.getGames().get(request.getGameId());
+
         // Check if game exists
-        if (playersInGames.containsKey(request.getGameId())) {
-            playersInGames.get(request.getGameId()).add(request.getUsername());
-            return new JoinGameResponse(true, "Joined game successfully.");
-        } else return new JoinGameResponse(false, "Game does not exist.");
+        if (game != null) {
+            if (game.getWhiteUsername().isEmpty()) {
+                game.setWhiteUsername(request.getUsername());
+                return new JoinGameResponse(true, "Joined game as White player.");
+            } else if (game.getBlackUsername().isEmpty()) {
+                game.setBlackUsername(request.getUsername());
+                return new JoinGameResponse(true, "Joined game as Black player.");
+            } else {
+                return new JoinGameResponse(false, "Game is already full.");
+            }
+        } else {
+            return new JoinGameResponse(false, "Game does not exist.");
+        }
     }
+
 
 
     ///   Getters and setters   ///

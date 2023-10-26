@@ -1,9 +1,8 @@
 package dataAccess;
 
 import models.User;
-
-import java.util.HashMap;
-import java.util.Map;
+import storage.StorageManager;
+import storage.UserStorage;
 
 /**
  * Responsible for handling user-related data operations.
@@ -13,13 +12,13 @@ public class UserDAO {
     /**
      * In-memory storage for users
      */
-    private final Map<String, User> userMap;
+    private final UserStorage userStorage;
 
     /**
-     * Default constructor.
+     * Default constructor. NOTE: May want to reset with new empty User Storage
      */
     public UserDAO() {
-        userMap = new HashMap<>();
+        userStorage = StorageManager.getInstance().getUserStorage();
     }
 
     /**
@@ -29,10 +28,10 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during insertion.
      */
     public void insertUser(User user) throws DataAccessException {
-        if (userMap.containsKey(user.getUsername())) {
+        if (userStorage.getUsers().containsKey(user.getUsername())) {
             throw new DataAccessException("User with this username already exists.");
         }
-        userMap.put(user.getUsername(), user);
+        userStorage.getUsers().put(user.getUsername(), user);
     }
 
     /**
@@ -43,7 +42,7 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during retrieval.
      */
     public User getUser(String username) throws DataAccessException {
-        return userMap.get(username);
+        return userStorage.getUsers().get(username);
     }
 
     /**
@@ -53,9 +52,10 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during update or user doesn't exist.
      */
     public void updateUser(User user) throws DataAccessException {
-        if (!userMap.containsKey(user.getUsername()))
+        if (!userStorage.getUsers().containsKey(user.getUsername())) {
             throw new DataAccessException("User not found.");
-        userMap.put(user.getUsername(), user);
+        }
+        userStorage.getUsers().put(user.getUsername(), user);
     }
 
     /**
@@ -65,8 +65,9 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during deletion or user doesn't exist.
      */
     public void deleteUser(String username) throws DataAccessException {
-        if (!userMap.containsKey(username))
+        if (!userStorage.getUsers().containsKey(username)) {
             throw new DataAccessException("User not found.");
-        userMap.remove(username);
+        }
+        userStorage.getUsers().remove(username);
     }
 }

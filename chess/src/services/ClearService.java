@@ -1,16 +1,11 @@
 package services;
 
-import java.util.ArrayList;
-import java.util.List;
+import storage.StorageManager;
 
 /**
  * Provides services to clear the application's database.
  */
 public class ClearService {
-    /**
-     * In-memory database storage
-     */
-    private static final List<Object> database = new ArrayList<>();
 
     /**
      * Default constructor.
@@ -26,7 +21,12 @@ public class ClearService {
     public ClearResponse clearDatabase(ClearRequest request) {
         // Validate the authToken (for simplicity, let's assume a valid token is "valid_token")
         if ("valid_token".equals(request.getAuthToken())) {
-            database.clear();
+            // Clear user data
+            StorageManager.getInstance().getUserStorage().getUsers().clear();
+
+            // Clear game data
+            StorageManager.getInstance().getGameStorage().getGames().clear();
+
             return new ClearResponse(true, "Database cleared successfully.");
         } else {
             return new ClearResponse(false, "Invalid authentication token.");

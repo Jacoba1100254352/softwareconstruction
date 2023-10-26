@@ -20,11 +20,11 @@ public class LogoutHandler extends BaseHandler {
 
         if (!result.isSuccess()) {
             response.status(401); // Unauthorized
-            return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            return new ErrorResponse("Error: unauthorized");
         }
 
         response.status(200);
-        return gson.toJson(new SuccessResponse("Logged out successfully."));
+        return new SuccessResponse("Logged out successfully.");
 
     }
 }

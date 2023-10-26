@@ -13,10 +13,10 @@ public class LoginHandler extends BaseHandler {
 
         if (result.getMessage() != null) {
             response.status(401); // Unauthorized
-            return gson.toJson(result);
+            return result;
         }
 
         response.status(200);
-        return gson.toJson(result);
+        return result;
     }
 }

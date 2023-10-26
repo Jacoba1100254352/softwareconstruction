@@ -16,10 +16,10 @@ public class CreateGameHandler extends BaseHandler {
 
         if (result == null || result.getGameID() == 0) {
             response.status(400);
-            return gson.toJson(new ErrorResponse("Invalid authentication token or game creation failed."));
+            return new ErrorResponse("Invalid authentication token or game creation failed.");
         }
 
         response.status(200);
-        return gson.toJson(result);
+        return result;
     }
 }

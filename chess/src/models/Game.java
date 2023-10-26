@@ -33,6 +33,22 @@ public class Game {
     public Game() { }
 
     /**
+     * Constructs a game with a given ID and name.
+     * Other attributes can be set later.
+     *
+     * @param gameID The unique ID of the game.
+     * @param gameName The name of the game.
+     */
+    public Game(int gameID, String gameName) {
+        this.gameID = gameID;
+        this.gameName = gameName;
+        this.whiteUsername = "";  // or null
+        this.blackUsername = "";  // or null
+        this.game = null;
+    }
+
+
+    /**
      * Constructs a game with the specified values.
      *
      * @param gameID The unique ID of the game.

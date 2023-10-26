@@ -19,10 +19,10 @@ public class ClearHandler extends BaseHandler {
 
         if (result.isSuccess()) {
             response.status(200);
-            return gson.toJson(new SuccessResponse("Database cleared successfully."));
+            return new SuccessResponse("Database cleared successfully.");
         } else {
             response.status(401); // Unauthorized
-            return gson.toJson(new ErrorResponse(result.getMessage()));
+            return new ErrorResponse(result.getMessage());
         }
     }
 }

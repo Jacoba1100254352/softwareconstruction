@@ -1,7 +1,8 @@
 package services;
 
-import java.util.ArrayList;
-import java.util.List;
+import models.Game;
+import storage.GameStorage;
+import storage.StorageManager;
 
 /**
  * Provides services to create a new game.
@@ -10,11 +11,7 @@ public class CreateGameService {
     /**
      * In-memory storage for games
      */
-    private static final List<String> games = new ArrayList<>();
-    /**
-     * Count the game id's created
-     */
-    private static int idCounter = 0;
+    GameStorage gameStorage = StorageManager.getInstance().getGameStorage();
 
     /**
      * Default constructor.
@@ -30,8 +27,9 @@ public class CreateGameService {
     public CreateGameResponse createGame(CreateGameRequest request) {
         // Validate the authToken
         if ("valid_token".equals(request.getAuthToken())) {
-            games.add(request.getGameName());
-            return new CreateGameResponse(idCounter++);
+            Game newGame = new Game(gameStorage.getNextGameId(), request.getGameName());
+            gameStorage.getGames().put(newGame.getGameID(), newGame);
+            return new CreateGameResponse(newGame.getGameID());
         } else {
             return null;  // For simplicity, return null on failure. Consider using a more descriptive response.
         }

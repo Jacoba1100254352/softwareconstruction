@@ -1,7 +1,8 @@
 package dataAccess;
 
-import java.util.HashMap;
-import java.util.Map;
+
+import storage.StorageManager;
+import storage.TokenStorage;
 
 /**
  * Responsible for handling authentication-related data operations.
@@ -11,13 +12,13 @@ public class AuthDAO {
     /**
      * In-memory storage for auth tokens and associated usernames
      */
-    private Map<String, String> tokenToUsernameMap;
+    private final TokenStorage tokenStorage;
 
     /**
      * Default constructor.
      */
     public AuthDAO() {
-        tokenToUsernameMap = new HashMap<>();
+        this.tokenStorage = StorageManager.getInstance().getTokenStorage();
     }
 
     /**
@@ -28,10 +29,10 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void insert(String token, String username) throws DataAccessException {
-        if (tokenToUsernameMap.containsKey(token)) {
+        if (tokenStorage.containsToken(token)) {
             throw new DataAccessException("Token already exists.");
         }
-        tokenToUsernameMap.put(token, username);
+        tokenStorage.addToken(token, username);
     }
 
     /**
@@ -42,7 +43,7 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public String find(String token) throws DataAccessException {
-        return tokenToUsernameMap.get(token);
+        return tokenStorage.getUsernameForToken(token);
     }
 
     /**
@@ -52,10 +53,10 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void delete(String token) throws DataAccessException {
-        if (!tokenToUsernameMap.containsKey(token)) {
+        if (!tokenStorage.containsToken(token)) {
             throw new DataAccessException("Token not found.");
         }
-        tokenToUsernameMap.remove(token);
+        tokenStorage.removeToken(token);
     }
 
     /**
@@ -64,6 +65,6 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void clear() throws DataAccessException {
-        tokenToUsernameMap.clear();
+        tokenStorage.clear();
     }
 }

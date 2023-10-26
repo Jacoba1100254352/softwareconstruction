@@ -20,10 +20,10 @@ public class JoinGameHandler extends BaseHandler {
 
         if (!result.isSuccess()) {
             response.status(400);
-            return gson.toJson(result);
+            return result;
         }
 
         response.status(200);
-        return gson.toJson(result);
+        return result;
     }
 }

@@ -1,12 +1,12 @@
 package dataAccess;
 
-import chess.*;
+import chess.ChessGame;
 import models.Game;
+import storage.GameStorage;
+import storage.StorageManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * DAO class for handling game-related data operations.
@@ -14,13 +14,13 @@ import java.util.Map;
 public class GameDAO {
 
     // In-memory storage for games
-    private final Map<Integer, Game> gameMap;
+    private final GameStorage gameStorage;
 
     /**
      * Default constructor.
      */
     public GameDAO() {
-        gameMap = new HashMap<>();
+        gameStorage = StorageManager.getInstance().getGameStorage();
     }
 
     /**
@@ -30,10 +30,10 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void insertGame(Game game) throws DataAccessException {
-        if (gameMap.containsKey(game.getGameID())) {
+        if (gameStorage.getGames().containsKey(game.getGameID())) {
             throw new DataAccessException("Game with this ID already exists.");
         }
-        gameMap.put(game.getGameID(), game);
+        gameStorage.getGames().put(game.getGameID(), game);
     }
 
     /**
@@ -43,11 +43,12 @@ public class GameDAO {
      * @return The retrieved game object.
      * @throws DataAccessException if the operation fails.
      */
-    public Game findGameById(String gameID) throws DataAccessException {
-        if (!gameMap.containsKey(gameID)) {
+    public Game findGameById(int gameID) throws DataAccessException {
+        Game game = gameStorage.getGames().get(gameID);
+        if (game == null) {
             throw new DataAccessException("Game not found.");
         }
-        return gameMap.get(gameID);
+        return game;
     }
 
     /**
@@ -57,7 +58,7 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public List<Game> findAllGames() throws DataAccessException {
-        return new ArrayList<>(gameMap.values());
+        return new ArrayList<>(gameStorage.getGames().values());
     }
 
     /**
@@ -68,24 +69,28 @@ public class GameDAO {
      * @param color The color (WHITE/BLACK) the player wants.
      * @throws DataAccessException if the operation fails.
      */
-    public void claimSpot(String gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
-        if (!gameMap.containsKey(gameID)) {
-            throw new DataAccessException("Game not found.");
-        }
+    public void claimSpot(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
+        Game game = findGameById(gameID);
 
-        Game game = gameMap.get(gameID);
         if (color == ChessGame.TeamColor.WHITE) {
             if (game.getWhiteUsername() != null) {
                 throw new DataAccessException("White player spot is already taken.");
+            }
+            if(username.equals(game.getBlackUsername())) {
+                throw new DataAccessException("Player already claimed the black spot.");
             }
             game.setWhiteUsername(username);
         } else if (color == ChessGame.TeamColor.BLACK) {
             if (game.getBlackUsername() != null) {
                 throw new DataAccessException("Black player spot is already taken.");
             }
+            if(username.equals(game.getWhiteUsername())) {
+                throw new DataAccessException("Player already claimed the white spot.");
+            }
             game.setBlackUsername(username);
         }
     }
+
 
     /**
      * Updates the chess game in the data store.
@@ -94,12 +99,8 @@ public class GameDAO {
      * @param newChessGame The new ChessGame object to replace the existing one.
      * @throws DataAccessException if the operation fails.
      */
-    public void updateGame(String gameID, ChessGame newChessGame) throws DataAccessException {
-        if (!gameMap.containsKey(gameID)) {
-            throw new DataAccessException("Game not found.");
-        }
-
-        Game game = gameMap.get(gameID);
+    public void updateGame(int gameID, ChessGame newChessGame) throws DataAccessException {
+        Game game = findGameById(gameID);
         game.setGame(newChessGame);
     }
 
@@ -109,11 +110,11 @@ public class GameDAO {
      * @param gameID The ID of the game to be removed.
      * @throws DataAccessException if the operation fails.
      */
-    public void removeGame(String gameID) throws DataAccessException {
-        if (!gameMap.containsKey(gameID)) {
+    public void removeGame(int gameID) throws DataAccessException {
+        if (!gameStorage.getGames().containsKey(gameID)) {
             throw new DataAccessException("Game not found.");
         }
-        gameMap.remove(gameID);
+        gameStorage.getGames().remove(gameID);
     }
 
     /**
@@ -122,6 +123,6 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void clearAll() throws DataAccessException {
-        gameMap.clear();
+        gameStorage.getGames().clear();
     }
 }

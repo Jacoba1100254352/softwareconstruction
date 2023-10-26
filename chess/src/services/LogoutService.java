@@ -1,16 +1,11 @@
 package services;
 
-import java.util.HashSet;
-import java.util.Set;
+import storage.*;
 
 /**
  * Provides services to logout a user.
  */
 public class LogoutService {
-    /**
-     * In-memory storage for the valid Tokens
-     */
-    private static final Set<String> validTokens = new HashSet<>();
 
     /**
      * Default constructor.
@@ -24,11 +19,11 @@ public class LogoutService {
      * @return LogoutResponse indicating success or failure.
      */
     public LogoutResponse logout(LogoutRequest request) {
-        if (validTokens.contains(request.getAuthToken())) {
-            validTokens.remove(request.getAuthToken());
+        TokenStorage tokens = StorageManager.getInstance().getTokenStorage();
+
+        if (tokens.containsToken(request.getAuthToken())) {
+            tokens.removeToken(request.getAuthToken());
             return new LogoutResponse(true, "Logged out successfully.");
-        } else {
-            return new LogoutResponse(false, "Invalid authentication token.");
-        }
+        } else return new LogoutResponse(false, "Invalid authentication token.");
     }
 }
