@@ -5,6 +5,10 @@ package services;
  */
 public class JoinGameRequest {
     /**
+     * The authentication token of the user trying to join a game.
+     */
+    private String authToken;
+    /**
      * The unique ID of the game.
      */
     private String gameId;
@@ -66,5 +70,13 @@ public class JoinGameRequest {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 }

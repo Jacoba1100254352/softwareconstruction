@@ -37,9 +37,7 @@ public class JoinGameService {
         if (playersInGames.containsKey(request.getGameId())) {
             playersInGames.get(request.getGameId()).add(request.getUsername());
             return new JoinGameResponse(true, "Joined game successfully.");
-        } else {
-            return new JoinGameResponse(false, "Game does not exist.");
-        }
+        } else return new JoinGameResponse(false, "Game does not exist.");
     }
 
 
