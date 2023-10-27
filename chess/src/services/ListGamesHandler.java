@@ -12,12 +12,15 @@ public class ListGamesHandler extends BaseHandler {
         ListGamesService listGamesService = new ListGamesService();
         ListGamesResponse result = listGamesService.listAllGames(listGamesRequest);
 
-        if (result.getMessage() != null) {
-            response.status(401); // Unauthorized
-            return result;
+        if (!result.isSuccess()) {
+            if ("Error: unauthorized".equals(result.getMessage())) {
+                response.status(401);
+            } else {
+                response.status(500);
+            }
+        } else {
+            response.status(200);
         }
-
-        response.status(200);
         return result;
     }
 }

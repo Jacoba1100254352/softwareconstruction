@@ -16,10 +16,6 @@ public class RegisterResponse {
      * The error message.
      */
     private String message;
-    /**
-     * Indicates if the register operation was successful.
-     */
-    private boolean success;
 
     /**
      * Default constructor.
@@ -101,13 +97,5 @@ public class RegisterResponse {
      */
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
     }
 }

@@ -1,11 +1,11 @@
 package services;
 
-        import spark.Request;
-        import spark.Response;
-        import spark.Spark;
+import spark.Request;
+import spark.Response;
+import spark.Spark;
 
-        import java.util.HashMap;
-        import java.util.Map;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
     private final Map<String, BaseHandler> handlers;
@@ -13,31 +13,34 @@ public class Server {
     public Server() {
         handlers = new HashMap<>();
 
-        // Using compound keys (path + method) for handlers
-        handlers.put("/dbDELETE", new ClearHandler());
-        handlers.put("/userPOST", new RegisterHandler());
-        handlers.put("/sessionPOST", new LoginHandler());
-        handlers.put("/sessionDELETE", new LogoutHandler());
-        handlers.put("/gameGET", new ListGamesHandler());
-        handlers.put("/gamePOST", new CreateGameHandler());
-        handlers.put("/gamePUT", new JoinGameHandler());
+        // Using compound keys (path + method) with separators for handlers
+        handlers.put("/db:DELETE", new ClearHandler());
+        handlers.put("/user:POST", new RegisterHandler());
+        handlers.put("/session:POST", new LoginHandler());
+        handlers.put("/session:DELETE", new LogoutHandler());
+        handlers.put("/game:GET", new ListGamesHandler());
+        handlers.put("/game:POST", new CreateGameHandler());
+        handlers.put("/game:PUT", new JoinGameHandler());
     }
 
     public String handleRequest(Request req, Response res) {
-        String key = req.pathInfo() + req.requestMethod();
+        String key = req.pathInfo() + ":" + req.requestMethod();
         BaseHandler handler = handlers.get(key);
 
         if (handler != null) {
             try {
                 Object result = handler.handleRequest(req, res); // Updated to pass Spark's request and response
+                res.type("application/json"); // Set response type to JSON
                 return BaseHandler.gson.toJson(result); // Convert the result object to JSON string
             } catch (Exception e) {
                 res.status(500);
-                return "Internal Server Error: " + e.getMessage();
+                res.type("application/json");
+                return "{\"error\":\"Internal Server Error: " + e.getMessage() + "\"}";
             }
         } else {
             res.status(404);
-            return "Not Found";
+            res.type("application/json");
+            return "{\"error\":\"Not Found\"}";
         }
     }
 
@@ -66,5 +69,3 @@ public class Server {
         server.start();
     }
 }
-
-

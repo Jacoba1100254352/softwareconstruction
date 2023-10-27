@@ -10,13 +10,21 @@ public class CreateGameHandler extends BaseHandler {
         String authToken = request.headers("Authorization");
         CreateGameRequest createGameRequest = gson.fromJson(request.body(), CreateGameRequest.class);
         createGameRequest.setAuthToken(authToken);
-
         CreateGameService createGameService = new CreateGameService();
         CreateGameResponse result = createGameService.createGame(createGameRequest);
 
-        if (result == null || result.getGameID() == 0) {
-            response.status(400);
-            return new ErrorResponse("Invalid authentication token or game creation failed.");
+        if (result == null) {
+            response.status(500);
+            return new CreateGameResponse("Error: unexpected error occurred.");
+        } else if (result.getGameID() == 0) {
+            if ("Error: bad request".equals(result.getMessage())) {
+                response.status(400);
+            } else if ("Error: unauthorized".equals(result.getMessage())) {
+                response.status(401);
+            } else {
+                response.status(500);
+            }
+            return result;
         }
 
         response.status(200);

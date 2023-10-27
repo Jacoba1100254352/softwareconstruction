@@ -16,6 +16,10 @@ public class ListGamesResponse {
      * A message providing details or an error description.
      */
     private String message;
+    /**
+     * The game listing was successful
+     */
+    private boolean success = true;  // Default to true. Set to false on errors.
 
     /**
      * Default constructor.
@@ -48,5 +52,13 @@ public class ListGamesResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }

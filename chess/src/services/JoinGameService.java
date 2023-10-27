@@ -36,21 +36,29 @@ public class JoinGameService {
     public JoinGameResponse joinGame(JoinGameRequest request) {
         Integer gameId = Integer.parseInt(request.getGameId());
         Game game = gameStorage.getGames().get(gameId);
-        // NOTE: Consider: Game game = gameStorage.getGames().get(request.getGameId());
 
-        // Check if game exists
-        if (game != null) {
-            if (game.getWhiteUsername().isEmpty()) {
-                game.setWhiteUsername(request.getUsername());
-                return new JoinGameResponse(true, "Joined game as White player.");
-            } else if (game.getBlackUsername().isEmpty()) {
-                game.setBlackUsername(request.getUsername());
-                return new JoinGameResponse(true, "Joined game as Black player.");
-            } else {
-                return new JoinGameResponse(false, "Game is already full.");
-            }
-        } else {
-            return new JoinGameResponse(false, "Game does not exist.");
+        if (game == null) {
+            return new JoinGameResponse(false, "Error: bad request");  // Game does not exist
+        }
+
+        switch(request.getPlayerColor().toUpperCase()) {
+            case "WHITE":
+                if (game.getWhiteUsername().isEmpty()) {
+                    game.setWhiteUsername(request.getUsername());
+                    return new JoinGameResponse(true, "");
+                } else {
+                    return new JoinGameResponse(false, "Error: already taken");
+                }
+            case "BLACK":
+                if (game.getBlackUsername().isEmpty()) {
+                    game.setBlackUsername(request.getUsername());
+                    return new JoinGameResponse(true, "");
+                } else {
+                    return new JoinGameResponse(false, "Error: already taken");
+                }
+            default:
+                // Observer or any other logic for unrecognized color
+                return new JoinGameResponse(true, "");
         }
     }
 

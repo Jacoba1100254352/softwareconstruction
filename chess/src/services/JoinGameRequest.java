@@ -16,6 +16,10 @@ public class JoinGameRequest {
      * The username of the user.
      */
     private String username;
+    /**
+     * The color the player wishes to play as.
+     */
+    private String playerColor;
 
     /**
      * Default constructor.
@@ -27,10 +31,12 @@ public class JoinGameRequest {
      *
      * @param gameId The unique ID of the game.
      * @param username The username of the user.
+     * @param playerColor The color the player wishes to play as.
      */
-    public JoinGameRequest(String gameId, String username) {
+    public JoinGameRequest(String gameId, String username, String playerColor) {
         this.gameId = gameId;
         this.username = username;
+        this.playerColor = playerColor;
     }
 
 
@@ -70,6 +76,24 @@ public class JoinGameRequest {
      */
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     * Retrieves the player's color.
+     *
+     * @return The player's color.
+     */
+    public String getPlayerColor() {
+        return playerColor;
+    }
+
+    /**
+     * Sets the player's color.
+     *
+     * @param playerColor The color to be set.
+     */
+    public void setPlayerColor(String playerColor) {
+        this.playerColor = playerColor;
     }
 
     public String getAuthToken() {

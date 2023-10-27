@@ -1,6 +1,7 @@
 package services;
 
-import storage.*;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
 
 /**
  * Provides services to logout a user.
@@ -19,11 +20,15 @@ public class LogoutService {
      * @return LogoutResponse indicating success or failure.
      */
     public LogoutResponse logout(LogoutRequest request) {
-        TokenStorage tokens = StorageManager.getInstance().getTokenStorage();
-
-        if (tokens.containsToken(request.getAuthToken())) {
-            tokens.removeToken(request.getAuthToken());
+        AuthDAO authDAO = new AuthDAO();
+        try {
+            if (authDAO.find(request.getAuthToken()) == null) {
+                return new LogoutResponse(false, "Error: unauthorized");
+            }
+            authDAO.delete(request.getAuthToken());
             return new LogoutResponse(true, "Logged out successfully.");
-        } else return new LogoutResponse(false, "Invalid authentication token.");
+        } catch (DataAccessException e) {
+            return new LogoutResponse(false, "Error: " + e.getMessage());
+        }
     }
 }

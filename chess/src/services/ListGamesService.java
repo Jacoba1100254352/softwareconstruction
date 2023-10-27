@@ -2,6 +2,7 @@ package services;
 
 import storage.GameStorage;
 import storage.StorageManager;
+import storage.TokenStorage;
 
 import java.util.ArrayList;
 
@@ -26,13 +27,22 @@ public class ListGamesService {
      * @return ListGamesResponse containing a list of all games.
      */
     public ListGamesResponse listAllGames(ListGamesRequest request) {
-        // Validate the authToken
-        if ("valid_token".equals(request.getAuthToken())) {
-            return new ListGamesResponse(new ArrayList<>(gameStorage.getGames().values())); // Return a copy of the games list
-        } else {
-            ListGamesResponse response = new ListGamesResponse();
-            response.setMessage("Invalid authentication token.");
-            return response;
+        TokenStorage tokenStorage = StorageManager.getInstance().getTokenStorage();
+        if (!tokenStorage.containsToken(request.getAuthToken())) {
+            ListGamesResponse errorResponse = new ListGamesResponse();
+            errorResponse.setSuccess(false);
+            errorResponse.setMessage("Error: unauthorized");
+            return errorResponse;
+        }
+
+        try {
+            return new ListGamesResponse(new ArrayList<>(gameStorage.getGames().values()));
+        } catch (Exception e) {
+            ListGamesResponse errorResponse = new ListGamesResponse();
+            errorResponse.setSuccess(false);
+            errorResponse.setMessage("Error: " + e.getMessage());
+            return errorResponse;
         }
     }
+
 }

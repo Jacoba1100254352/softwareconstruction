@@ -7,24 +7,26 @@ public class LogoutHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
         response.type("application/json");
-
         String authToken = request.headers("Authorization");
 
-        // Create a LogoutRequest object and set the authToken
+        if (authToken == null || authToken.isEmpty()) {
+            response.status(400);
+            return new LogoutResponse(false, "Error: Missing or empty Authorization header");
+        }
+
         LogoutRequest logoutRequest = new LogoutRequest(authToken);
-
         LogoutService logoutService = new LogoutService();
-
-        // Pass the LogoutRequest object to the service method
         LogoutResponse result = logoutService.logout(logoutRequest);
 
         if (!result.isSuccess()) {
-            response.status(401); // Unauthorized
-            return new ErrorResponse("Error: unauthorized");
+            if (result.getMessage().equals("Error: unauthorized")) {
+                response.status(401);
+            } else {
+                response.status(500);
+            }
+        } else {
+            response.status(200);
         }
-
-        response.status(200);
-        return new SuccessResponse("Logged out successfully.");
-
+        return result;
     }
 }

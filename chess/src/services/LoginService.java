@@ -40,7 +40,7 @@ public class LoginService {
         if (user != null && user.getPassword().equals(request.getPassword())) {
             return new LoginResponse("valid_token", request.getUsername());
         } else {
-            return new LoginResponse("Invalid username or password.");
+            return new LoginResponse("Error: unauthorized");
         }
     }
 

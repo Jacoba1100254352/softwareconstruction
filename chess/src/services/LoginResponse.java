@@ -35,6 +35,7 @@ public class LoginResponse {
     public LoginResponse(String authToken, String username) {
         this.authToken = authToken;
         this.username = username;
+        this.success = true;  // true: successful login
     }
 
     /**
@@ -44,6 +45,7 @@ public class LoginResponse {
      */
     public LoginResponse(String message) {
         this.message = message;
+        this.success = false;  // false for error messages
     }
 
 

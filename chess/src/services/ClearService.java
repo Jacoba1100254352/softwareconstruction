@@ -29,7 +29,7 @@ public class ClearService {
 
             return new ClearResponse(true, "Database cleared successfully.");
         } else {
-            return new ClearResponse(false, "Invalid authentication token.");
+            return new ClearResponse(false, "Error: Invalid authentication token.");
         }
     }
 }
