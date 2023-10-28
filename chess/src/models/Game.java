@@ -9,7 +9,7 @@ public class Game {
     /**
      * The unique ID of the game.
      */
-    private int gameID;
+    private Integer gameID;
     /**
      * The white player's username.
      */
@@ -39,7 +39,7 @@ public class Game {
      * @param gameID The unique ID of the game.
      * @param gameName The name of the game.
      */
-    public Game(int gameID, String gameName) {
+    public Game(Integer gameID, String gameName) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = "";  // or null
@@ -57,7 +57,7 @@ public class Game {
      * @param gameName The name of the game.
      * @param game The chess game.
      */
-    public Game(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
+    public Game(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
@@ -73,7 +73,7 @@ public class Game {
      *
      * @return The game ID.
      */
-    public int getGameID() {
+    public Integer getGameID() {
         return this.gameID;
     }
 
@@ -82,7 +82,7 @@ public class Game {
      *
      * @param gameID The game ID to be set.
      */
-    public void setGameID(int gameID) {
+    public void setGameID(Integer gameID) {
         this.gameID = gameID;
     }
 

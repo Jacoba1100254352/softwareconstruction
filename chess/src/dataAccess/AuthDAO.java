@@ -29,9 +29,9 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void insertAuth(String token, String username) throws DataAccessException {
-        if (tokenStorage.containsToken(token)) {
+        if (tokenStorage.containsToken(token))
             throw new DataAccessException("Token already exists.");
-        }
+
         tokenStorage.addToken(token, username);
     }
 
@@ -53,18 +53,16 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void deleteAuth(String token) throws DataAccessException {
-        if (!tokenStorage.containsToken(token)) {
+        if (!tokenStorage.containsToken(token))
             throw new DataAccessException("Token not found.");
-        }
+
         tokenStorage.removeToken(token);
     }
 
     /**
      * Clears all data from the database.
-     *
-     * @throws DataAccessException if there's an error in the data access operation.
      */
-    public void clearAuth() throws DataAccessException {
+    public void clearAuth() {
         tokenStorage.clearTokens();
     }
 }

@@ -14,19 +14,12 @@ public class LogoutHandler extends BaseHandler {
             return new LogoutResponse(false, "Error: Missing or empty Authorization header");
         }
 
-        LogoutRequest logoutRequest = new LogoutRequest(authToken);
-        LogoutService logoutService = new LogoutService();
-        LogoutResponse result = logoutService.logout(logoutRequest);
+        LogoutResponse result = (new LogoutService()).logout(new LogoutRequest(authToken));
 
-        if (!result.isSuccess()) {
-            if (result.getMessage().equals("Error: unauthorized")) {
-                response.status(401);
-            } else {
-                response.status(500);
-            }
-        } else {
+        if (result.isSuccess())
             response.status(200);
-        }
+        else response.status(result.getMessage().equals("Error: unauthorized") ? 500 : 401);
+
         return result;
     }
 }

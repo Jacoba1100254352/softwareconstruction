@@ -42,7 +42,7 @@ public class GameDAO {
      * @return The retrieved game object.
      * @throws DataAccessException if the operation fails.
      */
-    public Game findGameById(int gameID) throws DataAccessException {
+    public Game findGameById(Integer gameID) throws DataAccessException {
         Game game = gameStorage.getGame(gameID);
         if (game == null) {
             throw new DataAccessException("Game not found.");
@@ -68,7 +68,7 @@ public class GameDAO {
      * @param color The color (WHITE/BLACK) the player wants.
      * @throws DataAccessException if the operation fails.
      */
-    public void claimSpot(int gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
+    public void claimSpot(Integer gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         Game game = findGameById(gameID);
 
         if (color == ChessGame.TeamColor.WHITE) {
@@ -98,7 +98,7 @@ public class GameDAO {
      * @param newChessGame The new ChessGame object to replace the existing one.
      * @throws DataAccessException if the operation fails.
      */
-    public void updateGame(int gameID, ChessGame newChessGame) throws DataAccessException {
+    public void updateGame(Integer gameID, ChessGame newChessGame) throws DataAccessException {
         Game game = findGameById(gameID);
         game.setGame(newChessGame);
     }
@@ -109,7 +109,7 @@ public class GameDAO {
      * @param gameID The ID of the game to be removed.
      * @throws DataAccessException if the operation fails.
      */
-    public void deleteGame(int gameID) throws DataAccessException {
+    public void deleteGame(Integer gameID) throws DataAccessException {
         if (!gameStorage.containsGame(gameID)) {
             throw new DataAccessException("Game not found.");
         }
@@ -120,7 +120,7 @@ public class GameDAO {
         gameStorage.clearGames();
     }
 
-    public int getNextGameID() {
+    public Integer getNextGameID() {
         return gameStorage.getNextGameId();
     }
 

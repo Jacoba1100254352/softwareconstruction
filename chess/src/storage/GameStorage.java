@@ -8,14 +8,19 @@ import java.util.List;
 import java.util.Map;
 
 public class GameStorage {
-    private final Map<Integer, Game> games = new HashMap<>();
-    private int idCounter = 0;
+    private final Map<Integer, Game> games;
+    private Integer idCounter;
 
-    public boolean containsGame(int gameID) {
+    public GameStorage() {
+        games = new HashMap<>();
+        idCounter = 0;
+    }
+
+    public boolean containsGame(Integer gameID) {
         return games.containsKey(gameID);
     }
 
-    public Game getGame(int gameID) {
+    public Game getGame(Integer gameID) {
         return games.get(gameID);
     }
 
@@ -23,7 +28,7 @@ public class GameStorage {
         games.put(game.getGameID(), game);
     }
 
-    public void deleteGame(int gameID) {
+    public void deleteGame(Integer gameID) {
         games.remove(gameID);
     }
 
@@ -33,7 +38,7 @@ public class GameStorage {
 
     public void clearGames() { games.clear(); }
 
-    public int getNextGameId() {
-        return idCounter++;
+    public Integer getNextGameId() {
+        return ++idCounter;
     }
 }
