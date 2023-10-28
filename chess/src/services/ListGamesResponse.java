@@ -35,6 +35,17 @@ public class ListGamesResponse {
         this.games = games;
     }
 
+    /**
+     * Constructs a new ListGamesResponse with the given list of games.
+     *
+     * @param success Indicates the success of the List Game Response.
+     * @param message A message providing details or an error description.
+     */
+    public ListGamesResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
+
 
     ///   Getters and setters   ///
 

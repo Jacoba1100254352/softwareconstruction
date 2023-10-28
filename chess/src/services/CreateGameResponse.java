@@ -8,7 +8,7 @@ public class CreateGameResponse {
     /**
      * The unique ID of the created game.
      */
-    private int gameID;
+    private Integer gameID;
 
     /**
      * A message providing details or an error description.
@@ -34,18 +34,18 @@ public class CreateGameResponse {
      *
      * @param gameID The unique ID of the created game.
      */
-    public CreateGameResponse(int gameID) {
+    public CreateGameResponse(Integer gameID) {
         this.gameID = gameID;
     }
 
 
     ///   Getters and setters   ///
 
-    public int getGameID() {
+    public Integer getGameID() {
         return gameID;
     }
 
-    public void setGameID(int gameID) {
+    public void setGameID(Integer gameID) {
         this.gameID = gameID;
     }
 

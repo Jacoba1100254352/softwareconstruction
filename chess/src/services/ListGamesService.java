@@ -3,9 +3,6 @@ package services;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
-import models.Game;
-
-import java.util.List;
 
 /**
  * Provides services to list all games.
@@ -29,19 +26,11 @@ public class ListGamesService {
     public ListGamesResponse listAllGames(ListGamesRequest request) {
         try {
             if (authDAO.findAuth(request.getAuthToken()) == null) {
-                ListGamesResponse errorResponse = new ListGamesResponse();
-                errorResponse.setSuccess(false);
-                errorResponse.setMessage("Error: unauthorized");
-                return errorResponse;
+                return new ListGamesResponse(false, "Error: unauthorized");
             }
-            List<Game> allGames = gameDAO.findAllGames();
-            return new ListGamesResponse(allGames);
+            return new ListGamesResponse(gameDAO.findAllGames());
         } catch (DataAccessException e) {
-            ListGamesResponse errorResponse = new ListGamesResponse();
-            errorResponse.setSuccess(false);
-            errorResponse.setMessage("Error: " + e.getMessage());
-            return errorResponse;
+            return new ListGamesResponse(false, "Error: " + e.getMessage());
         }
     }
-
 }

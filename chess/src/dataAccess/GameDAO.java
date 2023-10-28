@@ -54,9 +54,8 @@ public class GameDAO {
      * Retrieves all games from the data store.
      *
      * @return A list of all game objects.
-     * @throws DataAccessException if the operation fails.
      */
-    public List<Game> findAllGames() throws DataAccessException {
+    public List<Game> findAllGames() {
         return gameStorage.getAllGames();
     }
 
