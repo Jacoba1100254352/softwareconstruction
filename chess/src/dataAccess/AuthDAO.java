@@ -28,7 +28,7 @@ public class AuthDAO {
      * @param username The username for the associated user.
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public void insert(String token, String username) throws DataAccessException {
+    public void insertAuth(String token, String username) throws DataAccessException {
         if (tokenStorage.containsToken(token)) {
             throw new DataAccessException("Token already exists.");
         }
@@ -42,7 +42,7 @@ public class AuthDAO {
      * @return Username associated with the token or null if not found.
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public String find(String token) throws DataAccessException {
+    public String findAuth(String token) throws DataAccessException {
         return tokenStorage.getUsernameForToken(token);
     }
 
@@ -52,7 +52,7 @@ public class AuthDAO {
      * @param token The authentication token to be removed.
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public void delete(String token) throws DataAccessException {
+    public void deleteAuth(String token) throws DataAccessException {
         if (!tokenStorage.containsToken(token)) {
             throw new DataAccessException("Token not found.");
         }
@@ -64,7 +64,7 @@ public class AuthDAO {
      *
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public void clear() throws DataAccessException {
-        tokenStorage.clear();
+    public void clearAuth() throws DataAccessException {
+        tokenStorage.clearTokens();
     }
 }

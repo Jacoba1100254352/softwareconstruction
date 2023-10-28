@@ -1,8 +1,7 @@
 package services;
 
+import dataAccess.*;
 import models.User;
-import storage.StorageManager;
-import storage.UserStorage;
 
 import java.util.UUID;
 
@@ -10,10 +9,8 @@ import java.util.UUID;
  * Provides services for registering a user.
  */
 public class RegisterService {
-    /**
-     * In-memory storage for the users.
-     */
-    UserStorage users = StorageManager.getInstance().getUserStorage();
+    private final UserDAO userDAO = new UserDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     /**
      * Registers a new user.
@@ -22,21 +19,26 @@ public class RegisterService {
      * @return RegisterResponse indicating success or failure.
      */
     public RegisterResponse register(RegisterRequest request) {
-        if (request.getUsername() == null || request.getUsername().isEmpty() ||
-                request.getPassword() == null || request.getPassword().isEmpty() ||
-                request.getEmail() == null || request.getEmail().isEmpty()) {
-            return new RegisterResponse("Error: bad request");
-        }
+        try {
+            if (request.getUsername() == null || request.getUsername().isEmpty() ||
+                    request.getPassword() == null || request.getPassword().isEmpty() ||
+                    request.getEmail() == null || request.getEmail().isEmpty()) {
+                return new RegisterResponse("Error: bad request");
+            }
 
-        if (!users.getUsers().containsKey(request.getUsername())) {
-            User newUser = new User(request.getUsername(), request.getPassword(), request.getEmail());
-            users.getUsers().put(request.getUsername(), newUser);
+            if (userDAO.getUser(request.getUsername()) == null) {
+                User newUser = new User(request.getUsername(), request.getPassword(), request.getEmail());
+                userDAO.insertUser(newUser);
 
-            String uniqueToken = UUID.randomUUID().toString();
+                String uniqueToken = UUID.randomUUID().toString();
+                authDAO.insertAuth(uniqueToken, request.getUsername());
 
-            return new RegisterResponse(uniqueToken, request.getUsername());
-        } else {
-            return new RegisterResponse("Error: already taken");
+                return new RegisterResponse(uniqueToken, request.getUsername());
+            } else {
+                return new RegisterResponse("Error: already taken");
+            }
+        } catch (DataAccessException e) {
+            return new RegisterResponse("Error: " + e.getMessage());
         }
     }
 }

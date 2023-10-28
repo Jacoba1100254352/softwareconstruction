@@ -11,11 +11,7 @@ public class JoinGameRequest {
     /**
      * The unique ID of the game.
      */
-    private String gameId;
-    /**
-     * The username of the user.
-     */
-    private String username;
+    private int gameId;
     /**
      * The color the player wishes to play as.
      */
@@ -29,13 +25,13 @@ public class JoinGameRequest {
     /**
      * JoinGameRequest Explicit Constructor.
      *
+     * @param authToken The authentication token of the user.
      * @param gameId The unique ID of the game.
-     * @param username The username of the user.
      * @param playerColor The color the player wishes to play as.
      */
-    public JoinGameRequest(String gameId, String username, String playerColor) {
+    public JoinGameRequest(String authToken, int gameId, String playerColor) {
+        this.authToken = authToken;
         this.gameId = gameId;
-        this.username = username;
         this.playerColor = playerColor;
     }
 
@@ -47,7 +43,7 @@ public class JoinGameRequest {
      *
      * @return The game ID.
      */
-    public String getGameId() {
+    public int getGameId() {
         return gameId;
     }
 
@@ -56,26 +52,8 @@ public class JoinGameRequest {
      *
      * @param gameId The game ID to be set.
      */
-    public void setGameId(String gameId) {
+    public void setGameId(int gameId) {
         this.gameId = gameId;
-    }
-
-    /**
-     * Retrieves the username.
-     *
-     * @return The username.
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * Sets the username.
-     *
-     * @param username The username to be set.
-     */
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     /**

@@ -14,6 +14,10 @@ public class TokenStorage {
         return validTokens.contains(token);
     }
 
+    public Set<String> getAllTokens() {
+        return new HashSet<>(validTokens);
+    }
+
     public void addToken(String token, String username) {
         validTokens.add(token);
         tokenToUsernameMap.put(token, username);
@@ -28,7 +32,7 @@ public class TokenStorage {
         return tokenToUsernameMap.get(token);
     }
 
-    public void clear() {
+    public void clearTokens() {
         validTokens.clear();
         tokenToUsernameMap.clear();
     }

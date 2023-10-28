@@ -1,17 +1,16 @@
 package services;
 
-import models.Game;
-import storage.GameStorage;
-import storage.StorageManager;
+import chess.ChessGame;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
 
 /**
  * Provides services for a user to join a game.
  */
 public class JoinGameService {
-    /**
-     * In-memory storage for the players in the games
-     */
-    GameStorage gameStorage = StorageManager.getInstance().getGameStorage();
+    private final GameDAO gameDAO = new GameDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     /**
      * The success status of the user joining the game.
@@ -34,33 +33,40 @@ public class JoinGameService {
      * @return JoinGameResponse indicating success or failure.
      */
     public JoinGameResponse joinGame(JoinGameRequest request) {
-        Integer gameId = Integer.parseInt(request.getGameId());
-        Game game = gameStorage.getGames().get(gameId);
-
-        if (game == null) {
-            return new JoinGameResponse(false, "Error: bad request");  // Game does not exist
+        // Ensure gameID and playerColor are valid. If not, return "Error: bad request".
+        if (request.getGameId() <= 0 || (request.getPlayerColor() == null ||
+                (!request.getPlayerColor().equalsIgnoreCase("WHITE") && !request.getPlayerColor().equalsIgnoreCase("BLACK")))) {
+            return new JoinGameResponse(false, "Error: bad request");
         }
 
-        switch(request.getPlayerColor().toUpperCase()) {
-            case "WHITE":
-                if (game.getWhiteUsername().isEmpty()) {
-                    game.setWhiteUsername(request.getUsername());
-                    return new JoinGameResponse(true, "");
-                } else {
-                    return new JoinGameResponse(false, "Error: already taken");
-                }
-            case "BLACK":
-                if (game.getBlackUsername().isEmpty()) {
-                    game.setBlackUsername(request.getUsername());
-                    return new JoinGameResponse(true, "");
-                } else {
-                    return new JoinGameResponse(false, "Error: already taken");
-                }
-            default:
-                // Observer or any other logic for unrecognized color
-                return new JoinGameResponse(true, "");
+        // Check if the authToken is valid. If not, return "Error: unauthorized".
+        String username;
+        try {
+            username = authDAO.findAuth(request.getAuthToken());
+        } catch (DataAccessException e) {
+            return new JoinGameResponse(false, "Error: unauthorized");
+        }
+
+        // If the authToken does not correspond to a username, also return "Error: unauthorized".
+        if (username == null || username.isEmpty()) {
+            return new JoinGameResponse(false, "Error: unauthorized");
+        }
+
+        try {
+            gameDAO.claimSpot(
+                    request.getGameId(),
+                    username,
+                    ChessGame.TeamColor.valueOf(request.getPlayerColor().toUpperCase())
+            );
+            return new JoinGameResponse(true, "");
+        } catch (DataAccessException e) {
+            if (e.getMessage().contains("already taken")) {
+                return new JoinGameResponse(false, "Error: already taken");
+            }
+            return new JoinGameResponse(false, "Error: " + e.getMessage());
         }
     }
+
 
 
 

@@ -1,11 +1,14 @@
 package services;
 
-import storage.StorageManager;
+import dataAccess.*;
 
 /**
  * Provides services to clear the application's database.
  */
 public class ClearService {
+    private final UserDAO userDAO = new UserDAO();
+    private final GameDAO gameDAO = new GameDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     /**
      * Default constructor.
@@ -19,17 +22,17 @@ public class ClearService {
      * @return ClearResponse indicating success or failure.
      */
     public ClearResponse clearDatabase(ClearRequest request) {
-        // Validate the authToken (for simplicity, let's assume a valid token is "valid_token")
-        if ("valid_token".equals(request.getAuthToken())) {
-            // Clear user data
-            StorageManager.getInstance().getUserStorage().getUsers().clear();
-
-            // Clear game data
-            StorageManager.getInstance().getGameStorage().getGames().clear();
-
-            return new ClearResponse(true, "Database cleared successfully.");
-        } else {
-            return new ClearResponse(false, "Error: Invalid authentication token.");
+        try {
+            if (authDAO.findAuth(request.getAuthToken()) != null) {
+                userDAO.clearUsers();
+                gameDAO.clearGames();
+                authDAO.clearAuth();
+                return new ClearResponse(true, "Database cleared successfully.");
+            } else {
+                return new ClearResponse(false, "Error: Invalid authentication token.");
+            }
+        } catch (DataAccessException e) {
+            return new ClearResponse(false, "Error: " + e.getMessage());
         }
     }
 }

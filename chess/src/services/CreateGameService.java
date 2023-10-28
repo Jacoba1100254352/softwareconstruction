@@ -1,20 +1,16 @@
 package services;
 
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
 import models.Game;
-import storage.*;
 
 /**
  * Provides services to create a new game.
  */
 public class CreateGameService {
-    /**
-     * In-memory storage for games
-     */
-    GameStorage gameStorage = StorageManager.getInstance().getGameStorage();
-    /**
-     * In-memory storage for tokens
-     */
-    TokenStorage tokenStorage = StorageManager.getInstance().getTokenStorage();
+    private final GameDAO gameDAO = new GameDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     /**
      * Default constructor.
@@ -28,19 +24,22 @@ public class CreateGameService {
      * @return CreateGameResponse with the result of the operation.
      */
     public CreateGameResponse createGame(CreateGameRequest request) {
-        if (request.getGameName() == null || request.getGameName().isEmpty()) {
-            return new CreateGameResponse("Error: bad request");
-        }
-
-        if (!tokenStorage.containsToken(request.getAuthToken())) {
-            return new CreateGameResponse("Error: unauthorized");
-        }
-
         try {
-            Game newGame = new Game(gameStorage.getNextGameId(), request.getGameName());
-            gameStorage.getGames().put(newGame.getGameID(), newGame);
+            if (request.getGameName() == null || request.getGameName().isEmpty()) {
+                return new CreateGameResponse("Error: bad request");
+            }
+            if (authDAO.findAuth(request.getAuthToken()) == null) {
+                return new CreateGameResponse("Error: unauthorized");
+            }
+
+            // Create a new Game object
+            Game newGame = new Game(gameDAO.getNextGameID(), request.getGameName());
+
+            // Insert the new Game object into the data store
+            gameDAO.insertGame(newGame);
+
             return new CreateGameResponse(newGame.getGameID());
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             return new CreateGameResponse("Error: " + e.getMessage());
         }
     }

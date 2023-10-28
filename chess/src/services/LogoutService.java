@@ -7,6 +7,7 @@ import dataAccess.DataAccessException;
  * Provides services to logout a user.
  */
 public class LogoutService {
+    private final AuthDAO authDAO = new AuthDAO();
 
     /**
      * Default constructor.
@@ -20,15 +21,16 @@ public class LogoutService {
      * @return LogoutResponse indicating success or failure.
      */
     public LogoutResponse logout(LogoutRequest request) {
-        AuthDAO authDAO = new AuthDAO();
         try {
-            if (authDAO.find(request.getAuthToken()) == null) {
-                return new LogoutResponse(false, "Error: unauthorized");
+            if (authDAO.findAuth(request.getAuthToken()) != null) {
+                authDAO.deleteAuth(request.getAuthToken());
+                return new LogoutResponse(true, "Logged out successfully.");
+            } else {
+                return new LogoutResponse(false, "Error: Invalid authentication token.");
             }
-            authDAO.delete(request.getAuthToken());
-            return new LogoutResponse(true, "Logged out successfully.");
         } catch (DataAccessException e) {
             return new LogoutResponse(false, "Error: " + e.getMessage());
         }
     }
+
 }

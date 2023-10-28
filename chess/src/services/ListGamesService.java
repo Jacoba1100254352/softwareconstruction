@@ -1,19 +1,18 @@
 package services;
 
-import storage.GameStorage;
-import storage.StorageManager;
-import storage.TokenStorage;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
+import models.Game;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides services to list all games.
  */
 public class ListGamesService {
-    /**
-     * In-memory storage for the games.
-     */
-    GameStorage gameStorage = StorageManager.getInstance().getGameStorage();
+    private final GameDAO gameDAO = new GameDAO();
+    private final AuthDAO authDAO = new AuthDAO();
 
     /**
      * Default constructor.
@@ -26,18 +25,18 @@ public class ListGamesService {
      * @param request The request containing the authToken of the user.
      * @return ListGamesResponse containing a list of all games.
      */
-    public ListGamesResponse listAllGames(ListGamesRequest request) {
-        TokenStorage tokenStorage = StorageManager.getInstance().getTokenStorage();
-        if (!tokenStorage.containsToken(request.getAuthToken())) {
-            ListGamesResponse errorResponse = new ListGamesResponse();
-            errorResponse.setSuccess(false);
-            errorResponse.setMessage("Error: unauthorized");
-            return errorResponse;
-        }
 
+    public ListGamesResponse listAllGames(ListGamesRequest request) {
         try {
-            return new ListGamesResponse(new ArrayList<>(gameStorage.getGames().values()));
-        } catch (Exception e) {
+            if (authDAO.findAuth(request.getAuthToken()) == null) {
+                ListGamesResponse errorResponse = new ListGamesResponse();
+                errorResponse.setSuccess(false);
+                errorResponse.setMessage("Error: unauthorized");
+                return errorResponse;
+            }
+            List<Game> allGames = gameDAO.findAllGames();
+            return new ListGamesResponse(allGames);
+        } catch (DataAccessException e) {
             ListGamesResponse errorResponse = new ListGamesResponse();
             errorResponse.setSuccess(false);
             errorResponse.setMessage("Error: " + e.getMessage());

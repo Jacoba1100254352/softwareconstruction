@@ -5,7 +5,6 @@ import models.Game;
 import storage.GameStorage;
 import storage.StorageManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,10 +29,10 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void insertGame(Game game) throws DataAccessException {
-        if (gameStorage.getGames().containsKey(game.getGameID())) {
+        if (gameStorage.containsGame(game.getGameID())) {
             throw new DataAccessException("Game with this ID already exists.");
         }
-        gameStorage.getGames().put(game.getGameID(), game);
+        gameStorage.addGame(game);
     }
 
     /**
@@ -44,7 +43,7 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public Game findGameById(int gameID) throws DataAccessException {
-        Game game = gameStorage.getGames().get(gameID);
+        Game game = gameStorage.getGame(gameID);
         if (game == null) {
             throw new DataAccessException("Game not found.");
         }
@@ -58,8 +57,9 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public List<Game> findAllGames() throws DataAccessException {
-        return new ArrayList<>(gameStorage.getGames().values());
+        return gameStorage.getAllGames();
     }
+
 
     /**
      * Claims a spot in a specified game.
@@ -110,19 +110,19 @@ public class GameDAO {
      * @param gameID The ID of the game to be removed.
      * @throws DataAccessException if the operation fails.
      */
-    public void removeGame(int gameID) throws DataAccessException {
-        if (!gameStorage.getGames().containsKey(gameID)) {
+    public void deleteGame(int gameID) throws DataAccessException {
+        if (!gameStorage.containsGame(gameID)) {
             throw new DataAccessException("Game not found.");
         }
-        gameStorage.getGames().remove(gameID);
+        gameStorage.deleteGame(gameID);
     }
 
-    /**
-     * Clears all data from the data store.
-     *
-     * @throws DataAccessException if the operation fails.
-     */
-    public void clearAll() throws DataAccessException {
-        gameStorage.getGames().clear();
+    public void clearGames() throws DataAccessException {
+        gameStorage.getAllGames().clear();
     }
+
+    public int getNextGameID() {
+        return gameStorage.getNextGameId();
+    }
+
 }

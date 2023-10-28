@@ -1,16 +1,16 @@
 package services;
 
-import storage.*;
+import dataAccess.*;
 import models.User;
+
+import java.util.UUID;
 
 /**
  * Provides services for logging in a user.
  */
 public class LoginService {
-    /**
-     * In-memory storage for the users and their login info
-     */
-    UserStorage users = StorageManager.getInstance().getUserStorage();
+    private final UserDAO userDAO = new UserDAO();
+    private final AuthDAO authDAO = new AuthDAO();
     /**
      * The success status of the login operation.
      */
@@ -36,11 +36,17 @@ public class LoginService {
      * @return LoginResponse indicating success or failure.
      */
     public LoginResponse login(LoginRequest request) {
-        User user = users.getUsers().get(request.getUsername());
-        if (user != null && user.getPassword().equals(request.getPassword())) {
-            return new LoginResponse("valid_token", request.getUsername());
-        } else {
-            return new LoginResponse("Error: unauthorized");
+        try {
+            User user = userDAO.getUser(request.getUsername());
+            if (user != null && user.getPassword().equals(request.getPassword())) {
+                String generatedToken = UUID.randomUUID().toString();
+                authDAO.insertAuth(generatedToken, request.getUsername());
+                return new LoginResponse(generatedToken, request.getUsername());
+            } else {
+                return new LoginResponse("Error: unauthorized");
+            }
+        } catch (DataAccessException e) {
+            return new LoginResponse("Error: " + e.getMessage());
         }
     }
 

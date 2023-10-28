@@ -28,10 +28,10 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during insertion.
      */
     public void insertUser(User user) throws DataAccessException {
-        if (userStorage.getUsers().containsKey(user.getUsername())) {
+        if (userStorage.containsUser(user.getUsername())) {
             throw new DataAccessException("User with this username already exists.");
         }
-        userStorage.getUsers().put(user.getUsername(), user);
+        userStorage.addUser(user);
     }
 
     /**
@@ -42,7 +42,7 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during retrieval.
      */
     public User getUser(String username) throws DataAccessException {
-        return userStorage.getUsers().get(username);
+        return userStorage.getUser(username);
     }
 
     /**
@@ -52,10 +52,10 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during update or user doesn't exist.
      */
     public void updateUser(User user) throws DataAccessException {
-        if (!userStorage.getUsers().containsKey(user.getUsername())) {
+        if (!userStorage.containsUser(user.getUsername())) {
             throw new DataAccessException("User not found.");
         }
-        userStorage.getUsers().put(user.getUsername(), user);
+        userStorage.addUser(user);  // Since it's a Map, this will replace the existing user
     }
 
     /**
@@ -65,9 +65,13 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during deletion or user doesn't exist.
      */
     public void deleteUser(String username) throws DataAccessException {
-        if (!userStorage.getUsers().containsKey(username)) {
+        if (!userStorage.containsUser(username)) {
             throw new DataAccessException("User not found.");
         }
-        userStorage.getUsers().remove(username);
+        userStorage.deleteUser(username);
+    }
+
+    public void clearUsers() throws DataAccessException {
+        userStorage.clearUsers();
     }
 }
