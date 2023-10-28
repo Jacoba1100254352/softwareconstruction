@@ -117,8 +117,8 @@ public class GameDAO {
         gameStorage.deleteGame(gameID);
     }
 
-    public void clearGames() throws DataAccessException {
-        gameStorage.getAllGames().clear();
+    public void clearGames() {
+        gameStorage.clearGames();
     }
 
     public int getNextGameID() {

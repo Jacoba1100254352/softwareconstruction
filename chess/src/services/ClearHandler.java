@@ -7,10 +7,8 @@ public class ClearHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
         response.type("application/json");
-        String authToken = request.headers("Authorization");
-        ClearRequest clearRequest = new ClearRequest(authToken);
         ClearService clearService = new ClearService();
-        ClearResponse result = clearService.clearDatabase(clearRequest);
+        ClearResponse result = clearService.clearDatabase();
 
         if (result.isSuccess()) {
             response.status(200);

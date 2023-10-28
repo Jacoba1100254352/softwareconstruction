@@ -18,19 +18,14 @@ public class ClearService {
     /**
      * Clears the entire database.
      *
-     * @param request The request to clear the database.
      * @return ClearResponse indicating success or failure.
      */
-    public ClearResponse clearDatabase(ClearRequest request) {
+    public ClearResponse clearDatabase() {
         try {
-            if (authDAO.findAuth(request.getAuthToken()) != null) {
-                userDAO.clearUsers();
-                gameDAO.clearGames();
-                authDAO.clearAuth();
-                return new ClearResponse(true, "Database cleared successfully.");
-            } else {
-                return new ClearResponse(false, "Error: Invalid authentication token.");
-            }
+            userDAO.clearUsers();
+            gameDAO.clearGames();
+            authDAO.clearAuth();
+            return new ClearResponse(true, "Database cleared successfully.");
         } catch (DataAccessException e) {
             return new ClearResponse(false, "Error: " + e.getMessage());
         }

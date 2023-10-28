@@ -31,6 +31,8 @@ public class GameStorage {
         return new ArrayList<>(games.values());
     }
 
+    public void clearGames() { games.clear(); }
+
     public int getNextGameId() {
         return idCounter++;
     }
