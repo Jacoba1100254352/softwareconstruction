@@ -77,16 +77,10 @@ public class GameDAO {
             if (game.getWhiteUsername() != null) {
                 throw new DataAccessException("White player spot is already taken.");
             }
-            if (username.equals(game.getBlackUsername())) {
-                throw new DataAccessException("Player already claimed the black spot.");
-            }
             game.setWhiteUsername(username);
         } else if (color == ChessGame.TeamColor.BLACK) {
             if (game.getBlackUsername() != null) {
                 throw new DataAccessException("Black player spot is already taken.");
-            }
-            if (username.equals(game.getWhiteUsername())) {
-                throw new DataAccessException("Player already claimed the white spot.");
             }
             game.setBlackUsername(username);
         }

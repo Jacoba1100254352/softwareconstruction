@@ -4,10 +4,9 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Server {
-    private final Map<String, BaseHandler> handlers;
+    private final HashMap<String, BaseHandler> handlers;
 
     public Server() {
         handlers = new HashMap<>();
