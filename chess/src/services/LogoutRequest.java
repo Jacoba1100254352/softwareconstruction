@@ -13,7 +13,8 @@ public class LogoutRequest {
     /**
      * Default constructor.
      */
-    public LogoutRequest() {}
+    public LogoutRequest() {
+    }
 
     /**
      * Constructs a new LogoutRequest with the given authToken.

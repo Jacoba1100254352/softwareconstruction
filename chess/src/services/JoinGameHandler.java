@@ -12,11 +12,14 @@ public class JoinGameHandler extends BaseHandler {
         // Deserialize the JoinGameRequest from the request body
         JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
 
+        if (joinGameRequest.getPlayerColor() == null) {
+            joinGameRequest.setPlayerColor("OBSERVER");  // NOTE: This can be set to any non-null string
+        }
+
         // Set the authToken of the JoinGameRequest object
         joinGameRequest.setAuthToken(authToken);
 
-        JoinGameService joinGameService = new JoinGameService();
-        JoinGameResponse result = joinGameService.joinGame(joinGameRequest);
+        JoinGameResponse result = (new JoinGameService()).joinGame(joinGameRequest);
 
         if (!result.isSuccess()) {
             switch (result.getMessage()) {

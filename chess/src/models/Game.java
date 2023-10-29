@@ -42,8 +42,8 @@ public class Game {
     public Game(Integer gameID, String gameName) {
         this.gameID = gameID;
         this.gameName = gameName;
-        this.whiteUsername = "";  // or null
-        this.blackUsername = "";  // or null
+        this.whiteUsername = null;
+        this.blackUsername = null;
         this.game = null;
     }
 

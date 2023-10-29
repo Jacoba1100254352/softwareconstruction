@@ -18,13 +18,14 @@ public class CreateGameRequest {
     /**
      * Default constructor.
      */
-    public CreateGameRequest() {}
+    public CreateGameRequest() {
+    }
 
     /**
      * Constructs a new CreateGameRequest with the given parameters.
      *
      * @param authToken The authentication token of the user.
-     * @param gameName The name of the game.
+     * @param gameName  The name of the game.
      */
     public CreateGameRequest(String authToken, String gameName) {
         this.authToken = authToken;

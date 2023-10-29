@@ -16,7 +16,8 @@ public class JoinGameResponse {
     /**
      * Default constructor.
      */
-    public JoinGameResponse() {}
+    public JoinGameResponse() {
+    }
 
     /**
      * Constructs a new JoinGameResponse.

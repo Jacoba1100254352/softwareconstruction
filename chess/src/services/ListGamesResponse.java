@@ -1,6 +1,8 @@
 package services;
 
 import models.Game;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ public class ListGamesResponse {
     /**
      * A list of games.
      */
-    private List<Game> games;
+    private Collection<Game> games;
     /**
      * A message providing details or an error description.
      */
@@ -24,14 +26,15 @@ public class ListGamesResponse {
     /**
      * Default constructor.
      */
-    public ListGamesResponse() {}
+    public ListGamesResponse() {
+    }
 
     /**
      * Constructs a new ListGamesResponse with the given list of games.
      *
      * @param games A list of games.
      */
-    public ListGamesResponse(List<Game> games) {
+    public ListGamesResponse(Collection<Game> games) {
         this.games = games;
     }
 
@@ -49,7 +52,7 @@ public class ListGamesResponse {
 
     ///   Getters and setters   ///
 
-    public List<Game> getGames() {
+    public Collection<Game> getGames() {
         return games;
     }
 

@@ -18,7 +18,8 @@ public class LogoutResponse {
     /**
      * Default constructor.
      */
-    public LogoutResponse() {}
+    public LogoutResponse() {
+    }
 
     /**
      * Constructs a new LogoutResponse with the given parameters.

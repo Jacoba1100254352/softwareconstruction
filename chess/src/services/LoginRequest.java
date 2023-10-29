@@ -16,7 +16,8 @@ public class LoginRequest {
     /**
      * Default constructor.
      */
-    public LoginRequest() { }
+    public LoginRequest() {
+    }
 
     /**
      * Constructs a new LoginRequest with the given parameters.

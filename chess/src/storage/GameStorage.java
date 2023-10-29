@@ -1,11 +1,7 @@
 package storage;
 
 import models.Game;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameStorage {
     private final Map<Integer, Game> games;
@@ -13,7 +9,7 @@ public class GameStorage {
 
     public GameStorage() {
         games = new HashMap<>();
-        idCounter = 0;
+        idCounter = 1;
     }
 
     public boolean containsGame(Integer gameID) {
@@ -32,13 +28,15 @@ public class GameStorage {
         games.remove(gameID);
     }
 
-    public List<Game> getAllGames() {
-        return new ArrayList<>(games.values());
+    public Collection<Game> getAllGames() {
+        return games.values();
     }
 
-    public void clearGames() { games.clear(); }
+    public void clearGames() {
+        games.clear();
+    }
 
     public Integer getNextGameId() {
-        return ++idCounter;
+        return idCounter++;
     }
 }

@@ -15,7 +15,9 @@ public class CreateGameService {
     /**
      * Default constructor.
      */
-    public CreateGameService() { }
+    public CreateGameService() {
+
+    }
 
     /**
      * Creates a new game based on the provided request.

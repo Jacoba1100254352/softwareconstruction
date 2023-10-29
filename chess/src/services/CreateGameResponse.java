@@ -18,7 +18,8 @@ public class CreateGameResponse {
     /**
      * Default constructor.
      */
-    public CreateGameResponse() {}
+    public CreateGameResponse() {
+    }
 
     /**
      * Constructs a new CreateGameResponse with the given gameID.

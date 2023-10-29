@@ -14,7 +14,8 @@ public class ListGamesService {
     /**
      * Default constructor.
      */
-    public ListGamesService() { }
+    public ListGamesService() {
+    }
 
     /**
      * Lists all games for the authenticated user.
@@ -25,9 +26,9 @@ public class ListGamesService {
 
     public ListGamesResponse listAllGames(ListGamesRequest request) {
         try {
-            if (authDAO.findAuth(request.getAuthToken()) == null) {
+            if (authDAO.findAuth(request.getAuthToken()) == null)
                 return new ListGamesResponse(false, "Error: unauthorized");
-            }
+
             return new ListGamesResponse(gameDAO.findAllGames());
         } catch (DataAccessException e) {
             return new ListGamesResponse(false, "Error: " + e.getMessage());

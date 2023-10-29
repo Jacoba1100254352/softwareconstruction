@@ -5,14 +5,16 @@ import models.Game;
 import storage.GameStorage;
 import storage.StorageManager;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * DAO class for handling game-related data operations.
  */
 public class GameDAO {
 
-    // In-memory storage for games
+    /**
+     * In-memory storage for games.
+     */
     private final GameStorage gameStorage;
 
     /**
@@ -29,9 +31,9 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void insertGame(Game game) throws DataAccessException {
-        if (gameStorage.containsGame(game.getGameID())) {
-            throw new DataAccessException("Game with this ID already exists.");
-        }
+        if (gameStorage.containsGame(game.getGameID()))
+            updateGame(game.getGameID(), game.getGame());
+
         gameStorage.addGame(game);
     }
 
@@ -44,9 +46,9 @@ public class GameDAO {
      */
     public Game findGameById(Integer gameID) throws DataAccessException {
         Game game = gameStorage.getGame(gameID);
-        if (game == null) {
+        if (game == null)
             throw new DataAccessException("Game not found.");
-        }
+
         return game;
     }
 
@@ -55,7 +57,7 @@ public class GameDAO {
      *
      * @return A list of all game objects.
      */
-    public List<Game> findAllGames() {
+    public Collection<Game> findAllGames() {
         return gameStorage.getAllGames();
     }
 
@@ -99,8 +101,7 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void updateGame(Integer gameID, ChessGame newChessGame) throws DataAccessException {
-        Game game = findGameById(gameID);
-        game.setGame(newChessGame);
+        findGameById(gameID).setGame(newChessGame);
     }
 
     /**
@@ -110,9 +111,9 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void deleteGame(Integer gameID) throws DataAccessException {
-        if (!gameStorage.containsGame(gameID)) {
+        if (!gameStorage.containsGame(gameID))
             throw new DataAccessException("Game not found.");
-        }
+
         gameStorage.deleteGame(gameID);
     }
 

@@ -12,7 +12,8 @@ public class LogoutService {
     /**
      * Default constructor.
      */
-    public LogoutService() { }
+    public LogoutService() {
+    }
 
     /**
      * Logs out a user based on the provided request.

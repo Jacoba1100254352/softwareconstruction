@@ -24,13 +24,14 @@ public class LoginResponse {
     /**
      * Default constructor.
      */
-    public LoginResponse() { }
+    public LoginResponse() {
+    }
 
     /**
      * Constructs a new LoginResponse indicating success.
      *
      * @param authToken The authentication token for the logged-in user.
-     * @param username The username of the logged-in user.
+     * @param username  The username of the logged-in user.
      */
     public LoginResponse(String authToken, String username) {
         this.authToken = authToken;

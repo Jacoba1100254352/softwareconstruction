@@ -13,7 +13,8 @@ public class ListGamesRequest {
     /**
      * Default constructor.
      */
-    public ListGamesRequest() {}
+    public ListGamesRequest() {
+    }
 
     /**
      * Constructs a new ListGamesRequest with the given authToken.

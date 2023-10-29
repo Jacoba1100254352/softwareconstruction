@@ -23,6 +23,11 @@ public class Server {
         handlers.put("/game:PUT", new JoinGameHandler());
     }
 
+    public static void main(String[] args) {
+        Server server = new Server();
+        server.start();
+    }
+
     public String handleRequest(Request req, Response res) {
         String key = req.pathInfo() + ":" + req.requestMethod();
         BaseHandler handler = handlers.get(key);
@@ -62,10 +67,5 @@ public class Server {
 
         // Finally, initialize the Spark server
         Spark.init();
-    }
-
-    public static void main(String[] args) {
-        Server server = new Server();
-        server.start();
     }
 }

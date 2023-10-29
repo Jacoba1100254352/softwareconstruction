@@ -13,7 +13,8 @@ public class ClearRequest {
     /**
      * Default constructor.
      */
-    public ClearRequest() {}
+    public ClearRequest() {
+    }
 
     /**
      * Constructs a new ClearRequest with the given authToken.

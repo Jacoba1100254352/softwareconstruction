@@ -20,7 +20,8 @@ public class RegisterRequest {
     /**
      * Default constructor.
      */
-    public RegisterRequest() { }
+    public RegisterRequest() {
+    }
 
     /**
      * Constructs a new RegisterRequest with the given parameters.
@@ -71,6 +72,7 @@ public class RegisterRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
     /**
      * Retrieves the email of a user.
      *

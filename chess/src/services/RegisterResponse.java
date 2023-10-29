@@ -20,13 +20,14 @@ public class RegisterResponse {
     /**
      * Default constructor.
      */
-    public RegisterResponse() { }
+    public RegisterResponse() {
+    }
 
     /**
      * Constructs a new RegisterResponse indicating success.
      *
      * @param authToken The authentication token for the registered user.
-     * @param username The username of the registered user.
+     * @param username  The username of the registered user.
      */
     public RegisterResponse(String authToken, String username) {
         this.authToken = authToken;

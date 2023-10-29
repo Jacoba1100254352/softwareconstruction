@@ -1,6 +1,9 @@
 package services;
 
-import dataAccess.*;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
+import dataAccess.UserDAO;
 
 /**
  * Provides services to clear the application's database.
@@ -13,7 +16,8 @@ public class ClearService {
     /**
      * Default constructor.
      */
-    public ClearService() { }
+    public ClearService() {
+    }
 
     /**
      * Clears the entire database.

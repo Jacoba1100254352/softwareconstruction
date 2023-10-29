@@ -18,7 +18,8 @@ public class ClearResponse {
     /**
      * Default constructor.
      */
-    public ClearResponse() {}
+    public ClearResponse() {
+    }
 
     /**
      * Constructs a new ClearResponse with the given parameters.
