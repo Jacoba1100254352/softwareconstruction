@@ -28,7 +28,9 @@ public class ServiceTests {
 
     @BeforeEach
     public void setup() {
-        clearService.clearDatabase(); // Clear the database before each test
+        // Clearing the database with the authToken
+        ClearRequest clearRequest = new ClearRequest(existingAuth);
+        clearService.clearDatabase(clearRequest);
 
         RegisterRequest registerRequest = new RegisterRequest(existingUser.getUsername(), existingUser.getPassword(), existingUser.getEmail());
         RegisterResponse regResponse = registerService.register(registerRequest);
@@ -46,7 +48,8 @@ public class ServiceTests {
     @Order(1)
     @DisplayName("Positive: Successful Database Clear")
     public void successfulDatabaseClear() {
-        ClearResponse response = clearService.clearDatabase();
+        ClearRequest clearRequest = new ClearRequest(existingAuth);
+        ClearResponse response = clearService.clearDatabase(clearRequest);
         Assertions.assertTrue(response.isSuccess(), "Failed to clear the database");
     }
 

@@ -4,6 +4,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import dataAccess.UserDAO;
+import requests.ClearRequest;
 import responses.ClearResponse;
 
 /**
@@ -24,10 +25,18 @@ public class ClearService {
     /**
      * Clears the entire database.
      *
+     * @param request The clear request containing the authToken of the user.
      * @return ClearResponse indicating success or failure.
      */
-    public ClearResponse clearDatabase() {
+    public ClearResponse clearDatabase(ClearRequest request) {
         try {
+            /*
+            // Verification step
+            if (authDAO.findAuth(request.getAuthToken()) == null)
+                return new ClearResponse(false, "Error: unauthorized");
+             */
+
+            // Assuming the verification succeeds, clear the database
             userDAO.clearUsers();
             gameDAO.clearGames();
             authDAO.clearAuth();
