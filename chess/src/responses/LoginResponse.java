@@ -25,6 +25,7 @@ public class LoginResponse {
      * Default constructor.
      */
     public LoginResponse() {
+
     }
 
     /**

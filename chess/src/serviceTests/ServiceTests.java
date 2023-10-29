@@ -10,9 +10,6 @@ import services.*;
 public class ServiceTests {
 
     private static User existingUser;
-    private String existingAuth;
-    private Integer createdGameID;
-
     private final JoinGameService joinGameService = new JoinGameService();
     private final ListGamesService listGamesService = new ListGamesService();
     private final LoginService loginService = new LoginService();
@@ -20,6 +17,8 @@ public class ServiceTests {
     private final RegisterService registerService = new RegisterService();
     private final ClearService clearService = new ClearService();
     private final CreateGameService createGameService = new CreateGameService();
+    private String existingAuth;
+    private Integer createdGameID;
 
     @BeforeAll
     public static void init() {

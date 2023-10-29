@@ -14,6 +14,7 @@ public class LogoutRequest {
      * Default constructor.
      */
     public LogoutRequest() {
+
     }
 
     /**

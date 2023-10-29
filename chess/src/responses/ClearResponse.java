@@ -19,6 +19,7 @@ public class ClearResponse {
      * Default constructor.
      */
     public ClearResponse() {
+
     }
 
     /**

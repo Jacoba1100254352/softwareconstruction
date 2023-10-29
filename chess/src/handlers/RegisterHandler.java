@@ -16,15 +16,9 @@ public class RegisterHandler extends BaseHandler {
 
         if (result.getMessage() != null) {
             switch (result.getMessage()) {
-                case "Error: bad request":
-                    response.status(400);
-                    break;
-                case "Error: already taken":
-                    response.status(403);
-                    break;
-                default:
-                    response.status(500);
-                    break;
+                case "Error: bad request" -> response.status(400);
+                case "Error: already taken" -> response.status(403);
+                default -> response.status(500);
             }
         } else {
             response.status(200);

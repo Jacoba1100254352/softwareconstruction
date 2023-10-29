@@ -1,6 +1,6 @@
 package dataAccess;
 
-
+import models.AuthToken;
 import storage.StorageManager;
 import storage.TokenStorage;
 
@@ -24,39 +24,38 @@ public class AuthDAO {
     /**
      * Inserts a new token for a user.
      *
-     * @param token    The user's authentication token.
-     * @param username The username for the associated user.
+     * @param authToken The user's authentication token.
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public void insertAuth(String token, String username) throws DataAccessException {
-        if (tokenStorage.containsToken(token))
+    public void insertAuth(AuthToken authToken) throws DataAccessException {
+        if (tokenStorage.containsToken(authToken.getToken()))
             throw new DataAccessException("Token already exists.");
 
-        tokenStorage.addToken(token, username);
+        tokenStorage.addToken(authToken);
     }
 
     /**
      * Finds a user token.
      *
-     * @param token The authentication token to be found.
+     * @param authToken The authentication token to be found.
      * @return Username associated with the token or null if not found.
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public String findAuth(String token) throws DataAccessException {
-        return tokenStorage.getUsernameForToken(token);
+    public AuthToken findAuth(String authToken) throws DataAccessException {
+        return tokenStorage.getToken(authToken);
     }
 
     /**
      * Removes a token.
      *
-     * @param token The authentication token to be removed.
+     * @param authToken The authentication token to be removed.
      * @throws DataAccessException if there's an error in the data access operation.
      */
-    public void deleteAuth(String token) throws DataAccessException {
-        if (!tokenStorage.containsToken(token))
+    public void deleteAuth(AuthToken authToken) throws DataAccessException {
+        if (!tokenStorage.containsToken(authToken.getToken()))
             throw new DataAccessException("Token not found.");
 
-        tokenStorage.removeToken(token);
+        tokenStorage.removeToken(authToken);
     }
 
     /**

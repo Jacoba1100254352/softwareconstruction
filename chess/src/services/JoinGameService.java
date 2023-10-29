@@ -4,6 +4,7 @@ import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import models.AuthToken;
 import requests.JoinGameRequest;
 import responses.JoinGameResponse;
 
@@ -27,6 +28,7 @@ public class JoinGameService {
      * Default constructor.
      */
     public JoinGameService() {
+
     }
 
     /**
@@ -38,9 +40,11 @@ public class JoinGameService {
     public JoinGameResponse joinGame(JoinGameRequest request) {
         try {
             // 1. Verify user's identity using the auth token
-            String username = authDAO.findAuth(request.getAuthToken());
-            if (username == null)
+            AuthToken authToken = authDAO.findAuth(request.getAuthToken());
+            if (authToken == null)
                 return new JoinGameResponse(false, "Error: unauthorized");
+
+            String username = authToken.getUsername();
 
             // 2. Check if the specified game exists
             if (gameDAO.findGameById(request.getGameID()) == null)

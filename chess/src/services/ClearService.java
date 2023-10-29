@@ -18,6 +18,7 @@ public class ClearService {
      * Default constructor.
      */
     public ClearService() {
+
     }
 
     /**

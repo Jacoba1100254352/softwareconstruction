@@ -26,6 +26,7 @@ public class ListGamesResponse {
      * Default constructor.
      */
     public ListGamesResponse() {
+
     }
 
     /**

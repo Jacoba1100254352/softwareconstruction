@@ -3,6 +3,7 @@ package services;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
+import models.AuthToken;
 import models.User;
 import requests.LoginRequest;
 import responses.LoginResponse;
@@ -32,6 +33,7 @@ public class LoginService {
      * Default constructor.
      */
     public LoginService() {
+
     }
 
     /**
@@ -45,8 +47,9 @@ public class LoginService {
             User user = userDAO.getUser(request.getUsername());
             if (user != null && user.getPassword().equals(request.getPassword())) {
                 String generatedToken = UUID.randomUUID().toString();
-                authDAO.insertAuth(generatedToken, request.getUsername());
-                return new LoginResponse(generatedToken, request.getUsername());
+                AuthToken newToken = new AuthToken(generatedToken, request.getUsername());
+                authDAO.insertAuth(newToken);
+                return new LoginResponse(newToken.getToken(), newToken.getUsername());
             } else {
                 return new LoginResponse("Error: unauthorized");
             }

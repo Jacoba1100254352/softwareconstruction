@@ -12,11 +12,6 @@ public class LogoutHandler extends BaseHandler {
         response.type("application/json");
         String authToken = request.headers("Authorization");
 
-        if (authToken == null || authToken.isEmpty()) {
-            response.status(400);
-            return new LogoutResponse(false, "Error: Missing or empty Authorization header");
-        }
-
         LogoutResponse result = (new LogoutService()).logout(new LogoutRequest(authToken));
 
         if (result.isSuccess())

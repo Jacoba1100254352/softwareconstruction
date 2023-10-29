@@ -166,16 +166,6 @@ public class ChessGameImpl implements ChessGame {
         board.addPiece(move.getEndPosition(), piece);
         board.removePiece(move.getStartPosition());
 
-        // Handle En Passant logic
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
-                Math.abs(move.getEndPosition().column() - move.getStartPosition().column()) == 1 &&
-                board.getPiece(move.getEndPosition()) == null) {
-            int direction = (currentTeamTurn == TeamColor.WHITE) ? -1 : 1;
-            ChessPosition capturedPawnPos = new ChessPositionImpl(move.getStartPosition().row() + direction, move.getEndPosition().column());
-
-            capturedPawn = board.getPiece(capturedPawnPos);
-            board.removePiece(capturedPawnPos);
-        }
 
         // Find the position of the current team's king
         ChessPosition kingPosition = (piece.getPieceType() == ChessPiece.PieceType.KING) ? move.getEndPosition() : findCurrentKingsPosition(piece.teamColor());
@@ -187,13 +177,6 @@ public class ChessGameImpl implements ChessGame {
         board.addPiece(move.getStartPosition(), piece);
         if (originalEndPiece != null) board.addPiece(move.getEndPosition(), originalEndPiece);
         else board.removePiece(move.getEndPosition());
-
-        // Restore the captured pawn if it was an En Passant move
-        if (capturedPawn != null) {
-            int direction = (currentTeamTurn == TeamColor.WHITE) ? -1 : 1;
-            ChessPosition capturedPawnPos = new ChessPositionImpl(move.getStartPosition().row() + direction, move.getEndPosition().column());
-            board.addPiece(capturedPawnPos, capturedPawn);
-        }
 
         return isCheck;
     }
