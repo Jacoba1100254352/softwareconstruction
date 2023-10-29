@@ -14,6 +14,7 @@ public class ClearRequest {
      * Default constructor.
      */
     public ClearRequest() {
+
     }
 
     /**

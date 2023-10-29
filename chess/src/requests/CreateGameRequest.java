@@ -19,6 +19,7 @@ public class CreateGameRequest {
      * Default constructor.
      */
     public CreateGameRequest() {
+
     }
 
     /**

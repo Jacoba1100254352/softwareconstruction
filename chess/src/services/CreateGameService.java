@@ -29,12 +29,11 @@ public class CreateGameService {
      */
     public CreateGameResponse createGame(CreateGameRequest request) {
         try {
-            if (request.getGameName() == null || request.getGameName().isEmpty()) {
+            if (request.getGameName() == null || request.getGameName().isEmpty())
                 return new CreateGameResponse("Error: bad request");
-            }
-            if (authDAO.findAuth(request.getAuthToken()) == null) {
+
+            if (authDAO.findAuth(request.getAuthToken()) == null)
                 return new CreateGameResponse("Error: unauthorized");
-            }
 
             // Create a new Game object
             Game newGame = new Game(gameDAO.getNextGameID(), request.getGameName());

@@ -166,10 +166,13 @@ memory. The method interfaces on your DAO classes shouldn’t need to change whe
 rest of your server code should be unaware of where data is being stored (main memory vs. database).
 
 For the most part, the methods on your DAO classes will be `CRUD` operations that: 1) Create objects in the data store,
+
 2) Read (or query) objects from the data store, 3) Update objects already in the data store, and 4) Delete objects from
-the data store. Often times, the parameters and return values of your DAO methods will be the model objects described in
-the previous section (User, Game, AuthToken). For example, your DAO classes will certainly need to provide a method for
-creating new User objects in the data store. This method might have a signature that looks like this:
+   the data store. Often times, the parameters and return values of your DAO methods will be the model objects described
+   in
+   the previous section (User, Game, AuthToken). For example, your DAO classes will certainly need to provide a method
+   for
+   creating new User objects in the data store. This method might have a signature that looks like this:
 
 ```java
 void CreateUser(User u) throws DataAccessException

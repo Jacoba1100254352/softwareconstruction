@@ -19,12 +19,11 @@ public class CreateGameHandler extends BaseHandler {
             response.status(500);
             return new CreateGameResponse("Error: unexpected error occurred.");
         } else if (result.getGameID() == null) {
-            if ("Error: bad request".equals(result.getMessage()))
-                response.status(400);
-            else if ("Error: unauthorized".equals(result.getMessage()))
-                response.status(401);
-            else
-                response.status(500);
+            switch (result.getMessage()) {
+                case "Error: bad request" -> response.status(400);
+                case "Error: unauthorized" -> response.status(401);
+                default -> response.status(500);
+            }
             return result;
         }
 

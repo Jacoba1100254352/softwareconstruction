@@ -17,6 +17,7 @@ public class AuthToken {
      * Default constructor.
      */
     public AuthToken() {
+
     }
 
     /**

@@ -1,9 +1,8 @@
 package services;
 
 import chess.ChessGame;
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
-import dataAccess.GameDAO;
+import dataAccess.*;
+import models.*;
 import requests.JoinGameRequest;
 import responses.JoinGameResponse;
 
@@ -13,6 +12,7 @@ import responses.JoinGameResponse;
 public class JoinGameService {
     private final GameDAO gameDAO = new GameDAO();
     private final AuthDAO authDAO = new AuthDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     /**
      * The success status of the user joining the game.
@@ -27,6 +27,7 @@ public class JoinGameService {
      * Default constructor.
      */
     public JoinGameService() {
+
     }
 
     /**
@@ -38,9 +39,13 @@ public class JoinGameService {
     public JoinGameResponse joinGame(JoinGameRequest request) {
         try {
             // 1. Verify user's identity using the auth token
-            String username = authDAO.findAuth(request.getAuthToken());
-            if (username == null)
+            AuthToken authToken = authDAO.findAuth(request.getAuthToken());
+            if (authToken == null)
                 return new JoinGameResponse(false, "Error: unauthorized");
+
+            User user = userDAO.getUser(authToken.getUsername());
+            if (user == null)
+                return new JoinGameResponse(false, "Error: user not found");
 
             // 2. Check if the specified game exists
             if (gameDAO.findGameById(request.getGameID()) == null)
@@ -48,9 +53,9 @@ public class JoinGameService {
 
             // 3. Check if color is specified and handle accordingly
             if (request.getPlayerColor().equalsIgnoreCase("WHITE"))
-                gameDAO.claimSpot(request.getGameID(), username, ChessGame.TeamColor.WHITE);
+                gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.WHITE);
             else if (request.getPlayerColor().equalsIgnoreCase("BLACK"))
-                gameDAO.claimSpot(request.getGameID(), username, ChessGame.TeamColor.BLACK);
+                gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.BLACK);
             else // User is watching the game; no changes are made to the game's data structure
                 return new JoinGameResponse(true, "Successfully watching the game");
 

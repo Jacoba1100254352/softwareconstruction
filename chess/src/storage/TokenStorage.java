@@ -1,37 +1,29 @@
 package storage;
 
+import models.AuthToken;
+
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class TokenStorage {
+    private final HashMap<String, AuthToken> tokens = new HashMap<>();
 
-    private final HashSet<String> validTokens = new HashSet<>();
-    private final HashMap<String, String> tokenToUsernameMap = new HashMap<>();
+    public void addToken(AuthToken authToken) {
+        tokens.put(authToken.getToken(), authToken);
+    }
+
+    public AuthToken getToken(String authTokenString) {
+        return tokens.get(authTokenString);
+    }
+
+    public void removeToken(AuthToken authToken) {
+        tokens.remove(authToken.getToken());
+    }
 
     public boolean containsToken(String token) {
-        return validTokens.contains(token);
-    }
-
-    public HashSet<String> getAllTokens() {
-        return new HashSet<>(validTokens);
-    }
-
-    public void addToken(String token, String username) {
-        validTokens.add(token);
-        tokenToUsernameMap.put(token, username);
-    }
-
-    public void removeToken(String token) {
-        validTokens.remove(token);
-        tokenToUsernameMap.remove(token);
-    }
-
-    public String getUsernameForToken(String token) {
-        return tokenToUsernameMap.get(token);
+        return tokens.containsKey(token);
     }
 
     public void clearTokens() {
-        validTokens.clear();
-        tokenToUsernameMap.clear();
+        tokens.clear();
     }
 }

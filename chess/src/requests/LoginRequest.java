@@ -17,6 +17,7 @@ public class LoginRequest {
      * Default constructor.
      */
     public LoginRequest() {
+
     }
 
     /**

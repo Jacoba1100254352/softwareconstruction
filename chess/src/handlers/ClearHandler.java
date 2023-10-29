@@ -12,11 +12,11 @@ public class ClearHandler extends BaseHandler {
         ClearService clearService = new ClearService();
         ClearResponse result = clearService.clearDatabase();
 
-        if (result.isSuccess()) {
+        if (result.isSuccess())
             response.status(200);
-        } else {
+        else
             response.status(500);
-        }
+
         return result;
     }
 }

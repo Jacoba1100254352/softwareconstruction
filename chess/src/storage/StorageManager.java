@@ -8,6 +8,7 @@ public class StorageManager {
     private final TokenStorage tokenStorage = new TokenStorage();
 
     private StorageManager() {
+
     }
 
     public static StorageManager getInstance() {

@@ -31,6 +31,7 @@ public class Game {
      * Default constructor.
      */
     public Game() {
+
     }
 
     /**
@@ -46,24 +47,6 @@ public class Game {
         this.whiteUsername = null;
         this.blackUsername = null;
         this.game = null;
-    }
-
-
-    /**
-     * Constructs a game with the specified values.
-     *
-     * @param gameID        The unique ID of the game.
-     * @param whiteUsername The white player's username.
-     * @param blackUsername The black player's username.
-     * @param gameName      The name of the game.
-     * @param game          The chess game.
-     */
-    public Game(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
-        this.gameID = gameID;
-        this.whiteUsername = whiteUsername;
-        this.blackUsername = blackUsername;
-        this.gameName = gameName;
-        this.game = game;
     }
 
 

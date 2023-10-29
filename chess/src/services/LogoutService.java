@@ -2,6 +2,7 @@ package services;
 
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
+import models.AuthToken;
 import requests.LogoutRequest;
 import responses.LogoutResponse;
 
@@ -15,6 +16,7 @@ public class LogoutService {
      * Default constructor.
      */
     public LogoutService() {
+
     }
 
     /**
@@ -25,8 +27,9 @@ public class LogoutService {
      */
     public LogoutResponse logout(LogoutRequest request) {
         try {
-            if (authDAO.findAuth(request.getAuthToken()) != null) {
-                authDAO.deleteAuth(request.getAuthToken());
+            AuthToken authToken = authDAO.findAuth(request.getAuthToken());
+            if (authToken != null) {
+                authDAO.deleteAuth(authToken);
                 return new LogoutResponse(true, "Logged out successfully.");
             } else {
                 return new LogoutResponse(false, "Error: Invalid authentication token.");
@@ -35,5 +38,4 @@ public class LogoutService {
             return new LogoutResponse(false, "Error: " + e.getMessage());
         }
     }
-
 }

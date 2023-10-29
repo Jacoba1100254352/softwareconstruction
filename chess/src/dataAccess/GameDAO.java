@@ -74,14 +74,14 @@ public class GameDAO {
         Game game = findGameById(gameID);
 
         if (color == ChessGame.TeamColor.WHITE) {
-            if (game.getWhiteUsername() != null) {
+            if (game.getWhiteUsername() != null)
                 throw new DataAccessException("White player spot is already taken.");
-            }
+
             game.setWhiteUsername(username);
         } else if (color == ChessGame.TeamColor.BLACK) {
-            if (game.getBlackUsername() != null) {
+            if (game.getBlackUsername() != null)
                 throw new DataAccessException("Black player spot is already taken.");
-            }
+
             game.setBlackUsername(username);
         }
     }
@@ -96,19 +96,6 @@ public class GameDAO {
      */
     public void updateGame(Integer gameID, ChessGame newChessGame) throws DataAccessException {
         findGameById(gameID).setGame(newChessGame);
-    }
-
-    /**
-     * Removes a game from the data store.
-     *
-     * @param gameID The ID of the game to be removed.
-     * @throws DataAccessException if the operation fails.
-     */
-    public void deleteGame(Integer gameID) throws DataAccessException {
-        if (!gameStorage.containsGame(gameID))
-            throw new DataAccessException("Game not found.");
-
-        gameStorage.deleteGame(gameID);
     }
 
     public void clearGames() {

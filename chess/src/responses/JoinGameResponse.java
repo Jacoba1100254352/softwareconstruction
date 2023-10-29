@@ -17,6 +17,7 @@ public class JoinGameResponse {
      * Default constructor.
      */
     public JoinGameResponse() {
+
     }
 
     /**

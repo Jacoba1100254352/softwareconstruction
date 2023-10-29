@@ -21,6 +21,7 @@ public class RegisterResponse {
      * Default constructor.
      */
     public RegisterResponse() {
+
     }
 
     /**

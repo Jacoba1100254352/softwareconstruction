@@ -21,6 +21,7 @@ public class JoinGameRequest {
      * Default constructor.
      */
     public JoinGameRequest() {
+
     }
 
     /**

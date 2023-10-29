@@ -19,6 +19,7 @@ public class CreateGameResponse {
      * Default constructor.
      */
     public CreateGameResponse() {
+
     }
 
     /**

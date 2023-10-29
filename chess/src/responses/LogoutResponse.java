@@ -19,6 +19,7 @@ public class LogoutResponse {
      * Default constructor.
      */
     public LogoutResponse() {
+
     }
 
     /**

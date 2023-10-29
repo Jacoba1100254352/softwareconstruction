@@ -21,6 +21,7 @@ public class RegisterRequest {
      * Default constructor.
      */
     public RegisterRequest() {
+
     }
 
     /**
@@ -28,6 +29,7 @@ public class RegisterRequest {
      *
      * @param username The username of the user.
      * @param password The password of the user.
+     * @param email    The email of the user.
      */
     public RegisterRequest(String username, String password, String email) {
         this.username = username;
@@ -35,7 +37,8 @@ public class RegisterRequest {
         this.email = email;
     }
 
-    // Getters and setters
+
+    ///   Getters and setters   ///
 
     /**
      * Retrieves the username of a user.

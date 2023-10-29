@@ -28,9 +28,9 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during insertion.
      */
     public void insertUser(User user) throws DataAccessException {
-        if (userStorage.containsUser(user.getUsername())) {
+        if (userStorage.containsUser(user.getUsername()))
             throw new DataAccessException("User with this username already exists.");
-        }
+
         userStorage.addUser(user);
     }
 
