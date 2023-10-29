@@ -24,7 +24,7 @@ public class AuthDAO {
     /**
      * Inserts a new token for a user.
      *
-     * @param token  The user's authentication token.
+     * @param token    The user's authentication token.
      * @param username The username for the associated user.
      * @throws DataAccessException if there's an error in the data access operation.
      */

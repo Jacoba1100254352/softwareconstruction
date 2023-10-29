@@ -16,13 +16,14 @@ public class AuthToken {
     /**
      * Default constructor.
      */
-    public AuthToken() { }
+    public AuthToken() {
+    }
 
     /**
      * Constructs an authentication token with the specified values.
      *
      * @param authToken The token string.
-     * @param username The associated username.
+     * @param username  The associated username.
      */
     public AuthToken(String authToken, String username) {
         this.authToken = authToken;

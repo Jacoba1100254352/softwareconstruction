@@ -21,7 +21,8 @@ public class User {
     /**
      * Default constructor.
      */
-    public User() { }
+    public User() {
+    }
 
     /**
      * Constructs a new user with the given attributes.

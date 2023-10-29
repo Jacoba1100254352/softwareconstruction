@@ -7,7 +7,8 @@ public class StorageManager {
     private final GameStorage gameStorage = new GameStorage();
     private final TokenStorage tokenStorage = new TokenStorage();
 
-    private StorageManager() {}
+    private StorageManager() {
+    }
 
     public static StorageManager getInstance() {
         return instance;

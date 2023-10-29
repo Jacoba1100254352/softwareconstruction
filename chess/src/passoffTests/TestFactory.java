@@ -10,23 +10,23 @@ public class TestFactory {
 
     //Chess Functions
     //------------------------------------------------------------------------------------------------------------------
-    public static ChessBoard getNewBoard(){
+    public static ChessBoard getNewBoard() {
         return new ChessBoardImpl();
     }
 
-    public static ChessGame getNewGame(){
+    public static ChessGame getNewGame() {
         return new ChessGameImpl();
     }
 
-    public static ChessPiece getNewPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){
+    public static ChessPiece getNewPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         return new ChessPieceImpl(pieceColor, type);
     }
 
-    public static ChessPosition getNewPosition(Integer row, Integer col){
+    public static ChessPosition getNewPosition(Integer row, Integer col) {
         return new ChessPositionImpl(row, col);
     }
 
-    public static ChessMove getNewMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece){
+    public static ChessMove getNewMove(ChessPosition startPosition, ChessPosition endPosition, ChessPiece.PieceType promotionPiece) {
         return new ChessMoveImpl(startPosition, endPosition, promotionPiece);
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ public class TestFactory {
 
     //Server API's
     //------------------------------------------------------------------------------------------------------------------
-    public static String getServerPort(){
+    public static String getServerPort() {
         return "8080";
     }
     //------------------------------------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public class TestFactory {
 
     //Websocket Tests
     //------------------------------------------------------------------------------------------------------------------
-    public static Long getMessageTime(){
+    public static Long getMessageTime() {
         /*
         Changing this will change how long tests will wait for the server to send messages.
         3000 Milliseconds (3 seconds) will be enough for most computers. Feel free to change as you see fit,

@@ -30,13 +30,14 @@ public class Game {
     /**
      * Default constructor.
      */
-    public Game() { }
+    public Game() {
+    }
 
     /**
      * Constructs a game with a given ID and name.
      * Other attributes can be set later.
      *
-     * @param gameID The unique ID of the game.
+     * @param gameID   The unique ID of the game.
      * @param gameName The name of the game.
      */
     public Game(Integer gameID, String gameName) {
@@ -51,11 +52,11 @@ public class Game {
     /**
      * Constructs a game with the specified values.
      *
-     * @param gameID The unique ID of the game.
+     * @param gameID        The unique ID of the game.
      * @param whiteUsername The white player's username.
      * @param blackUsername The black player's username.
-     * @param gameName The name of the game.
-     * @param game The chess game.
+     * @param gameName      The name of the game.
+     * @param game          The chess game.
      */
     public Game(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;

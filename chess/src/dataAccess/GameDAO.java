@@ -65,9 +65,9 @@ public class GameDAO {
     /**
      * Claims a spot in a specified game.
      *
-     * @param gameID The game ID of the spot to be claimed.
+     * @param gameID   The game ID of the spot to be claimed.
      * @param username The username of the player claiming the spot.
-     * @param color The color (WHITE/BLACK) the player wants.
+     * @param color    The color (WHITE/BLACK) the player wants.
      * @throws DataAccessException if the operation fails.
      */
     public void claimSpot(Integer gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
@@ -77,7 +77,7 @@ public class GameDAO {
             if (game.getWhiteUsername() != null) {
                 throw new DataAccessException("White player spot is already taken.");
             }
-            if(username.equals(game.getBlackUsername())) {
+            if (username.equals(game.getBlackUsername())) {
                 throw new DataAccessException("Player already claimed the black spot.");
             }
             game.setWhiteUsername(username);
@@ -85,7 +85,7 @@ public class GameDAO {
             if (game.getBlackUsername() != null) {
                 throw new DataAccessException("Black player spot is already taken.");
             }
-            if(username.equals(game.getWhiteUsername())) {
+            if (username.equals(game.getWhiteUsername())) {
                 throw new DataAccessException("Player already claimed the white spot.");
             }
             game.setBlackUsername(username);
@@ -96,7 +96,7 @@ public class GameDAO {
     /**
      * Updates the chess game in the data store.
      *
-     * @param gameID The ID of the game to be updated.
+     * @param gameID       The ID of the game to be updated.
      * @param newChessGame The new ChessGame object to replace the existing one.
      * @throws DataAccessException if the operation fails.
      */
