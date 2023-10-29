@@ -4,6 +4,8 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import models.User;
+import requests.RegisterRequest;
+import responses.RegisterResponse;
 
 import java.util.UUID;
 

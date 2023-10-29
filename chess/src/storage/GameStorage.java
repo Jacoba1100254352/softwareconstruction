@@ -1,15 +1,17 @@
 package storage;
 
 import models.Game;
-import java.util.*;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 public class GameStorage {
-    private final Map<Integer, Game> games;
+    private final HashMap<Integer, Game> games;
     private Integer idCounter;
 
     public GameStorage() {
         games = new HashMap<>();
-        idCounter = 1;
+        idCounter = 0;
     }
 
     public boolean containsGame(Integer gameID) {
@@ -37,6 +39,6 @@ public class GameStorage {
     }
 
     public Integer getNextGameId() {
-        return idCounter++;
+        return ++idCounter;
     }
 }

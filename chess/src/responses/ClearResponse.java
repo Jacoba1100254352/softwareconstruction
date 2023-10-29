@@ -1,12 +1,12 @@
-package services;
+package responses;
 
 /**
- * Represents the result of a logout request.
+ * Represents the response after attempting to clear the database.
  */
-public class LogoutResponse {
+public class ClearResponse {
 
     /**
-     * Indicates if the logout operation was successful.
+     * Indicates if the clearing operation was successful.
      */
     private boolean success;
 
@@ -18,16 +18,16 @@ public class LogoutResponse {
     /**
      * Default constructor.
      */
-    public LogoutResponse() {
+    public ClearResponse() {
     }
 
     /**
-     * Constructs a new LogoutResponse with the given parameters.
+     * Constructs a new ClearResponse with the given parameters.
      *
-     * @param success Indicates if the logout operation was successful.
+     * @param success Indicates if the clearing operation was successful.
      * @param message A message providing details or an error description.
      */
-    public LogoutResponse(boolean success, String message) {
+    public ClearResponse(boolean success, String message) {
         this.success = success;
         this.message = message;
     }

@@ -124,5 +124,4 @@ public class GameDAO {
     public Integer getNextGameID() {
         return gameStorage.getNextGameId();
     }
-
 }

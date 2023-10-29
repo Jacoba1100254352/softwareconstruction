@@ -1,4 +1,4 @@
-package services;
+package responses;
 
 /**
  * Represents the response after attempting to create a game.

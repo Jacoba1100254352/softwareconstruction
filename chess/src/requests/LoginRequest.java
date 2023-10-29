@@ -1,9 +1,9 @@
-package services;
+package requests;
 
 /**
- * Represents the request data required for registering a user.
+ * Represents the request data required for logging in a user.
  */
-public class RegisterRequest {
+public class LoginRequest {
     /**
      * The username of the user.
      */
@@ -12,33 +12,29 @@ public class RegisterRequest {
      * The password of the user.
      */
     private String password;
-    /**
-     * The email of the user.
-     */
-    private String email;
 
     /**
      * Default constructor.
      */
-    public RegisterRequest() {
+    public LoginRequest() {
     }
 
     /**
-     * Constructs a new RegisterRequest with the given parameters.
+     * Constructs a new LoginRequest with the given parameters.
      *
      * @param username The username of the user.
      * @param password The password of the user.
      */
-    public RegisterRequest(String username, String password, String email) {
+    public LoginRequest(String username, String password) {
         this.username = username;
         this.password = password;
-        this.email = email;
     }
 
-    // Getters and setters
+
+    ///   Getters and setters   ///
 
     /**
-     * Retrieves the username of a user.
+     * Retrieves the username of the user.
      *
      * @return The username.
      */
@@ -47,7 +43,7 @@ public class RegisterRequest {
     }
 
     /**
-     * Sets the username of a user.
+     * Sets the username of the user.
      *
      * @param username The username to be set.
      */
@@ -56,7 +52,7 @@ public class RegisterRequest {
     }
 
     /**
-     * Retrieves the password of a user.
+     * Retrieves the password of the user.
      *
      * @return The password.
      */
@@ -65,29 +61,11 @@ public class RegisterRequest {
     }
 
     /**
-     * Sets the password of a user.
+     * Sets the password of the user.
      *
      * @param password The password to be set.
      */
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    /**
-     * Retrieves the email of a user.
-     *
-     * @return The email.
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Sets the email of a user.
-     *
-     * @param email The email to be set.
-     */
-    public void setEmail(String email) {
-        this.email = email;
     }
 }

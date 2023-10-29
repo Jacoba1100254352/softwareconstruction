@@ -1,4 +1,4 @@
-package services;
+package responses;
 
 /**
  * Represents the result of a login request.

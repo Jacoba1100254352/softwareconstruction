@@ -4,6 +4,8 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import models.Game;
+import requests.CreateGameRequest;
+import responses.CreateGameResponse;
 
 /**
  * Provides services to create a new game.

@@ -1,27 +1,28 @@
-package services;
+package requests;
 
 /**
- * Represents the request data required for logging out a user.
+ * Represents the request data required to list all games.
  */
-public class LogoutRequest {
+public class ListGamesRequest {
 
     /**
-     * The authentication token of the user trying to logout.
+     * The authentication token of the user trying to list games.
      */
     private String authToken;
 
     /**
      * Default constructor.
      */
-    public LogoutRequest() {
+    public ListGamesRequest() {
+
     }
 
     /**
-     * Constructs a new LogoutRequest with the given authToken.
+     * Constructs a new ListGamesRequest with the given authToken.
      *
      * @param authToken The authentication token of the user.
      */
-    public LogoutRequest(String authToken) {
+    public ListGamesRequest(String authToken) {
         this.authToken = authToken;
     }
 
@@ -36,4 +37,3 @@ public class LogoutRequest {
         this.authToken = authToken;
     }
 }
-

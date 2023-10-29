@@ -1,5 +1,8 @@
-package services;
+package handlers;
 
+import requests.CreateGameRequest;
+import responses.CreateGameResponse;
+import services.CreateGameService;
 import spark.Request;
 import spark.Response;
 

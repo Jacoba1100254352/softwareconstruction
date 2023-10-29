@@ -1,9 +1,8 @@
-package services;
+package responses;
 
 import models.Game;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Represents the response containing a list of all games.
@@ -56,7 +55,7 @@ public class ListGamesResponse {
         return games;
     }
 
-    public void setGames(List<Game> games) {
+    public void setGames(Collection<Game> games) {
         this.games = games;
     }
 

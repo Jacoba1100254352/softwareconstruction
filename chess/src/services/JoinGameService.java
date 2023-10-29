@@ -4,6 +4,8 @@ import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import requests.JoinGameRequest;
+import responses.JoinGameResponse;
 
 /**
  * Provides services for a user to join a game.
@@ -37,35 +39,30 @@ public class JoinGameService {
         try {
             // 1. Verify user's identity using the auth token
             String username = authDAO.findAuth(request.getAuthToken());
-            if (username == null) {
+            if (username == null)
                 return new JoinGameResponse(false, "Error: unauthorized");
-            }
 
             // 2. Check if the specified game exists
-            if (gameDAO.findGameById(request.getGameID()) == null) {  // This check can be redundant but adds clarity.
+            if (gameDAO.findGameById(request.getGameID()) == null)
                 return new JoinGameResponse(false, "Error: bad request");
-            }
 
             // 3. Check if color is specified and handle accordingly
-            if (request.getPlayerColor().equalsIgnoreCase("WHITE")) {
+            if (request.getPlayerColor().equalsIgnoreCase("WHITE"))
                 gameDAO.claimSpot(request.getGameID(), username, ChessGame.TeamColor.WHITE);
-            } else if (request.getPlayerColor().equalsIgnoreCase("BLACK")) {
+            else if (request.getPlayerColor().equalsIgnoreCase("BLACK"))
                 gameDAO.claimSpot(request.getGameID(), username, ChessGame.TeamColor.BLACK);
-            } else {
-                // User is watching the game; no changes are made to the game's data structure
+            else // User is watching the game; no changes are made to the game's data structure
                 return new JoinGameResponse(true, "Successfully watching the game");
-            }
 
             return new JoinGameResponse(true, "Successfully joined the game");
 
         } catch (DataAccessException e) {
-            if (e.getMessage().contains("already taken")) {
+            if (e.getMessage().contains("already taken"))
                 return new JoinGameResponse(false, "Error: already taken");
-            } else if (e.getMessage().contains("not found")) {
+            else if (e.getMessage().contains("not found"))
                 return new JoinGameResponse(false, "Error: bad request");
-            } else {
+            else
                 return new JoinGameResponse(false, "Error: " + e.getMessage());
-            }
         }
     }
 

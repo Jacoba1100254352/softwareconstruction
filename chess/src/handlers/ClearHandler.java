@@ -1,5 +1,7 @@
-package services;
+package handlers;
 
+import responses.ClearResponse;
+import services.ClearService;
 import spark.Request;
 import spark.Response;
 

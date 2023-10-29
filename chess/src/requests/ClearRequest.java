@@ -1,4 +1,4 @@
-package services;
+package requests;
 
 /**
  * Represents the request data required to clear the database.

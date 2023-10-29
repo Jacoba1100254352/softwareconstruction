@@ -2,6 +2,8 @@ package services;
 
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
+import requests.LogoutRequest;
+import responses.LogoutResponse;
 
 /**
  * Provides services to logout a user.
