@@ -53,7 +53,7 @@ public class JoinGameRequest {
      *
      * @param gameID The game ID to be set.
      */
-    public void setGameId(Integer gameID) {
+    public void setGameID(Integer gameID) {
         this.gameID = gameID;
     }
 
