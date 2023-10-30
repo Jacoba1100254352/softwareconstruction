@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class Server {
     /**
-     * Handlers for service request and response
+     * Handlers for service request and response.
      */
     private final HashMap<String, BaseHandler> handlers;
 

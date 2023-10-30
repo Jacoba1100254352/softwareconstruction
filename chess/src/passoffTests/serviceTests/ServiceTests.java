@@ -29,8 +29,7 @@ public class ServiceTests {
     @BeforeEach
     public void setup() {
         // Clearing the database with the authToken
-        ClearRequest clearRequest = new ClearRequest(existingAuth);
-        clearService.clearDatabase(clearRequest);
+        clearService.clearDatabase(new ClearRequest(existingAuth));
 
         RegisterRequest registerRequest = new RegisterRequest(existingUser.getUsername(), existingUser.getPassword(), existingUser.getEmail());
         RegisterResponse regResponse = registerService.register(registerRequest);
