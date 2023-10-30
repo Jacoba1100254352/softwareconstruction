@@ -27,13 +27,12 @@ public class ClearService {
      */
     public ClearResponse clearDatabase(ClearRequest request) {
         try {
-            /*
-            // Verification step
-            if (authDAO.findAuth(request.getAuthToken()) == null)
-                return new ClearResponse(false, "Error: unauthorized");
-             */
+            // Optional verification step
+            if (authDAO.findAuth(request.getAuthToken()) == null) {
+                //return new ClearResponse(false, "Error: unauthorized");
+            }
 
-            // Assuming the verification succeeds, clear the database
+            // If the verification step succeeds, clear the database
             userDAO.clearUsers();
             gameDAO.clearGames();
             authDAO.clearAuth();

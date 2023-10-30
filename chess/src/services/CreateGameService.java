@@ -1,8 +1,6 @@
 package services;
 
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
-import dataAccess.GameDAO;
+import dataAccess.*;
 import models.Game;
 import requests.CreateGameRequest;
 import responses.CreateGameResponse;
@@ -25,7 +23,7 @@ public class CreateGameService {
      * Creates a new game based on the provided request.
      *
      * @param request The request containing game details.
-     * @return CreateGameResponse with the result of the operation.
+     * @return CreateGameResponse with the operation's result.
      */
     public CreateGameResponse createGame(CreateGameRequest request) {
         try {

@@ -1,8 +1,6 @@
 package services;
 
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
-import dataAccess.GameDAO;
+import dataAccess.*;
 import requests.ListGamesRequest;
 import responses.ListGamesResponse;
 
@@ -14,16 +12,9 @@ public class ListGamesService {
     private final AuthDAO authDAO = new AuthDAO();
 
     /**
-     * Default constructor.
-     */
-    public ListGamesService() {
-
-    }
-
-    /**
      * Lists all games for the authenticated user.
      *
-     * @param request The request containing the authToken of the user.
+     * @param request The request containing the user's authToken.
      * @return ListGamesResponse containing a list of all games.
      */
 
@@ -31,8 +22,8 @@ public class ListGamesService {
         try {
             if (authDAO.findAuth(request.getAuthToken()) == null)
                 return new ListGamesResponse(false, "Error: unauthorized");
-
-            return new ListGamesResponse(gameDAO.findAllGames());
+            else
+                return new ListGamesResponse(gameDAO.findAllGames());
         } catch (DataAccessException e) {
             return new ListGamesResponse(false, "Error: " + e.getMessage());
         }

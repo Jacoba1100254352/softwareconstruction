@@ -98,10 +98,16 @@ public class GameDAO {
         findGameById(gameID).setGame(newChessGame);
     }
 
+    /**
+     * Clear the games from the database.
+     */
     public void clearGames() {
         gameStorage.clearGames();
     }
 
+    /**
+     * Increment and retrieve the gameID.
+     */
     public Integer getNextGameID() {
         return gameStorage.getNextGameId();
     }

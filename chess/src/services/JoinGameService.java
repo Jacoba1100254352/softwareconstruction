@@ -38,30 +38,32 @@ public class JoinGameService {
      */
     public JoinGameResponse joinGame(JoinGameRequest request) {
         try {
-            // 1. Verify user's identity using the auth token
+            // Verify authToken exists
             AuthToken authToken = authDAO.findAuth(request.getAuthToken());
             if (authToken == null)
                 return new JoinGameResponse(false, "Error: unauthorized");
 
+            // Verify user exists
             User user = userDAO.getUser(authToken.getUsername());
             if (user == null)
                 return new JoinGameResponse(false, "Error: user not found");
 
-            // 2. Check if the specified game exists
+            // Verify the game exists
             if (gameDAO.findGameById(request.getGameID()) == null)
                 return new JoinGameResponse(false, "Error: bad request");
 
-            // 3. Check if color is specified and handle accordingly
+            // Add player to game or watch status based on color
             if (request.getPlayerColor().equalsIgnoreCase("WHITE"))
                 gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.WHITE);
             else if (request.getPlayerColor().equalsIgnoreCase("BLACK"))
                 gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.BLACK);
-            else // User is watching the game; no changes are made to the game's data structure
+            else // Watching
                 return new JoinGameResponse(true, "Successfully watching the game");
 
             return new JoinGameResponse(true, "Successfully joined the game");
 
         } catch (DataAccessException e) {
+            // Handle exceptions/errors
             if (e.getMessage().contains("already taken"))
                 return new JoinGameResponse(false, "Error: already taken");
             else if (e.getMessage().contains("not found"))
@@ -74,38 +76,18 @@ public class JoinGameService {
 
     ///   Getters and setters   ///
 
-    /**
-     * Checks if the user was successful in joining the game.
-     *
-     * @return A boolean indicating whether the user successfully joined the game or not.
-     */
     public boolean isSuccess() {
         return success;
     }
 
-    /**
-     * Sets the success status of the user's attempt to join the game.
-     *
-     * @param success A boolean indicating the success status to be set.
-     */
     public void setSuccess(boolean success) {
         this.success = success;
     }
 
-    /**
-     * Retrieves the message associated with the user's attempt to join the game.
-     *
-     * @return The message.
-     */
     public String getMessage() {
         return message;
     }
 
-    /**
-     * Sets the message associated with the user's attempt to join the game.
-     *
-     * @param message The message to be set.
-     */
     public void setMessage(String message) {
         this.message = message;
     }

@@ -11,33 +11,29 @@ public class CreateGameResponse {
     private Integer gameID;
 
     /**
-     * A message providing details or an error description.
+     * A message providing success or error info.
      */
     private String message;
 
-    /**
-     * Default constructor.
-     */
-    public CreateGameResponse() {
 
-    }
+    ///   Constructors   ///
 
     /**
-     * Constructs a new CreateGameResponse with the given gameID.
-     *
-     * @param message The unique ID of the created game.
-     */
-    public CreateGameResponse(String message) {
-        this.message = message;
-    }
-
-    /**
-     * Constructs a new CreateGameResponse with the given gameID.
+     * Constructor for the response gameID.
      *
      * @param gameID The unique ID of the created game.
      */
     public CreateGameResponse(Integer gameID) {
         this.gameID = gameID;
+    }
+
+    /**
+     * Constructor for the response message.
+     *
+     * @param message A message providing success or error info.
+     */
+    public CreateGameResponse(String message) {
+        this.message = message;
     }
 
 
@@ -51,20 +47,10 @@ public class CreateGameResponse {
         this.gameID = gameID;
     }
 
-    /**
-     * Retrieves the message associated with the operation.
-     *
-     * @return The message.
-     */
     public String getMessage() {
         return message;
     }
 
-    /**
-     * Sets the message associated with the operation.
-     *
-     * @param message The message to be set.
-     */
     public void setMessage(String message) {
         this.message = message;
     }

@@ -13,15 +13,11 @@ public class LoginRequest {
      */
     private String password;
 
-    /**
-     * Default constructor.
-     */
-    public LoginRequest() {
 
-    }
+    ///   Constructors   ///
 
     /**
-     * Constructs a new LoginRequest with the given parameters.
+     * Constructor for user log-in data.
      *
      * @param username The username of the user.
      * @param password The password of the user.
@@ -34,38 +30,18 @@ public class LoginRequest {
 
     ///   Getters and setters   ///
 
-    /**
-     * Retrieves the username of the user.
-     *
-     * @return The username.
-     */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Sets the username of the user.
-     *
-     * @param username The username to be set.
-     */
     public void setUsername(String username) {
         this.username = username;
     }
 
-    /**
-     * Retrieves the password of the user.
-     *
-     * @return The password.
-     */
     public String getPassword() {
         return password;
     }
 
-    /**
-     * Sets the password of the user.
-     *
-     * @param password The password to be set.
-     */
     public void setPassword(String password) {
         this.password = password;
     }

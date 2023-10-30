@@ -1,32 +1,28 @@
 package responses;
 
 /**
- * Represents the result of a logout request.
+ * Represents the response to the logout request.
  */
 public class LogoutResponse {
 
     /**
-     * Indicates if the logout operation was successful.
+     * Indicates the success of the logout operation.
      */
     private boolean success;
 
     /**
-     * A message providing details or an error description.
+     * A message providing success or error info.
      */
     private String message;
 
-    /**
-     * Default constructor.
-     */
-    public LogoutResponse() {
 
-    }
+    ///   Constructors   ///
 
     /**
-     * Constructs a new LogoutResponse with the given parameters.
+     * Constructor for the logout response success or failure.
      *
      * @param success Indicates if the logout operation was successful.
-     * @param message A message providing details or an error description.
+     * @param message A message providing success or error info.
      */
     public LogoutResponse(boolean success, String message) {
         this.success = success;

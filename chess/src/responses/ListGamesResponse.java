@@ -20,26 +20,23 @@ public class ListGamesResponse {
     /**
      * The game listing was successful
      */
-    private boolean success = true;  // Default to true. Set to false on errors.
+    private boolean success;
+
+
+    ///   Constructors   ///
 
     /**
-     * Default constructor.
-     */
-    public ListGamesResponse() {
-
-    }
-
-    /**
-     * Constructs a new ListGamesResponse with the given list of games.
+     * Constructor for creating list of games after a successful operation.
      *
      * @param games A list of games.
      */
     public ListGamesResponse(Collection<Game> games) {
         this.games = games;
+        this.success = true;
     }
 
     /**
-     * Constructs a new ListGamesResponse with the given list of games.
+     * Constructor for the list game response success or failure.
      *
      * @param success Indicates the success of the List Game Response.
      * @param message A message providing details or an error description.

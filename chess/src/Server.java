@@ -6,12 +6,16 @@ import spark.Spark;
 import java.util.HashMap;
 
 public class Server {
+    /**
+     * Handlers for service request and response
+     */
     private final HashMap<String, BaseHandler> handlers;
 
     public Server() {
+        // Initialize handlers
         handlers = new HashMap<>();
 
-        // Using compound keys (path + method) with separators for handlers
+        // Set up the handlers
         handlers.put("/db:DELETE", new ClearHandler());
         handlers.put("/user:POST", new RegisterHandler());
         handlers.put("/session:POST", new LoginHandler());
@@ -27,14 +31,15 @@ public class Server {
     }
 
     public String handleRequest(Request req, Response res) {
+        // Initialize handler
         String key = req.pathInfo() + ":" + req.requestMethod();
         BaseHandler handler = handlers.get(key);
 
+        // Handle request
         if (handler != null) {
             try {
-                Object result = handler.handleRequest(req, res); // Updated to pass Spark's request and response
-                res.type("application/json"); // Set response type to JSON
-                return BaseHandler.gson.toJson(result); // Convert the result object to JSON string
+                res.type("application/json");
+                return BaseHandler.gson.toJson(handler.handleRequest(req, res));
             } catch (Exception e) {
                 res.status(500);
                 res.type("application/json");
@@ -48,13 +53,13 @@ public class Server {
     }
 
     public void start() {
-        // Set the port first
+        // Set the Spark port
         Spark.port(8080);
 
-        // Then set the location for static files (this path should point to your web directory)
+        // Set the location for static files
         Spark.externalStaticFileLocation("src/web");
 
-        // Now, define the Spark routes
+        // Set the Spark routes
         Spark.delete("/db", this::handleRequest);
         Spark.post("/user", this::handleRequest);
         Spark.post("/session", this::handleRequest);
@@ -63,7 +68,7 @@ public class Server {
         Spark.post("/game", this::handleRequest);
         Spark.put("/game", this::handleRequest);
 
-        // Finally, initialize the Spark server
+        // Initialize the Spark server
         Spark.init();
     }
 }

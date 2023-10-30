@@ -10,15 +10,11 @@ public class ListGamesRequest {
      */
     private String authToken;
 
-    /**
-     * Default constructor.
-     */
-    public ListGamesRequest() {
 
-    }
+    ///   Constructor   ///
 
     /**
-     * Constructs a new ListGamesRequest with the given authToken.
+     * Constructor for the logout request authToken.
      *
      * @param authToken The authentication token of the user.
      */

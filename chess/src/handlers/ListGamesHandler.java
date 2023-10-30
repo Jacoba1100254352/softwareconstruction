@@ -1,15 +1,15 @@
 package handlers;
 
+import services.ListGamesService;
+
 import requests.ListGamesRequest;
 import responses.ListGamesResponse;
-import services.ListGamesService;
 import spark.Request;
 import spark.Response;
 
 public class ListGamesHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
-        response.type("application/json");
         String authToken = request.headers("Authorization");
         ListGamesResponse result = (new ListGamesService()).listAllGames(new ListGamesRequest(authToken));
 

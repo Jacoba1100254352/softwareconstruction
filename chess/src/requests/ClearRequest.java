@@ -10,15 +10,11 @@ public class ClearRequest {
      */
     private String authToken;
 
-    /**
-     * Default constructor.
-     */
-    public ClearRequest() {
 
-    }
+    ///   Constructor   ///
 
     /**
-     * Constructs a new ClearRequest with the given authToken.
+     * Constructor for the clear request authToken. (authToken here is yet unused)
      *
      * @param authToken The authentication token of the user.
      */

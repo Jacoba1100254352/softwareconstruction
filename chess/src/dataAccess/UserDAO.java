@@ -15,7 +15,7 @@ public class UserDAO {
     private final UserStorage userStorage;
 
     /**
-     * Default constructor. NOTE: May want to reset with new empty User Storage
+     * Default constructor.
      */
     public UserDAO() {
         userStorage = StorageManager.getInstance().getUserStorage();
@@ -52,9 +52,9 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during update or user doesn't exist.
      */
     public void updateUser(User user) throws DataAccessException {
-        if (!userStorage.containsUser(user.getUsername())) {
+        if (!userStorage.containsUser(user.getUsername()))
             throw new DataAccessException("User not found.");
-        }
+
         userStorage.addUser(user);  // Since it's a Map, this will replace the existing user
     }
 
@@ -65,9 +65,9 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during deletion or user doesn't exist.
      */
     public void deleteUser(String username) throws DataAccessException {
-        if (!userStorage.containsUser(username)) {
+        if (!userStorage.containsUser(username))
             throw new DataAccessException("User not found.");
-        }
+
         userStorage.deleteUser(username);
     }
 

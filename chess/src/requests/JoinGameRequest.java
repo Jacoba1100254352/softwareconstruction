@@ -17,15 +17,11 @@ public class JoinGameRequest {
      */
     private String playerColor;
 
-    /**
-     * Default constructor.
-     */
-    public JoinGameRequest() {
 
-    }
+    ///   Constructor   ///
 
     /**
-     * JoinGameRequest Explicit Constructor.
+     * Constructor for the user's join game data.
      *
      * @param authToken   The authentication token of the user.
      * @param gameID      The unique ID of the game.
@@ -40,38 +36,18 @@ public class JoinGameRequest {
 
     ///   Getters and setters   ///
 
-    /**
-     * Retrieves the game ID.
-     *
-     * @return The game ID.
-     */
     public Integer getGameID() {
         return gameID;
     }
 
-    /**
-     * Sets the game ID.
-     *
-     * @param gameID The game ID to be set.
-     */
     public void setGameID(Integer gameID) {
         this.gameID = gameID;
     }
 
-    /**
-     * Retrieves the player's color.
-     *
-     * @return The player's color.
-     */
     public String getPlayerColor() {
         return playerColor;
     }
 
-    /**
-     * Sets the player's color.
-     *
-     * @param playerColor The color to be set.
-     */
     public void setPlayerColor(String playerColor) {
         this.playerColor = playerColor;
     }

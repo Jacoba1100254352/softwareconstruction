@@ -13,15 +13,11 @@ public class AuthToken {
      */
     private String username;
 
-    /**
-     * Default constructor.
-     */
-    public AuthToken() {
 
-    }
+    ///   Constructor   ///
 
     /**
-     * Constructs an authentication token with the specified values.
+     * Constructor for a new authentication token with the given attributes.
      *
      * @param authToken The token string.
      * @param username  The associated username.

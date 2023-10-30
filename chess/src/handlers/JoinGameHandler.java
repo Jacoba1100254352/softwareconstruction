@@ -1,15 +1,15 @@
 package handlers;
 
+import services.JoinGameService;
+
 import requests.JoinGameRequest;
 import responses.JoinGameResponse;
-import services.JoinGameService;
 import spark.Request;
 import spark.Response;
 
 public class JoinGameHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
-        response.type("application/json");
         String authToken = request.headers("Authorization");
 
         // Deserialize the JoinGameRequest from the request body

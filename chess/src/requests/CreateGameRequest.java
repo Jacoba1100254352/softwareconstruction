@@ -15,15 +15,11 @@ public class CreateGameRequest {
      */
     private String gameName;
 
-    /**
-     * Default constructor.
-     */
-    public CreateGameRequest() {
 
-    }
+    ///   Constructor   ///
 
     /**
-     * Constructs a new CreateGameRequest with the given parameters.
+     * Constructor for the created game's data.
      *
      * @param authToken The authentication token of the user.
      * @param gameName  The name of the game.

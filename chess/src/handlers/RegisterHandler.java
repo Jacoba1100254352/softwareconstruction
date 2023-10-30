@@ -1,15 +1,15 @@
 package handlers;
 
+import services.RegisterService;
+
 import requests.RegisterRequest;
 import responses.RegisterResponse;
-import services.RegisterService;
 import spark.Request;
 import spark.Response;
 
 public class RegisterHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
-        response.type("application/json");
         RegisterRequest registerRequest = gson.fromJson(request.body(), RegisterRequest.class);
         RegisterService registerService = new RegisterService();
         RegisterResponse result = registerService.register(registerRequest);

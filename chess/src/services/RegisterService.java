@@ -1,10 +1,7 @@
 package services;
 
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
-import dataAccess.UserDAO;
-import models.AuthToken;
-import models.User;
+import dataAccess.*;
+import models.*;
 import requests.RegisterRequest;
 import responses.RegisterResponse;
 
@@ -32,12 +29,10 @@ public class RegisterService {
             }
 
             if (userDAO.getUser(request.getUsername()) == null) {
-                User newUser = new User(request.getUsername(), request.getPassword(), request.getEmail());
-                userDAO.insertUser(newUser);
+                userDAO.insertUser(new User(request.getUsername(), request.getPassword(), request.getEmail()));
 
                 String uniqueToken = UUID.randomUUID().toString();
-                AuthToken authToken = new AuthToken(uniqueToken, request.getUsername());
-                authDAO.insertAuth(authToken);
+                authDAO.insertAuth(new AuthToken(uniqueToken, request.getUsername()));
 
                 return new RegisterResponse(uniqueToken, request.getUsername());
             } else {

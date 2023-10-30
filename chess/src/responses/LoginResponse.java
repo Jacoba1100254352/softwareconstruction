@@ -21,15 +21,11 @@ public class LoginResponse {
      */
     private boolean success;
 
-    /**
-     * Default constructor.
-     */
-    public LoginResponse() {
 
-    }
+    ///   Constructors   ///
 
     /**
-     * Constructs a new LoginResponse indicating success.
+     * Constructor for successful response.
      *
      * @param authToken The authentication token for the logged-in user.
      * @param username  The username of the logged-in user.
@@ -41,68 +37,38 @@ public class LoginResponse {
     }
 
     /**
-     * Constructs a new LoginResponse indicating an error.
+     * Constructor for error messages.
      *
      * @param message The error message.
      */
     public LoginResponse(String message) {
         this.message = message;
-        this.success = false;  // false for error messages
+        this.success = false; // false: failed login
     }
 
 
     ///   Getters and setters   ///
 
-    /**
-     * Retrieves the message associated with the operation or request.
-     *
-     * @return The message.
-     */
     public String getMessage() {
         return message;
     }
 
-    /**
-     * Sets the message associated with the operation or request.
-     *
-     * @param message The message to be set.
-     */
     public void setMessage(String message) {
         this.message = message;
     }
 
-    /**
-     * Retrieves the authentication token for the user session.
-     *
-     * @return The authentication token.
-     */
     public String getAuthToken() {
         return authToken;
     }
 
-    /**
-     * Sets the authentication token for the user session.
-     *
-     * @param authToken The authentication token to be set.
-     */
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
 
-    /**
-     * Retrieves the username of the user associated with the operation or request.
-     *
-     * @return The username.
-     */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Sets the username of the user associated with the operation or request.
-     *
-     * @param username The username to be set.
-     */
     public void setUsername(String username) {
         this.username = username;
     }

@@ -1,15 +1,15 @@
 package handlers;
 
+import services.CreateGameService;
+
 import requests.CreateGameRequest;
 import responses.CreateGameResponse;
-import services.CreateGameService;
 import spark.Request;
 import spark.Response;
 
 public class CreateGameHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
-        response.type("application/json");
         String authToken = request.headers("Authorization");
         CreateGameRequest createGameRequest = gson.fromJson(request.body(), CreateGameRequest.class);
         createGameRequest.setAuthToken(authToken);

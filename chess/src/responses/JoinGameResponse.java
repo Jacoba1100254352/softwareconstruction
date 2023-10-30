@@ -5,7 +5,7 @@ package responses;
  */
 public class JoinGameResponse {
     /**
-     * Indicates if the operation was successful.
+     * Indicates the success of the join operation.
      */
     private boolean success;
     /**
@@ -13,17 +13,13 @@ public class JoinGameResponse {
      */
     private String message;
 
-    /**
-     * Default constructor.
-     */
-    public JoinGameResponse() {
 
-    }
+    ///   Constructors   ///
 
     /**
-     * Constructs a new JoinGameResponse.
+     * Constructor for the join game response success or failure.
      *
-     * @param success Indicates if the operation was successful.
+     * @param success Indicates the success of the join operation.
      * @param message A message providing details or an error description.
      */
     public JoinGameResponse(boolean success, String message) {
@@ -34,38 +30,18 @@ public class JoinGameResponse {
 
     ///   Getters and setters   ///
 
-    /**
-     * Checks if the operation was successful.
-     *
-     * @return A boolean indicating whether the operation was successful or not.
-     */
     public boolean isSuccess() {
         return success;
     }
 
-    /**
-     * Sets the success status of the operation.
-     *
-     * @param success A boolean indicating the success status to be set.
-     */
     public void setSuccess(boolean success) {
         this.success = success;
     }
 
-    /**
-     * Retrieves the message associated with the operation.
-     *
-     * @return The message.
-     */
     public String getMessage() {
         return message;
     }
 
-    /**
-     * Sets the message associated with the operation.
-     *
-     * @param message The message to be set.
-     */
     public void setMessage(String message) {
         this.message = message;
     }

@@ -6,19 +6,15 @@ package requests;
 public class LogoutRequest {
 
     /**
-     * The authentication token of the user trying to logout.
+     * The authentication token of the user trying to log-out.
      */
     private String authToken;
 
-    /**
-     * Default constructor.
-     */
-    public LogoutRequest() {
 
-    }
+    ///   Constructors   ///
 
     /**
-     * Constructs a new LogoutRequest with the given authToken.
+     * Constructor for the logout request authToken.
      *
      * @param authToken The authentication token of the user.
      */

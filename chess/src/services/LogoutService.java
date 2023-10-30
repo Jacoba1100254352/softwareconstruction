@@ -7,7 +7,7 @@ import requests.LogoutRequest;
 import responses.LogoutResponse;
 
 /**
- * Provides services to logout a user.
+ * Provides services to log out a user.
  */
 public class LogoutService {
     private final AuthDAO authDAO = new AuthDAO();
@@ -22,7 +22,7 @@ public class LogoutService {
     /**
      * Logs out a user based on the provided request.
      *
-     * @param request The logout request containing the authToken of the user.
+     * @param request The logout request with the user's authToken.
      * @return LogoutResponse indicating success or failure.
      */
     public LogoutResponse logout(LogoutRequest request) {
