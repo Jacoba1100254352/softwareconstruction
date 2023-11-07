@@ -1,8 +1,7 @@
 package dataAccess;
 
 import models.AuthToken;
-import storage.StorageManager;
-import storage.TokenStorage;
+import java.sql.*;
 
 /**
  * Responsible for handling authentication-related data operations.
@@ -10,15 +9,15 @@ import storage.TokenStorage;
 public class AuthDAO {
 
     /**
-     * In-memory storage for auth tokens and associated usernames
+     * Database storage for auth tokens and associated usernames
      */
-    private final TokenStorage tokenStorage;
+    private final Database db;
 
     /**
      * Default constructor.
      */
     public AuthDAO() {
-        this.tokenStorage = StorageManager.getInstance().getTokenStorage();
+        this.db = Database.getInstance();
     }
 
     /**
@@ -28,10 +27,18 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void insertAuth(AuthToken authToken) throws DataAccessException {
-        if (tokenStorage.containsToken(authToken.getToken()))
-            throw new DataAccessException("Token already exists.");
+        // Adjust the SQL to include both the Token and the associated Username
+        String sql = "INSERT INTO AuthToken (Token, Username) VALUES (?, ?);"; // Changed UserID to Username
 
-        tokenStorage.addToken(authToken);
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, authToken.getToken());
+            stmt.setString(2, authToken.getUsername()); // Bind the Username value here
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error encountered while inserting auth token: " + e.getMessage());
+        }
     }
 
     /**
@@ -42,7 +49,22 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public AuthToken findAuth(String authToken) throws DataAccessException {
-        return tokenStorage.getToken(authToken);
+        AuthToken token = null;
+        String sql = "SELECT * FROM AuthToken WHERE Token = ?;";
+
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, authToken);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                token = new AuthToken(rs.getString("Token"), rs.getString("UserID"));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error encountered while finding token: " + e.getMessage());
+        }
+
+        return token;
     }
 
     /**
@@ -52,16 +74,31 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void deleteAuth(AuthToken authToken) throws DataAccessException {
-        if (!tokenStorage.containsToken(authToken.getToken()))
-            throw new DataAccessException("Token not found.");
+        String sql = "DELETE FROM AuthToken WHERE Token = ?;";
 
-        tokenStorage.removeToken(authToken);
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, authToken.getToken());
+
+            if (stmt.executeUpdate() != 1) {
+                throw new DataAccessException("Token deletion failed: Token not found.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error encountered while deleting token: " + e.getMessage());
+        }
     }
 
     /**
      * Clears all data from the database.
      */
-    public void clearAuth() {
-        tokenStorage.clearTokens();
+    public void clearAuth() throws DataAccessException {
+        String sql = "DELETE FROM AuthToken;";
+
+        try (Connection conn = db.getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error encountered while clearing tokens: " + e.getMessage());
+        }
     }
 }

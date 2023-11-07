@@ -34,7 +34,7 @@ public class CreateGameService {
                 return new CreateGameResponse("Error: unauthorized");
 
             // Create a new Game object
-            Game newGame = new Game(gameDAO.getNextGameID(), request.getGameName());
+            Game newGame = new Game(gameDAO.getCurrentGameId(), request.getGameName());
 
             // Insert the new Game object into the data store
             gameDAO.insertGame(newGame);

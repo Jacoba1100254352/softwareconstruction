@@ -10,12 +10,42 @@ import java.sql.SQLException;
  */
 public class Database {
 
-    // FIXME: Change these fields, if necessary, to match your database configuration
-    public static final String DB_NAME = "chess";
-    private static final String DB_USERNAME = "root";
-    private static final String DB_PASSWORD = "admin";
+    private static final String DB_NAME = "chessServerDB";
+    private static final String DB_USERNAME = "root"; //System.getProperty("dbUsername", "root"); // Fallback to 'root' if not set
+    private static final String DB_PASSWORD = "nyvceB-gysvuq-gozne5"; // System.getProperty("dbPassword", ""); // Fallback to empty if not set
 
     private static final String CONNECTION_URL = "jdbc:mysql://localhost:3306/" + DB_NAME;
+
+    private static Database instance;
+
+    private Database() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Get a Database instance
+     *
+     * @return Database instance
+     */
+    public static synchronized Database getInstance() {
+        if (instance == null)
+            instance = new Database();
+
+        return instance;
+    }
+
+    /**
+     * Start a transaction.
+     *
+     * @throws DataAccessException if a data access error occurs.
+     */
+    public void startTransaction(Connection conn) throws DataAccessException {
+        try {
+            conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new DataAccessException("Start transaction failed: " + e.getMessage());
+        }
+    }
 
     /**
      * Gets a connection to the database.
@@ -27,7 +57,7 @@ public class Database {
         try {
             return DriverManager.getConnection(CONNECTION_URL, DB_USERNAME, DB_PASSWORD);
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+            throw new DataAccessException("Error connecting to the database: " + e.getMessage());
         }
     }
 

@@ -44,8 +44,7 @@ public class LoginService {
      */
     public LoginResponse login(LoginRequest request) {
         try {
-            User user = userDAO.getUser(request.getUsername());
-            if (user != null && user.getPassword().equals(request.getPassword())) {
+            if (userDAO.validatePassword(request.getUsername(), request.getPassword())) {
                 AuthToken newToken = new AuthToken(UUID.randomUUID().toString(), request.getUsername());
                 authDAO.insertAuth(newToken);
                 return new LoginResponse(newToken.getToken(), newToken.getUsername());
