@@ -41,7 +41,7 @@ interactively pass off most phases.
 The deliverables in blue represent tests provided by the course start up code that you must pass. The deliverables in
 green represent unit tests that you must write and pass.
 
-![deliverables](../../deliverables.png)
+![deliverables](deliverables.png)
 
 ## Example
 
