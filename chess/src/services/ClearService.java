@@ -8,17 +8,6 @@ import responses.ClearResponse;
  * Provides services to clear the application's database.
  */
 public class ClearService {
-    private final UserDAO userDAO = new UserDAO();
-    private final GameDAO gameDAO = new GameDAO();
-    private final AuthDAO authDAO = new AuthDAO();
-
-    /**
-     * Default constructor.
-     */
-    public ClearService() {
-
-    }
-
     /**
      * Clears the entire database.
      *
@@ -27,18 +16,12 @@ public class ClearService {
      */
     public ClearResponse clearDatabase(ClearRequest request) {
         try {
-            // Optional verification step
-            if (authDAO.findAuth(request.getAuthToken()) == null) {
-                //return new ClearResponse(false, "Error: unauthorized");
-            }
-
-            // If the verification step succeeds, clear the database
-            userDAO.clearUsers();
-            gameDAO.clearGames();
-            authDAO.clearAuth();
+            // Call resetDatabase method to clear all data
+            Database.getInstance().resetDatabase();
             return new ClearResponse(true, "Database cleared successfully.");
         } catch (DataAccessException e) {
             return new ClearResponse(false, "Error: " + e.getMessage());
         }
     }
+
 }
