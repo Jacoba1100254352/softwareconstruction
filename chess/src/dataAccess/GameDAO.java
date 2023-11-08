@@ -222,7 +222,11 @@ public class GameDAO {
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            return (rs.next()) ? rs.getInt("GameID") : 0; // No games exist, this will belong to the first.
+            if (rs.next())
+                return rs.getInt("GameID");
+            else // No games exist, this will belong to the first.
+                throw new DataAccessException("Error retrieving id, no games in the database.");
+
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while retrieving the current game ID: " + e.getMessage());
         }
