@@ -44,8 +44,8 @@ public class KingPiece implements ChessPiece {
 
         // Iterate through all possible moves and validate
         for (int[] direction : directions) {
-            int newRow = myPosition.row() + direction[0];
-            int newCol = myPosition.column() + direction[1];
+            int newRow = myPosition.getRow() + direction[0];
+            int newCol = myPosition.getCol() + direction[1];
 
             // Skip if the move is outside the board
             if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8) continue;

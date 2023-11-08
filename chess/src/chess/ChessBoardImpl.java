@@ -100,4 +100,8 @@ public class ChessBoardImpl implements ChessBoard {
     public boolean getTestingMode() {
         return testingMode;
     }
+
+    public Map<ChessPosition, ChessPiece> getBoard() {
+        return board;
+    }
 }

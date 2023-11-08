@@ -11,11 +11,11 @@ public interface ChessPosition {
      * @return which row this position is in
      * 1 codes for the bottom row
      */
-    int row();
+    int getRow();
 
     /**
      * @return which column this position is in
      * 1 codes for the left row
      */
-    int column();
+    int getCol();
 }

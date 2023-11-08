@@ -1,7 +1,10 @@
 package services;
 
-import dataAccess.*;
-import models.*;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
+import dataAccess.UserDAO;
+import models.AuthToken;
+import models.User;
 import requests.RegisterRequest;
 import responses.RegisterResponse;
 

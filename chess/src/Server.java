@@ -1,4 +1,3 @@
-import dataAccess.*;
 import handlers.*;
 import spark.Request;
 import spark.Response;
@@ -63,8 +62,6 @@ public class Server {
         // Set the location for static files
         Spark.externalStaticFileLocation("src/web");
 
-        resetDatabaseForTesting();
-
         // Set the Spark routes
         Spark.delete("/db", this::handleRequest);
         Spark.post("/user", this::handleRequest);
@@ -73,36 +70,16 @@ public class Server {
         Spark.get("/game", this::handleRequest);
         Spark.post("/game", this::handleRequest);
         Spark.put("/game", this::handleRequest);
-        // Add a route for resetting the database, with proper security checks
-        Spark.post("/reset-database", (req, res) -> {
-            // Perform security checks here to ensure this can't be called in a production environment
-            resetDatabaseForTesting();
-            return "Database reset for testing.";
-        });
 
         // Initialize the Spark server
         Spark.init();
     }
 
     public void stopServer() {
-        // Perform any necessary cleanup here
-        System.out.println("Server is stopping. Cleaning up resources...");
-
-        // For example, if you need to close a database connection pool
-        // you would call the respective method to shut it down here.
-        // Database.getInstance().closeConnectionPool();
-
         // Stop the Spark server
         Spark.stop();
-    }
 
-    // Method to reset the database for testing
-    public void resetDatabaseForTesting() {
-        try {
-            Database.getInstance().resetDatabase();
-            System.out.println("Database reset successfully for testing.");
-        } catch (DataAccessException e) {
-            System.err.println("Error resetting database for testing: " + e.getMessage());
-        }
+        // Stop the Spark server
+        System.out.println("Server stopped successfully.");
     }
 }

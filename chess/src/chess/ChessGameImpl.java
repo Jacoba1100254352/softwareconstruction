@@ -45,7 +45,7 @@ public class ChessGameImpl implements ChessGame {
 
                 // If the piece is a king, limit its movement to 1 square
                 if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                    moves.removeIf(move -> Math.abs(move.getEndPosition().column() - move.getStartPosition().column()) > 1);
+                    moves.removeIf(move -> Math.abs(move.getEndPosition().getCol() - move.getStartPosition().getCol()) > 1);
                 }
 
                 // Check if any of the moves can attack the given position
@@ -72,14 +72,14 @@ public class ChessGameImpl implements ChessGame {
             return false;
 
         // Fetch the rook piece and validate its conditions for castling
-        ChessPiece rook = board.getPiece(new ChessPositionImpl(position.row(), kingSide ? 8 : 1));
+        ChessPiece rook = board.getPiece(new ChessPositionImpl(position.getRow(), kingSide ? 8 : 1));
         if (rook == null || rook.getPieceType() != ChessPiece.PieceType.ROOK || rook.hasMoved())
             return false;
 
         // Ensure there are no pieces in between the king and rook and the path isn't under attack
         int[] range = kingSide ? new int[]{1, 2} : new int[]{1, 2, 3};
         for (int i : range) {
-            ChessPosition checkPos = new ChessPositionImpl(position.row(), position.column() + (kingSide ? i : -i));
+            ChessPosition checkPos = new ChessPositionImpl(position.getRow(), position.getCol() + (kingSide ? i : -i));
             if (board.getPiece(checkPos) != null || isSquareUnderAttack(checkPos, color))
                 return false;
         }
@@ -106,9 +106,9 @@ public class ChessGameImpl implements ChessGame {
         // Handle castling logic for the king
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             if (canCastle(board, startPosition, piece.teamColor(), true))
-                validMoves.add(new ChessMoveImpl(startPosition, new ChessPositionImpl(startPosition.row(), startPosition.column() + 2), null));
+                validMoves.add(new ChessMoveImpl(startPosition, new ChessPositionImpl(startPosition.getRow(), startPosition.getCol() + 2), null));
             if (canCastle(board, startPosition, piece.teamColor(), false))
-                validMoves.add(new ChessMoveImpl(startPosition, new ChessPositionImpl(startPosition.row(), startPosition.column() - 2), null));
+                validMoves.add(new ChessMoveImpl(startPosition, new ChessPositionImpl(startPosition.getRow(), startPosition.getCol() - 2), null));
         }
 
         return validMoves;
@@ -126,22 +126,22 @@ public class ChessGameImpl implements ChessGame {
         int direction = (currentPiece.teamColor() == TeamColor.WHITE) ? 1 : -1;
 
         // Ensure the pawn is in the right rank for En Passant
-        if ((currentPiece.teamColor() == TeamColor.WHITE && startPosition.row() == 5) ||
-                (currentPiece.teamColor() == TeamColor.BLACK && startPosition.row() == 4)) {
+        if ((currentPiece.teamColor() == TeamColor.WHITE && startPosition.getRow() == 5) ||
+                (currentPiece.teamColor() == TeamColor.BLACK && startPosition.getRow() == 4)) {
 
             // Check adjacent squares for enemy pawns that moved two squares in the last move
             for (int colDirection : new int[]{-1, 1}) {
-                int column = startPosition.column() + colDirection;
+                int column = startPosition.getCol() + colDirection;
                 if (column < 1 || column > 7) continue;
-                ChessPosition adjPos = new ChessPositionImpl(startPosition.row(), column);
+                ChessPosition adjPos = new ChessPositionImpl(startPosition.getRow(), column);
                 ChessPiece adjPiece = board.getPiece(adjPos);
 
                 // Validate if the adjacent piece is an enemy pawn that moved two squares
                 if (adjPiece != null && adjPiece.getPieceType() == ChessPiece.PieceType.PAWN && adjPiece.teamColor() != currentPiece.teamColor()) {
                     ChessMove lastMove = board.getLastMove();
                     if (lastMove != null && lastMove.getEndPosition().equals(adjPos) &&
-                            Math.abs(lastMove.getStartPosition().row() - lastMove.getEndPosition().row()) == 2) {
-                        ChessPosition endPosition = new ChessPositionImpl(startPosition.row() + direction, startPosition.column() + colDirection);
+                            Math.abs(lastMove.getStartPosition().getRow() - lastMove.getEndPosition().getRow()) == 2) {
+                        ChessPosition endPosition = new ChessPositionImpl(startPosition.getRow() + direction, startPosition.getCol() + colDirection);
                         moves.add(new ChessMoveImpl(startPosition, endPosition, null));
                     }
                 }
@@ -208,28 +208,28 @@ public class ChessGameImpl implements ChessGame {
 
         // Handle En Passant logic for pawns
         if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getEndPosition() != null &&
-                Math.abs(move.getEndPosition().column() - move.getStartPosition().column()) == 1 &&
+                Math.abs(move.getEndPosition().getCol() - move.getStartPosition().getCol()) == 1 &&
                 board.getPiece(move.getEndPosition()) == null) {
             // Move the piece that is capturing
-            ChessPosition capturingPawnPos = new ChessPositionImpl(move.getEndPosition().row(), move.getEndPosition().column());
+            ChessPosition capturingPawnPos = new ChessPositionImpl(move.getEndPosition().getRow(), move.getEndPosition().getCol());
             board.removePiece(capturingPawnPos);
 
             // Remove the captured piece
-            ChessPosition capturedPawnPos = new ChessPositionImpl(move.getStartPosition().row(), move.getEndPosition().column());
+            ChessPosition capturedPawnPos = new ChessPositionImpl(move.getStartPosition().getRow(), move.getEndPosition().getCol());
             board.removePiece(capturedPawnPos);
         }
 
         // Handle castling logic for the king
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            int colDiff = move.getEndPosition().column() - move.getStartPosition().column();
+            int colDiff = move.getEndPosition().getCol() - move.getStartPosition().getCol();
             if (Math.abs(colDiff) == 2) {
                 ChessPosition rookOriginalPosition = (colDiff == 2) ?
-                        new ChessPositionImpl(move.getStartPosition().row(), 8) :
-                        new ChessPositionImpl(move.getStartPosition().row(), 1);
+                        new ChessPositionImpl(move.getStartPosition().getRow(), 8) :
+                        new ChessPositionImpl(move.getStartPosition().getRow(), 1);
 
                 ChessPosition rookNewPosition = (colDiff == 2) ?
-                        new ChessPositionImpl(move.getStartPosition().row(), 6) :
-                        new ChessPositionImpl(move.getStartPosition().row(), 4);
+                        new ChessPositionImpl(move.getStartPosition().getRow(), 6) :
+                        new ChessPositionImpl(move.getStartPosition().getRow(), 4);
 
                 ChessPiece rook = board.getPiece(rookOriginalPosition);
                 board.removePiece(rookOriginalPosition);

@@ -1,6 +1,7 @@
 package services;
 
-import dataAccess.*;
+import dataAccess.DataAccessException;
+import dataAccess.Database;
 import requests.ClearRequest;
 import responses.ClearResponse;
 

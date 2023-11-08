@@ -1,6 +1,8 @@
 package services;
 
-import dataAccess.*;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
 import requests.ListGamesRequest;
 import responses.ListGamesResponse;
 

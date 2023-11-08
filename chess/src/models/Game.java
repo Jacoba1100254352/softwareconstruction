@@ -44,6 +44,23 @@ public class Game {
         this.game = null;
     }
 
+    /**
+     * Constructor for a new game with the given attributes.
+     *
+     * @param gameID        The unique ID of the game.
+     * @param gameName      The name of the game.
+     * @param whiteUsername The username of the white player.
+     * @param blackUsername The username of the black player.
+     * @param game          The Chess Game object.
+     */
+    public Game(Integer gameID, String gameName, String whiteUsername, String blackUsername, ChessGame game) {
+        this.gameID = gameID;
+        this.gameName = gameName;
+        this.whiteUsername = whiteUsername;
+        this.blackUsername = blackUsername;
+        this.game = game;
+    }
+
 
     ///   Getters and setters   ///
 

@@ -1,9 +1,8 @@
 package handlers;
 
-import services.ListGamesService;
-
 import requests.ListGamesRequest;
 import responses.ListGamesResponse;
+import services.ListGamesService;
 import spark.Request;
 import spark.Response;
 
