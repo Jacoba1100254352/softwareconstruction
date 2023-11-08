@@ -41,7 +41,7 @@ public class PawnPiece implements ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
         int direction = (teamColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
-        int newRow = myPosition.row() + direction;
+        int newRow = myPosition.getRow() + direction;
 
         if (newRow >= 1 && newRow <= 8) {
             checkForwardMoves(board, myPosition, newRow, moves, direction);
@@ -53,28 +53,28 @@ public class PawnPiece implements ChessPiece {
 
     // Check and add valid forward moves for the pawn
     private void checkForwardMoves(ChessBoard board, ChessPosition myPosition, int newRow, Collection<ChessMove> moves, int direction) {
-        ChessPosition forwardOne = new ChessPositionImpl(newRow, myPosition.column());
+        ChessPosition forwardOne = new ChessPositionImpl(newRow, myPosition.getCol());
 
         // If the forward square is empty
         if (board.getPiece(forwardOne) == null) {
             addMoveWithPromotion(myPosition, forwardOne, moves);
 
             // Check for double move from starting position
-            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column())) == null) {
-                moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.row() + (2 * direction), myPosition.column()), null));
+            if (isNewPawnPosition(myPosition) && board.getPiece(new ChessPositionImpl(myPosition.getRow() + (2 * direction), myPosition.getCol())) == null) {
+                moves.add(new ChessMoveImpl(myPosition, new ChessPositionImpl(myPosition.getRow() + (2 * direction), myPosition.getCol()), null));
             }
         }
     }
 
     // Check if the pawn is on its initial row
     private boolean isNewPawnPosition(ChessPosition position) {
-        return (teamColor == ChessGame.TeamColor.WHITE && position.row() == 2) || (teamColor == ChessGame.TeamColor.BLACK && position.row() == 7);
+        return (teamColor == ChessGame.TeamColor.WHITE && position.getRow() == 2) || (teamColor == ChessGame.TeamColor.BLACK && position.getRow() == 7);
     }
 
     // Check and add valid diagonal capture moves for the pawn
     private void checkDiagonalCaptures(ChessBoard board, ChessPosition myPosition, int newRow, Collection<ChessMove> moves) {
         for (int diagDirection : new int[]{-1, 1}) {
-            int newCol = myPosition.column() + diagDirection;
+            int newCol = myPosition.getCol() + diagDirection;
 
             // Check if the new column is within valid bounds (1 to 8)
             if (newCol < 1 || newCol > 8)
@@ -91,7 +91,7 @@ public class PawnPiece implements ChessPiece {
 
     // Check for pawn promotion and add valid moves accordingly
     private void addMoveWithPromotion(ChessPosition start, ChessPosition end, Collection<ChessMove> moves) {
-        if (end.row() == 1 || end.row() == 8)
+        if (end.getRow() == 1 || end.getRow() == 8)
             // Add promotion moves for the pawn
             for (PieceType type : new PieceType[]{PieceType.QUEEN, PieceType.BISHOP, PieceType.ROOK, PieceType.KNIGHT})
                 moves.add(new ChessMoveImpl(start, end, type));

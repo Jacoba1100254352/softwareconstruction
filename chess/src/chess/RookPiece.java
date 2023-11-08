@@ -39,8 +39,8 @@ public class RookPiece implements ChessPiece {
         int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
         for (int[] direction : directions) {
-            int row = myPosition.row();
-            int col = myPosition.column();
+            int row = myPosition.getRow();
+            int col = myPosition.getCol();
 
             while (true) {
                 row += direction[0];

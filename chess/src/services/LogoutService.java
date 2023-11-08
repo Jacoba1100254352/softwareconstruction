@@ -3,7 +3,6 @@ package services;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import models.AuthToken;
-import org.jetbrains.annotations.NotNull;
 import requests.LogoutRequest;
 import responses.LogoutResponse;
 

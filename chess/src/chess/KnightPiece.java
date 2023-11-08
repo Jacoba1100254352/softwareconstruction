@@ -42,8 +42,8 @@ public class KnightPiece implements ChessPiece {
         };
 
         for (int[] direction : directions) {
-            int newRow = myPosition.row() + direction[0];
-            int newCol = myPosition.column() + direction[1];
+            int newRow = myPosition.getRow() + direction[0];
+            int newCol = myPosition.getCol() + direction[1];
 
             if (newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8)
                 continue; // Move is outside the bounds of the board

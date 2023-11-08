@@ -3,10 +3,10 @@ package chess;
 import java.util.ArrayList;
 import java.util.List;
 
-public record ChessPositionImpl(int row, int column) implements ChessPosition {
+public record ChessPositionImpl(int getRow, int getCol) implements ChessPosition {
 
     public ChessPositionImpl {
-        if (row < 1 || row > 8 || column < 1 || column > 8)
+        if (getRow < 1 || getRow > 8 || getCol < 1 || getCol > 8)
             throw new IllegalArgumentException("Row and column values must be between 1 and 8.");
     }
 

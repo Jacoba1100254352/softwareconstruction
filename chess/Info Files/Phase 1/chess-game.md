@@ -1,6 +1,6 @@
 # ♕ Phase 1: Chess Game
 
-- [Chess Application Overview](../../chess.md)
+- [Chess Application Overview](../General/chess.md)
 - [Getting Started](getting-started.md)
 - [Starter Code](../../1-chess-game/src)
 

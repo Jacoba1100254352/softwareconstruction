@@ -1,9 +1,8 @@
 package handlers;
 
-import services.LogoutService;
-
 import requests.LogoutRequest;
 import responses.LogoutResponse;
+import services.LogoutService;
 import spark.Request;
 import spark.Response;
 

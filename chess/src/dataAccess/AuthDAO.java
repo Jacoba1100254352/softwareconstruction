@@ -1,6 +1,7 @@
 package dataAccess;
 
 import models.AuthToken;
+
 import java.sql.*;
 
 /**
@@ -29,27 +30,21 @@ public class AuthDAO {
     public void insertAuth(AuthToken authToken) throws DataAccessException {
         String sql = "INSERT INTO AuthTokens (Token, Username) VALUES (?, ?);";
         Connection conn = null;
-        PreparedStatement stmt = null;
         try {
-            conn = db.getConnection(); // Get the connection
+            conn = db.getConnection();
+            db.startTransaction(conn);
+            PreparedStatement stmt = conn.prepareStatement(sql);
+
             conn.setAutoCommit(false); // Start the transaction
 
-            stmt = conn.prepareStatement(sql);
             stmt.setString(1, authToken.getToken());
             stmt.setString(2, authToken.getUsername());
             stmt.executeUpdate();
 
             conn.commit(); // Commit the transaction
         } catch (SQLException e) {
-            try {
-                conn.rollback(); // Roll back the transaction on error
-            } catch (SQLException ex) {
-                throw new DataAccessException("Rollback failed: " + ex.getMessage());
-            }
+            db.rollback(conn, e); // Handle rollback
             throw new DataAccessException("Error encountered while inserting auth token: " + e.getMessage());
-        } finally {
-            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignored */ }
-            db.closeConnection(conn); // Close the connection in the finally block
         }
     }
 
@@ -61,22 +56,17 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public AuthToken findAuth(String authToken) throws DataAccessException {
-        AuthToken token = null;
         String sql = "SELECT * FROM AuthTokens WHERE Token = ?;";
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, authToken);
-
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                token = new AuthToken(rs.getString("Token"), rs.getString("Username"));
-            }
+
+            return (rs.next()) ? new AuthToken(rs.getString("Token"), rs.getString("Username")) : null;
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while finding token: " + e.getMessage());
         }
-
-        return token;
     }
 
     /**
@@ -92,9 +82,7 @@ public class AuthDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, authToken.getToken());
 
-            if (stmt.executeUpdate() != 1) {
-                throw new DataAccessException("Token deletion failed: Token not found.");
-            }
+            if (stmt.executeUpdate() != 1) throw new DataAccessException("Token deletion failed: Token not found.");
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while deleting token: " + e.getMessage());
         }

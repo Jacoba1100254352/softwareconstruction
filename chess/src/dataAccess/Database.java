@@ -12,16 +12,10 @@ import java.sql.Statement;
 public class Database {
 
     private static final String DB_NAME = "chessServerDB";
-    private static final String DB_USERNAME = "root"; //System.getProperty("dbUsername", "root"); // Fallback to 'root' if not set
+    private static final String DB_USERNAME = "root"; // System.getProperty("dbUsername", "root"); // Fallback to 'root' if not set
     private static final String DB_PASSWORD = "nyvceB-gysvuq-gozne5"; // System.getProperty("dbPassword", ""); // Fallback to empty if not set
-
     private static final String CONNECTION_URL = "jdbc:mysql://localhost:3306/" + DB_NAME;
-
     private static Database instance;
-
-    public Database() {
-        // Private constructor to prevent instantiation
-    }
 
     /**
      * Get a Database instance
@@ -35,6 +29,27 @@ public class Database {
         return instance;
     }
 
+    /**
+     * Attempts to roll back the connection transaction.
+     *
+     * @param conn The connection to perform the rollback on.
+     * @param e    The SQLException that caused the rollback to occur.
+     * @throws DataAccessException if the rollback fails.
+     */
+    public void rollback(Connection conn, SQLException e) throws DataAccessException {
+        try {
+            if (conn != null && !conn.isClosed())
+                conn.rollback();
+        } catch (SQLException ex) {
+            throw new DataAccessException("Could not roll back transaction. Initial Exception: " + e.getMessage() + "\nAdditional Exception: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * High-level function using the DAO clear methods to reset the database.
+     *
+     * @throws DataAccessException if the database reset fails.
+     */
     public void resetDatabase() throws DataAccessException {
         Connection conn = null;
         Statement stmt = null;
@@ -65,7 +80,9 @@ public class Database {
             }
             throw new DataAccessException("Error resetting database: " + e.getMessage());
         } finally {
-            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignored */ }
+            if (stmt != null) try {
+                stmt.close();
+            } catch (SQLException e) { /* ignored */ }
             closeConnection(conn); // Close the connection
         }
     }
@@ -101,15 +118,17 @@ public class Database {
     /**
      * Closes the specified connection.
      *
-     * @param connection the connection to be closed.
+     * @param conn the connection to be closed.
      * @throws DataAccessException if a data access error occurs while closing the connection.
      */
-    public void closeConnection(Connection connection) throws DataAccessException {
-        if (connection != null) {
+    public void closeConnection(Connection conn) throws DataAccessException {
+        if (conn != null) {
             try {
-                connection.close();
+                if (!conn.isClosed())
+                    conn.close();
+
             } catch (SQLException e) {
-                throw new DataAccessException(e.getMessage());
+                throw new DataAccessException("Error encountered while closing the connection: " + e.getMessage());
             }
         }
     }

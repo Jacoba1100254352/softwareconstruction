@@ -1,10 +1,12 @@
 package passoffTests.serverTests;
 
-import chess.ChessGameImpl;
+import chess.*;
 import dataAccess.*;
-import models.*;
+import models.AuthToken;
+import models.Game;
+import models.User;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
-import chess.ChessGame;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -15,7 +17,6 @@ public class ServerTests {
     private static AuthDAO authDAO;
     private static UserDAO userDAO;
     private static GameDAO gameDAO;
-    private static ChessGame chessGame;
 
     @BeforeAll
     public static void setUp() throws DataAccessException {
@@ -24,17 +25,47 @@ public class ServerTests {
         authDAO = new AuthDAO();
         userDAO = new UserDAO();
         gameDAO = new GameDAO();
-        chessGame = new ChessGameImpl();
     }
 
+    @NotNull
+    private static ChessGame getChessGame(ChessGame originalGame) throws InvalidMoveException {
+        // Simulate a move to change the state of the game.
+        ChessPosition startPosition = new ChessPositionImpl(2, 5);
+        ChessPosition endPosition = new ChessPositionImpl(4, 5);
+        originalGame.makeMove(new ChessMoveImpl(startPosition, endPosition, null));
+
+        // Return the updated game state.
+        return originalGame;
+    }
+
+    private void insertTestUser(String username, String email) throws DataAccessException {
+        String hashedPassword = userDAO.hashPassword("password");
+        User user = new User(username, hashedPassword, email);
+        userDAO.insertUser(user);
+    }
+
+    @BeforeEach
+    public void setUpEach() throws DataAccessException {
+        db.resetDatabase(); // Resetting the database to a clean state before each test
+    }
 
     ///   AuthDAOTest   ///
+
+    @AfterEach
+    public void tearDownEach() throws DataAccessException {
+        db.resetDatabase(); // Cleans up the database after each test
+    }
 
     // Positive Test for insertAuth
     @Test
     @Order(1)
     @DisplayName("Positive: insertAuth")
     public void insertAuthPass() throws DataAccessException {
+        // First, insert a user
+        User user = new User("testUser", "password", "test@example.com");
+        userDAO.insertUser(user);
+
+        // Then, create and insert the AuthToken
         AuthToken token = new AuthToken("12345", "testUser");
         authDAO.insertAuth(token);
         Assertions.assertNotNull(authDAO.findAuth(token.getToken()));
@@ -45,8 +76,15 @@ public class ServerTests {
     @Order(2)
     @DisplayName("Negative: insertAuth")
     public void insertAuthFail() throws DataAccessException {
+        // First, ensure the user exists
+        User user = new User("testUser", "password", "test@example.com");
+        userDAO.insertUser(user);
+
+        // Then, insert the first AuthToken
         AuthToken token = new AuthToken("12345", "testUser");
         authDAO.insertAuth(token);
+
+        // Attempt to insert the same AuthToken again and expect an exception
         Assertions.assertThrows(DataAccessException.class, () -> {
             authDAO.insertAuth(token); // Attempting to insert the same token again
         });
@@ -57,6 +95,8 @@ public class ServerTests {
     @Order(3)
     @DisplayName("Positive: findAuth")
     public void findAuthPass() throws DataAccessException {
+        insertTestUser("testUser", "test@example.com"); // Inserting the user first
+
         AuthToken token = new AuthToken("12345", "testUser");
         authDAO.insertAuth(token);
         AuthToken foundToken = authDAO.findAuth(token.getToken());
@@ -76,11 +116,16 @@ public class ServerTests {
     @Order(5)
     @DisplayName("Positive: deleteAuth")
     public void deleteAuthPass() throws DataAccessException {
+        insertTestUser("testUser", "test@example.com"); // Inserting the user first
+
         AuthToken token = new AuthToken("12345", "testUser");
         authDAO.insertAuth(token);
         authDAO.deleteAuth(token);
         Assertions.assertNull(authDAO.findAuth(token.getToken()));
     }
+
+
+    ///   UserDAO   ///
 
     // Negative Test for deleteAuth (token doesn't exist)
     @Test
@@ -90,9 +135,6 @@ public class ServerTests {
         AuthToken token = new AuthToken("nonExistingToken", "testUser");
         Assertions.assertThrows(DataAccessException.class, () -> authDAO.deleteAuth(token));
     }
-
-
-    ///   UserDAO   ///
 
     // Positive Test for insertUser
     @Test
@@ -109,10 +151,11 @@ public class ServerTests {
     @Order(8)
     @DisplayName("Negative: insertUser")
     public void insertUserFail() throws DataAccessException {
-        User user = new User("testUser", "password", "test@example.com");
+        String uniqueUsername = "uniqueTestUser" + System.currentTimeMillis(); // Ensures uniqueness
+        User user = new User(uniqueUsername, "password", uniqueUsername + "@example.com");
         userDAO.insertUser(user);
         Assertions.assertThrows(DataAccessException.class, () -> {
-            userDAO.insertUser(user); // Attempting to insert the same user again
+            userDAO.insertUser(user); // This should fail
         });
     }
 
@@ -182,12 +225,15 @@ public class ServerTests {
     @Test
     @Order(15)
     @DisplayName("Positive: deleteUser")
-    public void deleteUserPass() throws DataAccessException {
+    public void deleteUserPass() throws DataAccessException, SQLException {
         User user = new User("testUser", "password", "test@example.com");
         userDAO.insertUser(user);
         userDAO.deleteUser(user.getUsername());
         Assertions.assertNull(userDAO.getUser(user.getUsername()));
     }
+
+
+    ///   GameDAO   ///
 
     // Negative Test for deleteUser (user doesn't exist)
     @Test
@@ -197,60 +243,58 @@ public class ServerTests {
         Assertions.assertThrows(DataAccessException.class, () -> userDAO.deleteUser("nonExistingUser"));
     }
 
-
-    ///   GameDAO   ///
-
     // Positive Test for insertGame
     @Test
     @Order(17)
     @DisplayName("Positive: insertGame")
     public void insertGamePass() throws DataAccessException {
-        Integer gameID = 1; // This should be a unique ID, probably obtained from the database or some ID generation strategy
-        String gameName = "testGame";
+        // Assume a new game with unique data to be inserted
+        String gameName = "testGamePass";
+        ChessGame chessGame = new ChessGameImpl(); // Creating an instance of ChessGame
+        Game game = new Game(null, gameName); // GameID is null before insertion
+        game.setGame(chessGame); // Setting the chess game
 
-        // Create a new Game object with the game ID and name
-        Game game = new Game(gameID, gameName);
-
-        // Set the chess game
-        game.setGame(chessGame);
-
-        // Insert the game into the database
+        // Insert the game
         gameDAO.insertGame(game);
 
-        // Retrieve the game from the database and check if it's not null
-        Assertions.assertNotNull(gameDAO.findGameById(game.getGameID()));
+        // Now, we retrieve the game by name to check if it was inserted correctly
+        Game insertedGame = gameDAO.findGameById(game.getGameID());
+        Assertions.assertNotNull(insertedGame);
+        Assertions.assertEquals(gameName, insertedGame.getGameName());
     }
 
-
-    // Negative Test for insertGame (attempting to insert a game with an existing ID)
+    // Negative Test for insertGame (attempting to insert a game with non-existent user)
     @Test
     @Order(18)
     @DisplayName("Negative: insertGame")
     public void insertGameFail() throws DataAccessException {
-        Integer gameID = 1; // This should be a unique ID, probably obtained from the database or some ID generation strategy
-        String gameName = "testGame";
-        ChessGame chessGame = new ChessGameImpl(); // Creating an instance of ChessGame
-        Game game = new Game(gameID, gameName); // Using the correct constructor
-        game.setGame(chessGame); // Setting the chess game
-        gameDAO.insertGame(game);
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.insertGame(game); // Attempting to insert the same game again
-        });
+        // Arrange
+        String gameName = "testGameFail";
+        ChessGame chessGame = new ChessGameImpl();
+        Game game = new Game(null, gameName, "nonExistentUser", "nonExistentUser", chessGame);
+
+        // Act & Assert
+        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.insertGame(game));
     }
 
     // Positive Test for findGameById
     @Test
     @Order(19)
-    @DisplayName("Positive: findGame")
+    @DisplayName("Positive: findGameById")
     public void findGameByIdPass() throws DataAccessException {
-        Integer gameID = 2; // This should be a unique ID
-        String gameName = "testGame";
+        // Assume a new game with unique data to be inserted
+        String gameName = "testFindGame";
         ChessGame chessGame = new ChessGameImpl(); // Creating an instance of ChessGame
-        Game game = new Game(gameID, gameName); // Using the correct constructor
+        Game game = new Game(null, gameName); // GameID is null before insertion
         game.setGame(chessGame); // Setting the chess game
+
+        // Insert the game and retrieve it by ID
         gameDAO.insertGame(game);
-        Game foundGame = gameDAO.findGameById(game.getGameID());
-        Assertions.assertEquals(game.getGameID(), foundGame.getGameID());
+        Game retrievedGame = gameDAO.findGameById(game.getGameID());
+
+        // Assertions
+        Assertions.assertNotNull(retrievedGame);
+        Assertions.assertEquals(game.getGameID(), retrievedGame.getGameID());
     }
 
     // Negative Test for findGameById (game doesn't exist)
@@ -266,20 +310,16 @@ public class ServerTests {
     @Order(21)
     @DisplayName("Positive: findAllGames")
     public void findAllGamesPass() throws DataAccessException {
-        Integer gameID1 = 3; // Unique ID
-        Integer gameID2 = 4; // Unique ID
-        String gameName1 = "testGame1";
-        String gameName2 = "testGame2";
-        ChessGame chessGame1 = new ChessGameImpl(); // Creating an instance of ChessGame
-        ChessGame chessGame2 = new ChessGameImpl(); // Creating another instance of ChessGame
-        Game game1 = new Game(gameID1, gameName1); // Using the correct constructor
-        Game game2 = new Game(gameID2, gameName2); // Using the correct constructor
-        game1.setGame(chessGame1); // Setting the chess game
-        game2.setGame(chessGame2); // Setting the chess game
-        gameDAO.insertGame(game1);
-        gameDAO.insertGame(game2);
+        // Insert multiple games
+        for (int i = 0; i < 3; i++) {
+            Game game = new Game(null, "testGame" + i);
+            game.setGame(new ChessGameImpl()); // Setting the chess game
+            gameDAO.insertGame(game);
+        }
+
+        // Retrieve all games and assert that the count is correct
         List<Game> games = gameDAO.findAllGames();
-        Assertions.assertTrue(games.size() >= 2); // Check that at least 2 games are found
+        Assertions.assertEquals(3, games.size());
     }
 
     // Positive Test for claimSpot
@@ -287,15 +327,21 @@ public class ServerTests {
     @Order(22)
     @DisplayName("Positive: claimSpot")
     public void claimSpotPass() throws DataAccessException {
-        Integer gameID = 5; // Unique ID
-        String gameName = "testGame";
-        ChessGame chessGame = new ChessGameImpl(); // Creating an instance of ChessGame
-        Game game = new Game(gameID, gameName); // Using the correct constructor
-        game.setGame(chessGame); // Setting the chess game
+        // Insert a new user for testing
+        insertTestUser("testPlayer", "testPlayer@example.com");
+
+        // Insert a new game
+        String gameName = "testClaimSpot";
+        Game game = new Game(null, gameName);
+        game.setGame(new ChessGameImpl());
         gameDAO.insertGame(game);
-        gameDAO.claimSpot(game.getGameID(), "testUser", ChessGame.TeamColor.WHITE);
+
+        // Claim a spot
+        gameDAO.claimSpot(game.getGameID(), "testPlayer", ChessGame.TeamColor.WHITE);
+
+        // Retrieve the game and assert that the spot has been claimed
         Game updatedGame = gameDAO.findGameById(game.getGameID());
-        Assertions.assertEquals("testUser", updatedGame.getWhiteUsername());
+        Assertions.assertEquals("testPlayer", updatedGame.getWhiteUsername());
     }
 
     // Negative Test for claimSpot (spot already claimed)
@@ -303,6 +349,9 @@ public class ServerTests {
     @Order(23)
     @DisplayName("Negative: claimSpot")
     public void claimSpotFail() throws DataAccessException {
+        insertTestUser("testUser", "test@example.com"); // Inserting the user first
+        insertTestUser("anotherUser", "another@example.com"); // Inserting another user
+
         Integer gameID = 6; // Unique ID
         String gameName = "testGame";
         ChessGame chessGame = new ChessGameImpl(); // Creating an instance of ChessGame
@@ -317,18 +366,35 @@ public class ServerTests {
     @Test
     @Order(24)
     @DisplayName("Positive: updateGame")
-    public void updateGamePass() throws DataAccessException {
-        Integer gameID = 7; // Unique ID
-        String gameName = "testGame";
-        ChessGame chessGame = new ChessGameImpl(); // Creating an instance of ChessGame
-        Game game = new Game(gameID, gameName); // Using the correct constructor
-        game.setGame(chessGame); // Setting the chess game
-        gameDAO.insertGame(game);
-        ChessGame newChessGame = new ChessGameImpl(); // Assuming a new state is created
-        gameDAO.updateGame(game.getGameID(), newChessGame);
-        Game updatedGame = gameDAO.findGameById(game.getGameID());
-        // Assuming there's a way to validate the updated state, perhaps via a toString or equivalent
-        Assertions.assertEquals(newChessGame.toString(), updatedGame.getGame().toString());
+    public void updateGamePass() throws DataAccessException, InvalidMoveException {
+        // Setup player
+        String whiteUsername = "whitePlayer";
+        String blackUsername = "blackPlayer";
+        String whiteEmail = "test1@example.com";
+        String blackEmail = "test2@example.com";
+
+        // Ensure the users exist in the database
+        insertTestUser(whiteUsername, whiteEmail);
+        insertTestUser(blackUsername, blackEmail);
+
+        // Setup game
+        ChessGame originalGame = new ChessGameImpl();
+        originalGame.getBoard().resetBoard();
+        originalGame.setTeamTurn(ChessGame.TeamColor.WHITE);
+
+        // Insert Game
+        Game game = new Game(null, "game1", whiteUsername, blackUsername, originalGame);
+        gameDAO.insertGame(game); // insertGame now sets the gameID on the game object
+
+        // Act
+        // Make a move to change the game state
+        ChessGame newGame = getChessGame(originalGame);
+        game.setGame(newGame); // Update the game object with the new game state
+        gameDAO.updateGame(game); // Pass the game object with the updated state to updateGame
+
+        // Assert
+        Game gameAfterUpdate = gameDAO.findGameById(game.getGameID()); // Use the gameID from the inserted game
+        Assertions.assertEquals(gameDAO.serializeChessGame(newGame), gameDAO.serializeChessGame(gameAfterUpdate.getGame()), "Game state did not update correctly in the database.");
     }
 
     // Negative Test for updateGame (game does not exist)
@@ -337,8 +403,10 @@ public class ServerTests {
     @DisplayName("Negative: updateGame")
     public void updateGameFail() {
         ChessGame newChessGame = new ChessGameImpl(); // Correct instantiation
+        Game nonExistentGame = new Game(9999, "NonExistentGame", "whitePlayer", "blackPlayer", newChessGame); // Assuming ID 9999 does not exist
+
         Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.updateGame(9999, newChessGame); // Assuming ID 9999 does not exist
+            gameDAO.updateGame(nonExistentGame); // Pass the non-existent game object
         });
     }
 
