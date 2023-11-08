@@ -3,6 +3,7 @@ package dataAccess;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Responsible for creating connections to the database. Connections should be closed after use, either by calling
@@ -18,7 +19,7 @@ public class Database {
 
     private static Database instance;
 
-    private Database() {
+    public Database() {
         // Private constructor to prevent instantiation
     }
 
@@ -33,6 +34,42 @@ public class Database {
 
         return instance;
     }
+
+    public void resetDatabase() throws DataAccessException {
+        Connection conn = null;
+        Statement stmt = null;
+        try {
+            conn = getConnection(); // Get the connection
+            conn.setAutoCommit(false); // Ensure the entire operation is atomic
+
+            stmt = conn.createStatement();
+
+            // Disable foreign key checks for this session
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 0;");
+
+            // Clear all tables that have foreign key relationships
+            new AuthDAO().clearAuth(conn); // Clear AuthTokens first
+            new GameDAO().clearGames(conn); // Clear Games (if they have foreign keys to Users)
+            new UserDAO().clearUsers(conn); // Finally, clear Users
+
+            // Re-enable foreign key checks
+            stmt.execute("SET FOREIGN_KEY_CHECKS = 1;");
+
+            conn.commit(); // Commit the changes if all operations were successful
+
+        } catch (SQLException e) {
+            try {
+                conn.rollback(); // Roll back the changes on error
+            } catch (SQLException ex) {
+                throw new DataAccessException("Rollback failed: " + ex.getMessage());
+            }
+            throw new DataAccessException("Error resetting database: " + e.getMessage());
+        } finally {
+            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignored */ }
+            closeConnection(conn); // Close the connection
+        }
+    }
+
 
     /**
      * Start a transaction.
@@ -68,7 +105,7 @@ public class Database {
      * @throws DataAccessException if a data access error occurs while closing the connection.
      */
     public void closeConnection(Connection connection) throws DataAccessException {
-        if(connection != null) {
+        if (connection != null) {
             try {
                 connection.close();
             } catch (SQLException e) {

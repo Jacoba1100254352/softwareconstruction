@@ -42,7 +42,7 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void insertGame(Game game) throws DataAccessException {
-        String sql = "INSERT INTO Games (WhiteUsername, BlackUsername, GameState) VALUES (?, ?, ?);";
+        String sql = "INSERT INTO Games (GameName, WhiteUsername, BlackUsername, GameState) VALUES (?, ?, ?, ?);";
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet generatedKeys = null;
@@ -51,9 +51,20 @@ public class GameDAO {
             conn.setAutoCommit(false); // Start transaction
 
             stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            stmt.setString(1, game.getWhiteUsername());
-            stmt.setString(2, game.getBlackUsername());
-            stmt.setString(3, serializeChessGame(game.getGame()));
+
+            // Set the values for each placeholder based on your game object
+            stmt.setString(1, game.getGameName());
+            stmt.setString(2, game.getWhiteUsername());
+            stmt.setString(3, game.getBlackUsername());
+
+            // Make sure serializeChessGame() returns a non-null, valid string representation of the game state.
+            // If game.getGame() is null or can result in a null serialized form, you need to handle that case appropriately.
+            String serializedGameState = serializeChessGame(game.getGame());
+            if (serializedGameState == null) {
+                // Handle null game state appropriately, perhaps by initializing it to an empty state or a default state
+                serializedGameState = ""; // or whatever your default serialized game state should be
+            }
+            stmt.setString(4, serializedGameState);
 
             int affectedRows = stmt.executeUpdate();
 
@@ -71,12 +82,10 @@ public class GameDAO {
             conn.commit(); // Commit transaction
 
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback on error
-                } catch (SQLException ex) {
-                    throw new DataAccessException("Rollback failed: " + ex.getMessage());
-                }
+            try {
+                conn.rollback(); // Rollback on error
+            } catch (SQLException ex) {
+                throw new DataAccessException("Rollback failed: " + ex.getMessage());
             }
             throw new DataAccessException("Error encountered while inserting into the database: " + e.getMessage());
         } finally {
@@ -108,7 +117,9 @@ public class GameDAO {
                 );
                 game.setWhiteUsername(rs.getString("WhiteUsername"));
                 game.setBlackUsername(rs.getString("BlackUsername"));
-                // game.setGame(ChessGame) // This would require a way to serialize/deserialize ChessGame objects
+
+                // Deserialize the game state to set the ChessGame object
+                game.setGame(deserializeChessGame(rs.getString("GameState")));
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while finding game: " + e.getMessage());
@@ -134,7 +145,10 @@ public class GameDAO {
                 );
                 game.setWhiteUsername(rs.getString("WhiteUsername"));
                 game.setBlackUsername(rs.getString("BlackUsername"));
-                // game.setGame(ChessGame) // This would require a way to serialize/deserialize ChessGame objects
+
+                // Deserialize the game state to set the ChessGame object
+                game.setGame(deserializeChessGame(rs.getString("GameState")));
+
                 games.add(game);
             }
         } catch (SQLException e) {
@@ -165,6 +179,9 @@ public class GameDAO {
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while claiming spot: " + e.getMessage());
         }
+
+        // After claiming the spot, fetch the game to return the updated state
+        // return findGameById(gameID); // updateGame(gameID, findGameById(gameID).getGame());
     }
 
     /**
@@ -193,12 +210,10 @@ public class GameDAO {
 
             conn.commit(); // Commit transaction
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback on error
-                } catch (SQLException ex) {
-                    throw new DataAccessException("Rollback failed: " + ex.getMessage());
-                }
+            try {
+                conn.rollback(); // Rollback on error
+            } catch (SQLException ex) {
+                throw new DataAccessException("Rollback failed: " + ex.getMessage());
             }
             throw new DataAccessException("Error encountered while updating game: " + e.getMessage());
         } finally {
@@ -210,10 +225,9 @@ public class GameDAO {
     /**
      * Clear the games from the database.
      */
-    public void clearGames() throws DataAccessException {
+    public void clearGames(Connection conn) throws DataAccessException {
         String sql = "DELETE FROM Games;";
-        try (Connection conn = db.getConnection();
-             Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while clearing games: " + e.getMessage());
@@ -234,7 +248,7 @@ public class GameDAO {
             if (rs.next()) {
                 return rs.getInt("GameID");
             } else {
-                throw new DataAccessException("No games found in the database.");
+                return 0; // Or another appropriate default value that indicates no games are present.
             }
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while retrieving the current game ID: " + e.getMessage());

@@ -173,12 +173,10 @@ public class UserDAO {
 
             conn.commit(); // Commit transaction
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback on error
-                } catch (SQLException ex) {
-                    throw new DataAccessException("Rollback failed: " + ex.getMessage());
-                }
+            try {
+                conn.rollback(); // Rollback on error
+            } catch (SQLException ex) {
+                throw new DataAccessException("Rollback failed: " + ex.getMessage());
             }
             throw new DataAccessException("Error encountered while deleting user: " + e.getMessage());
         } finally {
@@ -187,28 +185,12 @@ public class UserDAO {
         }
     }
 
-    public void clearUsers() throws DataAccessException {
+    public void clearUsers(Connection conn) throws DataAccessException {
         String sql = "DELETE FROM Users;";
-        Connection conn = null;
-        Statement stmt = null;
-        try {
-            conn = db.getConnection();
-            conn.setAutoCommit(false); // Start transaction
-
-            stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(sql);
-
-            conn.commit(); // Commit transaction
         } catch (SQLException e) {
-            try {
-                conn.rollback(); // Rollback on error
-            } catch (SQLException ex) {
-                throw new DataAccessException("Rollback failed: " + ex.getMessage());
-            }
             throw new DataAccessException("Error encountered while clearing users: " + e.getMessage());
-        } finally {
-            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignored */ }
-            if (conn != null) try { conn.close(); } catch (SQLException e) { /* ignored */ }
         }
     }
 }
