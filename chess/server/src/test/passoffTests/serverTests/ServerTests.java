@@ -335,7 +335,7 @@ public class ServerTests {
     public void findGameByIdFail() throws DataAccessException {
         // Find id not associated yet with a game in the database
         Integer id = 0;
-        while (gameDAO.findGameById(++id) != null);
+        while (gameDAO.findGameById(++id) != null) ;
 
         // Test search for non-existing game
         Assertions.assertNull(gameDAO.findGameById(9999));
@@ -429,7 +429,7 @@ public class ServerTests {
     public void updateGameFail() throws DataAccessException {
         // Find id not associated yet with a game in the database
         Integer id = 0;
-        while (gameDAO.findGameById(++id) != null);
+        while (gameDAO.findGameById(++id) != null) ;
 
         // Create a game object for a non-existing game
         Game nonExistentGame = new Game(id, "NonExistentGame", "whitePlayer", "blackPlayer", new ChessGameImpl());
