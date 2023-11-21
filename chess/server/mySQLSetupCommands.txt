@@ -1,4 +1,6 @@
-use chessServerDB;
+CREATE DATABASE chessServerDB;
+
+USE chessServerDB;
 
 -- Users Table
 CREATE TABLE Users (

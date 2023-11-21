@@ -10,5 +10,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="shared" exported="" />
     <orderEntry type="library" exported="" name="client lib" level="project" />
+    <orderEntry type="module" module-name="server" />
   </component>
 </module>
