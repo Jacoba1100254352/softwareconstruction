@@ -1,44 +1,59 @@
 package passoffTests.clientTests;
 
+import dataAccess.Database;
 import server.ServerFacade;
 import org.junit.jupiter.api.*;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
-
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import server.ServerFacadeException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServerFacadeTests {
 
     private static ServerFacade serverFacade;
-    private static String validAuthToken;
+    private static Database db; // Database instance solely for clearing the database when needed for testing purposes
 
     @BeforeAll
-    public static void setup() throws IOException, URISyntaxException, ServerFacadeException {
+    public static void setupClass() {
         serverFacade = new ServerFacade("http://localhost:8080");
+        db = new Database();
+    }
 
-        // Register a new user
+    @BeforeEach // Clear the database before each test
+    public void setup() throws Exception {
+        db.resetDatabase();
+    }
+
+    @AfterEach // Clear the database after each test
+    public void tearDown() throws Exception {
+        db.resetDatabase();
+    }
+
+    private String registerAndLogin() throws IOException, URISyntaxException, ServerFacadeException {
+        // Register a new user and log in
         String registerEndpoint = "/user";
-        String registerBody = "{\"username\":\"testUser\",\"password\":\"password\",\"email\":\"test@example.com\"}";
+        String uniqueUsername = "testUser" + System.currentTimeMillis();
+        String registerBody = "{\"username\":\"" + uniqueUsername + "\",\"password\":\"password\",\"email\":\"" + uniqueUsername + "@example.com\"}";
         serverFacade.sendPostRequest(registerEndpoint, registerBody, null);
 
-        // Log in to get a valid token
         String loginEndpoint = "/session";
-        String loginBody = "{\"username\":\"testUser\",\"password\":\"password\"}";
+        String loginBody = "{\"username\":\"" + uniqueUsername + "\",\"password\":\"password\"}";
         String loginResponse = serverFacade.sendPostRequest(loginEndpoint, loginBody, null);
         JsonObject responseObject = JsonParser.parseString(loginResponse).getAsJsonObject();
-        validAuthToken = responseObject.get("authToken").getAsString();
+        return responseObject.get("authToken").getAsString();
+    }
 
+    private int createGameAndGetId(String authToken) throws IOException, URISyntaxException, ServerFacadeException {
         // Create a new game
         String createGameEndpoint = "/game";
         JsonObject createGameJsonRequest = new JsonObject();
         createGameJsonRequest.addProperty("gameName", "Test Game");
-        serverFacade.sendPostRequest(createGameEndpoint, createGameJsonRequest.toString(), validAuthToken);
+        String createGameResponse = serverFacade.sendPostRequest(createGameEndpoint, createGameJsonRequest.toString(), authToken);
+        JsonObject createGameResponseObject = JsonParser.parseString(createGameResponse).getAsJsonObject();
+        return createGameResponseObject.get("gameID").getAsInt();
     }
 
     @Test
@@ -60,11 +75,12 @@ public class ServerFacadeTests {
     @Test
     @Order(2)
     @DisplayName("Positive: sendGetRequest for Listing Games")
-    public void sendGetRequestListGamesSuccess() {
+    public void sendGetRequestListGamesSuccess() throws IOException, URISyntaxException, ServerFacadeException {
+        String authToken = registerAndLogin();
         String endpoint = "/game";
 
         try {
-            String response = serverFacade.sendGetRequest(endpoint, validAuthToken);
+            String response = serverFacade.sendGetRequest(endpoint, authToken);
             assertNotNull(response, "Response should not be null");
             assertTrue(response.contains("games")); // Check for games array in the response
         } catch (Exception e) {
@@ -76,22 +92,15 @@ public class ServerFacadeTests {
     @Order(3)
     @DisplayName("Positive: sendPutRequest for Joining a Game")
     public void sendPutRequestJoinGameSuccess() throws IOException, URISyntaxException, ServerFacadeException {
-        // Create a new game first
-        String createGameEndpoint = "/game";
-        JsonObject createGameJsonRequest = new JsonObject();
-        createGameJsonRequest.addProperty("gameName", "Test Game");
-        String createGameResponse = serverFacade.sendPostRequest(createGameEndpoint, createGameJsonRequest.toString(), validAuthToken);
-        JsonObject createGameResponseObject = JsonParser.parseString(createGameResponse).getAsJsonObject();
-        Integer gameId = createGameResponseObject.get("gameID").getAsInt();
-
-        // Now try to join the game
-        String joinGameEndpoint = "/game";
+        String authToken = registerAndLogin();
+        int gameId = createGameAndGetId(authToken);
+        String endpoint = "/game";
         JsonObject joinGameJsonRequest = new JsonObject();
         joinGameJsonRequest.addProperty("playerColor", "WHITE");
         joinGameJsonRequest.addProperty("gameID", gameId);
 
         try {
-            String joinGameResponse = serverFacade.sendPutRequest(joinGameEndpoint, joinGameJsonRequest.toString(), validAuthToken);
+            String joinGameResponse = serverFacade.sendPutRequest(endpoint, joinGameJsonRequest.toString(), authToken);
             assertNotNull(joinGameResponse, "Response should not be null");
             assertTrue(joinGameResponse.contains("\"success\":true")); // Check for success in the response
         } catch (Exception e) {
@@ -99,16 +108,16 @@ public class ServerFacadeTests {
         }
     }
 
-
     @Test
     @Order(4)
     @DisplayName("Positive: sendDeleteRequest for User Logout")
-    public void sendDeleteRequestLogoutSuccess() {
+    public void sendDeleteRequestLogoutSuccess() throws IOException, URISyntaxException, ServerFacadeException {
+        String authToken = registerAndLogin();
         String endpoint = "/session";
         String jsonRequestBody = "{}"; // Assuming logout does not require a request body
 
         try {
-            String response = serverFacade.sendDeleteRequest(endpoint, jsonRequestBody, validAuthToken);
+            String response = serverFacade.sendDeleteRequest(endpoint, jsonRequestBody, authToken);
             assertNotNull(response, "Response should not be null");
             assertTrue(response.contains("\"success\":true")); // Check for success in the response
         } catch (Exception e) {
@@ -123,63 +132,41 @@ public class ServerFacadeTests {
         String endpoint = "/invalidEndpoint";
         String jsonRequestBody = "{\"key\":\"value\"}";
 
-        try {
-            String response = serverFacade.sendPostRequest(endpoint, jsonRequestBody, validAuthToken);
-            fail("Expected IOException was not thrown");
-        } catch (ServerFacadeException e) {
-            assertNotNull(e.getMessage(), "Exception message should not be null");
-        } catch (Exception e) {
-            fail("Unexpected exception type: " + e.getClass().getName());
-        }
+        assertThrows(ServerFacadeException.class, () -> serverFacade.sendPostRequest(endpoint, jsonRequestBody, null), "ServerFacadeException should be thrown for invalid endpoint");
     }
 
     @Test
     @Order(6)
     @DisplayName("Negative: sendGetRequest with Invalid Endpoint")
-    public void sendGetRequestInvalidEndpoint() {
+    public void sendGetRequestInvalidEndpoint() throws IOException, URISyntaxException, ServerFacadeException {
+        String validAuthToken = registerAndLogin();
         String endpoint = "/invalidEndpoint";
 
-        try {
-            String response = serverFacade.sendGetRequest(endpoint, validAuthToken);
-            fail("Expected IOException was not thrown");
-        } catch (ServerFacadeException e) {
-            assertNotNull(e.getMessage(), "Exception message should not be null");
-        } catch (Exception e) {
-            fail("Unexpected exception type: " + e.getClass().getName());
-        }
+        assertThrows(ServerFacadeException.class, () -> serverFacade.sendGetRequest(endpoint, validAuthToken), "ServerFacadeException should be thrown for invalid endpoint");
     }
 
     @Test
     @Order(7)
     @DisplayName("Negative: sendPutRequest with Invalid Endpoint")
-    public void sendPutRequestInvalidEndpoint() {
+    public void sendPutRequestInvalidEndpoint() throws IOException, URISyntaxException, ServerFacadeException {
+        String validAuthToken = registerAndLogin();
+        Integer gameId = createGameAndGetId(validAuthToken);
         String endpoint = "/invalidPutEndpoint";
-        String jsonRequestBody = "{\"key\":\"newValue\"}";
+        JsonObject jsonRequestBody = new JsonObject();
+        jsonRequestBody.addProperty("playerColor", "WHITE");
+        jsonRequestBody.addProperty("gameID", gameId);
 
-        try {
-            String response = serverFacade.sendPutRequest(endpoint, jsonRequestBody, validAuthToken);
-            fail("Expected IOException was not thrown");
-        } catch (ServerFacadeException e) {
-            assertNotNull(e.getMessage(), "Exception message should not be null");
-        } catch (Exception e) {
-            fail("Unexpected exception type: " + e.getClass().getName());
-        }
+        assertThrows(ServerFacadeException.class, () -> serverFacade.sendPutRequest(endpoint, jsonRequestBody.toString(), validAuthToken), "ServerFacadeException should be thrown for invalid endpoint");
     }
 
     @Test
     @Order(8)
     @DisplayName("Negative: sendDeleteRequest with Invalid Endpoint")
-    public void sendDeleteRequestInvalidEndpoint() {
+    public void sendDeleteRequestInvalidEndpoint() throws IOException, URISyntaxException, ServerFacadeException {
+        String validAuthToken = registerAndLogin();
         String endpoint = "/invalidDeleteEndpoint";
-        String jsonRequestBody = "{\"key\":\"valueToDelete\"}";
+        String jsonRequestBody = "{}";
 
-        try {
-            String response = serverFacade.sendDeleteRequest(endpoint, jsonRequestBody, validAuthToken);
-            fail("Expected IOException was not thrown");
-        } catch (ServerFacadeException e) {
-            assertNotNull(e.getMessage(), "Exception message should not be null");
-        } catch (Exception e) {
-            fail("Unexpected exception type: " + e.getClass().getName());
-        }
+        assertThrows(ServerFacadeException.class, () -> serverFacade.sendDeleteRequest(endpoint, jsonRequestBody, validAuthToken), "ServerFacadeException should be thrown for invalid endpoint");
     }
 }
