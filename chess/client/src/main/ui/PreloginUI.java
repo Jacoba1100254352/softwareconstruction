@@ -10,7 +10,6 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class PreloginUI {
-
     private static final Logger LOGGER = Logger.getLogger(PreloginUI.class.getName());
     private final ChessClient client;
     private final ServerFacade serverFacade;
@@ -31,17 +30,10 @@ public class PreloginUI {
         int choice = scanner.nextInt();
 
         switch (choice) {
-            case 1:
-                login();
-                break;
-            case 2:
-                register();
-                break;
-            case 3:
-                client.exit();
-                break;
-            default:
-                System.out.println("Invalid choice.");
+            case 1: login(); break;
+            case 2: register(); break;
+            case 3: client.exit(); break;
+            default: System.out.println("Invalid choice.");
         }
     }
 
@@ -57,7 +49,7 @@ public class PreloginUI {
         jsonRequest.addProperty("password", password);
 
         try {
-            String response = serverFacade.sendPostRequest("/session", jsonRequest.toString());
+            String response = serverFacade.sendPostRequest("/session", jsonRequest.toString(), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();
@@ -93,17 +85,15 @@ public class PreloginUI {
         jsonRequest.addProperty("email", email);
 
         try {
-            String response = serverFacade.sendPostRequest("/user", jsonRequest.toString());
+            String response = serverFacade.sendPostRequest("/user", jsonRequest.toString(), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
-
-            if (responseObject.has("authToken") && !responseObject.get("authToken").isJsonNull()) {
+            if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();
                 client.setAuthToken(authToken);
                 client.transitionToPostloginUI();
                 System.out.println("Registered and logged in successfully.");
             } else {
-                String errorMessage = responseObject.has("message") && !responseObject.get("message").isJsonNull() ? responseObject.get("message").getAsString() : "Unknown error occurred";
-                System.out.println("Registration failed: " + errorMessage);
+                System.out.println("Registration failed: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException e) {
             if (e.getMessage().contains("HTTP response code: 403")) {

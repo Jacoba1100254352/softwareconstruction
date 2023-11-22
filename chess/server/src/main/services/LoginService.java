@@ -17,28 +17,6 @@ public class LoginService {
     private final AuthDAO authDAO = new AuthDAO();
 
     /**
-     * The success status of the login operation.
-     */
-    private boolean success;
-
-    /**
-     * The success or error message associated with the login operation.
-     */
-    private String message;
-
-    /**
-     * The authentication token of the logged-in user.
-     */
-    private String authToken;
-
-    /**
-     * Default constructor.
-     */
-    public LoginService() {
-
-    }
-
-    /**
      * Logs-in a user.
      *
      * @param request The login request containing user credentials.
@@ -56,29 +34,5 @@ public class LoginService {
         } catch (DataAccessException e) {
             return new LoginResponse("Error: " + e.getMessage());
         }
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
     }
 }

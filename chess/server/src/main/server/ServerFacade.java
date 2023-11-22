@@ -15,28 +15,32 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    public String sendPostRequest(String endpoint, String jsonRequestBody) throws IOException, URISyntaxException, ServerFacadeException {
-        return sendHttpRequest(endpoint, "POST", jsonRequestBody);
+    public String sendPostRequest(String endpoint, String jsonRequestBody, String authToken) throws IOException, URISyntaxException, ServerFacadeException {
+        return sendHttpRequest(endpoint, "POST", jsonRequestBody, authToken);
     }
 
-    public String sendGetRequest(String endpoint) throws IOException, URISyntaxException, ServerFacadeException {
-        return sendHttpRequest(endpoint, "GET", null);
+    public String sendGetRequest(String endpoint, String authToken) throws IOException, URISyntaxException, ServerFacadeException {
+        return sendHttpRequest(endpoint, "GET", null, authToken);
     }
 
-    public String sendPutRequest(String endpoint, String jsonRequestBody) throws IOException, URISyntaxException, ServerFacadeException {
-        return sendHttpRequest(endpoint, "PUT", jsonRequestBody);
+    public String sendPutRequest(String endpoint, String jsonRequestBody, String authToken) throws IOException, URISyntaxException, ServerFacadeException {
+        return sendHttpRequest(endpoint, "PUT", jsonRequestBody, authToken);
     }
 
-    public String sendDeleteRequest(String endpoint, String jsonRequestBody) throws IOException, URISyntaxException, ServerFacadeException {
-        return sendHttpRequest(endpoint, "DELETE", jsonRequestBody);
+    public String sendDeleteRequest(String endpoint, String jsonRequestBody, String authToken) throws IOException, URISyntaxException, ServerFacadeException {
+        return sendHttpRequest(endpoint, "DELETE", jsonRequestBody, authToken);
     }
 
-    private String sendHttpRequest(String endpoint, String method, String jsonRequestBody) throws IOException, URISyntaxException, ServerFacadeException {
-        URL url = (new URI(serverUrl + endpoint)).toURL();
+    private String sendHttpRequest(String endpoint, String method, String jsonRequestBody, String authToken)
+            throws IOException, URISyntaxException, ServerFacadeException {
+        URL url = new URI(serverUrl + endpoint).toURL();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         // Set up the request
         conn.setRequestMethod(method);
+        if (authToken != null && !authToken.isEmpty()) {
+            conn.setRequestProperty("Authorization", authToken);
+        }
         if (jsonRequestBody != null && !jsonRequestBody.isEmpty()) {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
@@ -46,7 +50,7 @@ public class ServerFacade {
             }
         }
 
-        // Handle the response
+        // Read the response
         try {
             return readResponse(conn);
         } catch (IOException e) {

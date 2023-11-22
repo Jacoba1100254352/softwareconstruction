@@ -22,17 +22,16 @@ public class JoinGameHandler extends BaseHandler {
 
         JoinGameResponse result = (new JoinGameService()).joinGame(joinGameRequest);
 
-        if (!result.isSuccess()) {
+        if (result.isSuccess()) {
+            response.status(200);
+        } else {
             switch (result.getMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);
                 default -> response.status(500);
             }
-            return result;
         }
-
-        response.status(200);
         return result;
     }
 }

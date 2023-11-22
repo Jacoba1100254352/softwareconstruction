@@ -13,13 +13,6 @@ public class LogoutService {
     private final AuthDAO authDAO = new AuthDAO();
 
     /**
-     * Default constructor.
-     */
-    public LogoutService() {
-
-    }
-
-    /**
      * Logs out a user based on the provided request.
      *
      * @param request The logout request with the user's authToken.
@@ -30,12 +23,12 @@ public class LogoutService {
             AuthToken authToken = authDAO.findAuth(request.getAuthToken());
             if (authToken != null) {
                 authDAO.deleteAuth(authToken);
-                return new LogoutResponse(true, "Logged out successfully.");
+                return new LogoutResponse("Logged out successfully.", true);
             } else {
-                return new LogoutResponse(false, "Error: Invalid authentication token.");
+                return new LogoutResponse("Error: Invalid authentication token.", false);
             }
         } catch (DataAccessException e) {
-            return new LogoutResponse(false, "Error: " + e.getMessage());
+            return new LogoutResponse("Error: " + e.getMessage(), false);
         }
     }
 }

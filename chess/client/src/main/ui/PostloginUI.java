@@ -13,7 +13,6 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class PostloginUI {
-
     private final ChessClient client;
     private final ServerFacade serverFacade;
     private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
@@ -35,20 +34,11 @@ public class PostloginUI {
         int choice = scanner.nextInt();
 
         switch (choice) {
-            case 1:
-                createGame();
-                break;
-            case 2:
-                listGames();
-                break;
-            case 3:
-                joinGame();
-                break;
-            case 4:
-                logout();
-                break;
-            default:
-                System.out.println("Invalid choice.");
+            case 1: createGame(); break;
+            case 2: listGames(); break;
+            case 3: joinGame(); break;
+            case 4: logout(); break;
+            default: System.out.println("Invalid choice.");
         }
     }
 
@@ -58,12 +48,10 @@ public class PostloginUI {
         String gameName = scanner.nextLine();
 
         JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("authToken", client.getAuthToken());
         jsonRequest.addProperty("gameName", gameName);
 
         try {
-            String response = serverFacade.sendPostRequest("/game", new Gson().toJson(jsonRequest));
-
+            String response = serverFacade.sendPostRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 System.out.println("Game created successfully. Game ID: " + responseObject.get("gameID").getAsInt());
@@ -78,11 +66,10 @@ public class PostloginUI {
 
     private void listGames() {
         try {
-            String response = serverFacade.sendGetRequest("/game?authToken=" + client.getAuthToken());
+            String response = serverFacade.sendGetRequest("/game", client.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 System.out.println("Games: " + responseObject.get("games").getAsJsonArray().toString());
-                // Additional logic to format and display games
             } else {
                 System.out.println("Failed to list games: " + responseObject.get("message").getAsString());
             }
@@ -100,12 +87,11 @@ public class PostloginUI {
         String color = scanner.next().toUpperCase();
 
         JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("gameID", gameId);
         jsonRequest.addProperty("playerColor", color);
-        jsonRequest.addProperty("authToken", client.getAuthToken());
+        jsonRequest.addProperty("gameID", gameId);
 
         try {
-            String response = serverFacade.sendPutRequest("/game", new Gson().toJson(jsonRequest));
+            String response = serverFacade.sendPutRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 System.out.println("Joined game successfully.");
@@ -123,11 +109,11 @@ public class PostloginUI {
         jsonRequest.addProperty("authToken", client.getAuthToken());
 
         try {
-            String response = serverFacade.sendDeleteRequest("/session", new Gson().toJson(jsonRequest));
+            String response = serverFacade.sendDeleteRequest("/session", new Gson().toJson(jsonRequest), client.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
-                client.setAuthToken(null); // Reset authToken
-                client.transitionToPreloginUI(); // Transition to Prelogin UI
+                client.setAuthToken(null);
+                client.transitionToPreloginUI();
                 System.out.println("Logged out successfully.");
             } else {
                 System.out.println("Failed to logout: " + responseObject.get("message").getAsString());

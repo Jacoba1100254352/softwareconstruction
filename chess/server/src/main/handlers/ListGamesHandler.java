@@ -12,9 +12,10 @@ public class ListGamesHandler extends BaseHandler {
         String authToken = request.headers("Authorization");
         ListGamesResponse result = (new ListGamesService()).listAllGames(new ListGamesRequest(authToken));
 
-        if (!result.isSuccess())
+        if (result.isSuccess())
+            response.status(200);
+        else
             response.status(("Error: unauthorized".equals(result.getMessage())) ? 401 : 500);
-        else response.status(200);
 
         return result;
     }

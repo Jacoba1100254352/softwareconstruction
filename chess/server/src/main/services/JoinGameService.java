@@ -19,22 +19,6 @@ public class JoinGameService {
     private final UserDAO userDAO = new UserDAO();
 
     /**
-     * The success status of the user joining the game.
-     */
-    private boolean success;
-    /**
-     * The message associated with the user's attempt to join the game.
-     */
-    private String message;
-
-    /**
-     * Default constructor.
-     */
-    public JoinGameService() {
-
-    }
-
-    /**
      * Allows a user to join a game.
      *
      * @param request The request to join a game.
@@ -45,16 +29,16 @@ public class JoinGameService {
             // Verify authToken exists
             AuthToken authToken = authDAO.findAuth(request.getAuthToken());
             if (authToken == null)
-                return new JoinGameResponse(false, "Error: unauthorized");
+                return new JoinGameResponse("Error: unauthorized", false);
 
             // Verify user exists
             User user = userDAO.getUser(authToken.getUsername());
             if (user == null)
-                return new JoinGameResponse(false, "Error: user not found");
+                return new JoinGameResponse("Error: user not found", false);
 
             // Verify the game exists
             if (gameDAO.findGameById(request.getGameID()) == null)
-                return new JoinGameResponse(false, "Error: bad request");
+                return new JoinGameResponse("Error: bad request", false);
 
             // Add player to game or watch status based on color
             if (request.getPlayerColor().equalsIgnoreCase("WHITE"))
@@ -62,37 +46,18 @@ public class JoinGameService {
             else if (request.getPlayerColor().equalsIgnoreCase("BLACK"))
                 gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.BLACK);
             else // Watching
-                return new JoinGameResponse(true, "Successfully watching the game");
+                return new JoinGameResponse("Successfully watching the game", true);
 
-            return new JoinGameResponse(true, "Successfully joined the game");
+            return new JoinGameResponse("Successfully joined the game", true);
 
         } catch (DataAccessException e) {
             // Handle exceptions/errors
             if (e.getMessage().contains("already taken"))
-                return new JoinGameResponse(false, "Error: already taken");
+                return new JoinGameResponse("Error: already taken", false);
             else if (e.getMessage().contains("not found"))
-                return new JoinGameResponse(false, "Error: bad request");
+                return new JoinGameResponse("Error: bad request", false);
             else
-                return new JoinGameResponse(false, "Error: " + e.getMessage());
+                return new JoinGameResponse("Error: " + e.getMessage(), false);
         }
-    }
-
-
-    ///   Getters and setters   ///
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
     }
 }

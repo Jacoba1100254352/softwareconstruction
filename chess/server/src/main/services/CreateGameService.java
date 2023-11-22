@@ -15,13 +15,6 @@ public class CreateGameService {
     private final AuthDAO authDAO = new AuthDAO();
 
     /**
-     * Default constructor.
-     */
-    public CreateGameService() {
-
-    }
-
-    /**
      * Creates a new game based on the provided request.
      *
      * @param request The request containing game details.

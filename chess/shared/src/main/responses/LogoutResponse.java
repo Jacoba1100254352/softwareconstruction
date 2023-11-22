@@ -3,17 +3,16 @@ package responses;
 /**
  * Represents the response to the logout request.
  */
-public class LogoutResponse {
+public class LogoutResponse implements Response {
+    /**
+     * A message providing success or error info.
+     */
+    private String message;
 
     /**
      * Indicates the success of the logout operation.
      */
     private boolean success;
-
-    /**
-     * A message providing success or error info.
-     */
-    private String message;
 
 
     ///   Constructors   ///
@@ -21,30 +20,34 @@ public class LogoutResponse {
     /**
      * Constructor for the logout response success or failure.
      *
-     * @param success Indicates if the logout operation was successful.
      * @param message A message providing success or error info.
+     * @param success Indicates if the logout operation was successful.
      */
-    public LogoutResponse(boolean success, String message) {
-        this.success = success;
+    public LogoutResponse(String message, boolean success) {
         this.message = message;
+        this.success = success;
     }
 
 
     ///   Getters and setters   ///
 
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
+    @Override
     public String getMessage() {
         return message;
     }
 
+    @Override
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return success;
+    }
+
+    @Override
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }

@@ -46,7 +46,7 @@ public class ServiceTests {
     @DisplayName("Positive: Successful Database Clear")
     public void successfulDatabaseClear() {
         ClearRequest clearRequest = new ClearRequest(existingAuth);
-        ClearResponse response = clearService.clearDatabase(clearRequest);
+        Response response = clearService.clearDatabase(clearRequest);
         Assertions.assertTrue(response.isSuccess(), "Failed to clear the database");
     }
 

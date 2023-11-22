@@ -14,7 +14,8 @@ public class LogoutHandler extends BaseHandler {
 
         if (result.isSuccess())
             response.status(200);
-        else response.status(result.getMessage().equals("Error: unauthorized") ? 500 : 401);
+        else
+            response.status(result.getMessage().equals("Error: unauthorized") ? 500 : 401);
 
         return result;
     }

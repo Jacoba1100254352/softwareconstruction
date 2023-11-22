@@ -4,6 +4,7 @@ import dataAccess.DataAccessException;
 import dataAccess.Database;
 import requests.ClearRequest;
 import responses.ClearResponse;
+import responses.Response;
 
 /**
  * Provides services to clear the application's database.
@@ -15,13 +16,13 @@ public class ClearService {
      * @param request The clear request containing the authToken of the user.
      * @return ClearResponse indicating success or failure.
      */
-    public ClearResponse clearDatabase(ClearRequest request) {
+    public Response clearDatabase(ClearRequest request) {
         try {
             // Call resetDatabase method to clear all data
             Database.getInstance().resetDatabase();
-            return new ClearResponse(true, "Database cleared successfully.");
+            return new ClearResponse("Database cleared successfully.", true);
         } catch (DataAccessException e) {
-            return new ClearResponse(false, "Error: " + e.getMessage());
+            return new ClearResponse("Error: " + e.getMessage(), false);
         }
     }
 

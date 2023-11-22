@@ -3,19 +3,22 @@ package responses;
 /**
  * Represents the result of a login request.
  */
-public class LoginResponse {
+public class LoginResponse implements Response {
     /**
      * The authentication token for the logged-in user.
      */
     private String authToken;
+
     /**
      * The username of the logged-in user.
      */
     private String username;
+
     /**
      * The error message.
      */
     private String message;
+
     /**
      * Indicates if the login operation was successful.
      */
@@ -49,14 +52,6 @@ public class LoginResponse {
 
     ///   Getters and setters   ///
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public String getAuthToken() {
         return authToken;
     }
@@ -73,10 +68,22 @@ public class LoginResponse {
         this.username = username;
     }
 
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Override
     public boolean isSuccess() {
         return success;
     }
 
+    @Override
     public void setSuccess(boolean success) {
         this.success = success;
     }

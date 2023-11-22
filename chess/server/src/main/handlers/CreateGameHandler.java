@@ -14,10 +14,9 @@ public class CreateGameHandler extends BaseHandler {
         createGameRequest.setAuthToken(authToken);
         CreateGameResponse result = (new CreateGameService()).createGame(createGameRequest);
 
-        if (result == null) {
-            response.status(500);
-            return new CreateGameResponse("Error: unexpected error occurred.");
-        } else if (result.getGameID() == null) {
+        if (result.isSuccess()) {
+            response.status(200);
+        } else {
             switch (result.getMessage()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
@@ -26,7 +25,6 @@ public class CreateGameHandler extends BaseHandler {
             return result;
         }
 
-        response.status(200);
         return result;
     }
 }

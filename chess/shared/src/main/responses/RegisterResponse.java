@@ -3,19 +3,26 @@ package responses;
 /**
  * Represents the result of a registration request.
  */
-public class RegisterResponse {
+public class RegisterResponse implements Response {
     /**
      * The authentication token for the registered user.
      */
     private String authToken;
+
     /**
      * The username of the registered user.
      */
     private String username;
+
     /**
      * The error message.
      */
     private String message;
+
+    /**
+     * Indicates the success of the register operation.
+     */
+    private boolean success;
 
 
     ///   Constructors   ///
@@ -29,6 +36,7 @@ public class RegisterResponse {
     public RegisterResponse(String authToken, String username) {
         this.authToken = authToken;
         this.username = username;
+        this.success = true;  // true: successful registration
     }
 
     /**
@@ -38,18 +46,11 @@ public class RegisterResponse {
      */
     public RegisterResponse(String message) {
         this.message = message;
+        this.success = false; // false: failed registration
     }
 
 
     ///   Getters and setters   ///
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
     public String getAuthToken() {
         return authToken;
@@ -65,5 +66,25 @@ public class RegisterResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Override
+    public boolean isSuccess() {
+        return success;
+    }
+
+    @Override
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }
