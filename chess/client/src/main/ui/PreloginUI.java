@@ -1,11 +1,12 @@
 package ui;
 
 import client.ChessClient;
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import server.ServerFacadeException;
+import serverFacade.ServerFacadeException;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -26,14 +27,23 @@ public class PreloginUI {
         System.out.println("3. Quit");
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter choice: ");
-        int choice = scanner.nextInt();
+        int choice = -1;
 
-        switch (choice) {
-            case 1: login(); break;
-            case 2: register(); break;
-            case 3: client.exit(); break;
-            default: System.out.println("Invalid choice.");
+        // Validate user input
+        while (choice < 1 || choice > 3) {
+            System.out.print("Enter choice (1-3): ");
+            try {
+                choice = scanner.nextInt();
+                switch (choice) {
+                    case 1 -> login();
+                    case 2 -> register();
+                    case 3 -> client.exit();
+                    default -> System.out.println("Invalid choice. Please enter a number between 1 and 3.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
         }
     }
 
@@ -51,9 +61,15 @@ public class PreloginUI {
         try {
             String response = serverFacade.sendPostRequest("/session", jsonRequest.toString(), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
+            System.out.println(responseObject.toString());
             if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();
+                boolean isAdmin = responseObject.has("isAdmin") && responseObject.get("isAdmin").getAsBoolean();
+
+                System.out.println("isAdmin: " + isAdmin);
+
                 client.setAuthToken(authToken);
+                client.setAdmin(isAdmin);
                 client.transitionToPostloginUI();
                 System.out.println("Logged in successfully.");
             } else {

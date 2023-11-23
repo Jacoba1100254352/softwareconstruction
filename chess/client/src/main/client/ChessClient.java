@@ -1,6 +1,6 @@
 package client;
 
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 import ui.*;
 
 public class ChessClient {
@@ -8,6 +8,7 @@ public class ChessClient {
     private final PostloginUI postloginUI;
     private final GameplayUI gameplayUI;
     private String authToken;
+    private boolean isAdmin;
     private boolean isRunning;
     private boolean isLoggedIn;
 
@@ -52,6 +53,16 @@ public class ChessClient {
     public String getAuthToken() {
         return authToken;
     }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+
 
     public static void main(String[] args) {
         ChessClient client = new ChessClient();

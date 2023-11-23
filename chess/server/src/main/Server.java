@@ -1,11 +1,13 @@
-package server;
-
+import dataAccess.DataAccessException;
 import handlers.*;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
 
 import java.util.HashMap;
+
+import dataAccess.UserDAO;
+import models.User;
 
 public class Server {
     /**
@@ -73,6 +75,8 @@ public class Server {
         Spark.post("/game", this::handleRequest);
         Spark.put("/game", this::handleRequest);
 
+        createAdminAccount(); // Ensure admin account exists
+
         // Initialize the Spark server
         Spark.init();
     }
@@ -83,5 +87,21 @@ public class Server {
 
         // Stop the Spark server
         System.out.println("server.Server stopped successfully.");
+    }
+
+    private void createAdminAccount() {
+        UserDAO userDAO = new UserDAO();
+        try {
+            String adminUsername = "admin"; // Admin username
+            String adminPassword = "adminPassword"; // Admin password
+            String adminEmail = "admin@example.com"; // Admin email
+
+            // Check if admin already exists
+            if (userDAO.getUser(adminUsername) == null)
+                userDAO.insertUser(new User(adminUsername, adminPassword, adminEmail, true));
+
+        } catch (DataAccessException e) {
+            System.err.println("Error creating admin account: " + e.getMessage());
+        }
     }
 }

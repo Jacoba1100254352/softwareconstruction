@@ -1,4 +1,4 @@
-package server;
+package serverFacade;
 
 import java.io.*;
 import java.net.HttpURLConnection;
