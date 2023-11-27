@@ -1,6 +1,7 @@
 package handlers;
 
 import requests.ClearRequest;
+import responses.ClearResponse;
 import services.ClearService;
 import spark.Request;
 import spark.Response;
@@ -11,8 +12,7 @@ public class ClearHandler extends BaseHandler {
         response.type("application/json");
         String authToken = request.headers("Authorization");
 
-        ClearService clearService = new ClearService();
-        responses.Response result = clearService.clearDatabase(new ClearRequest(authToken));
+        ClearResponse result = (new ClearService()).clearDatabase(new ClearRequest(authToken));
 
         response.status(result.isSuccess() ? 200 : 500);
 

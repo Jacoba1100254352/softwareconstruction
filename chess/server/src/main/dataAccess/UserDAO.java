@@ -93,7 +93,6 @@ public class UserDAO {
         }
     }
 
-
     /**
      * Retrieves a user based on username.
      *
@@ -166,7 +165,7 @@ public class UserDAO {
     }
 
     public void clearUsers(Connection conn) throws DataAccessException {
-        String sql = "DELETE FROM Users;";
+        String sql = "DELETE FROM Users WHERE IsAdmin = false;"; // Delete all except admin // "DELETE FROM Users;";
         try (Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
