@@ -1,6 +1,6 @@
 package client;
 
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 import ui.*;
 
 public class ChessClient {

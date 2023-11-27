@@ -1,10 +1,10 @@
 package ui;
 
 import client.ChessClient;
-import server.ServerFacade;
+import serverFacade.ServerFacade;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import server.ServerFacadeException;
+import serverFacade.ServerFacadeException;
 
 import java.util.Scanner;
 import java.util.logging.Logger;

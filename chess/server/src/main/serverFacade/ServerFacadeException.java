@@ -1,4 +1,4 @@
-package server;
+package serverFacade;
 
 // Custom exception class
 public class ServerFacadeException extends Exception {

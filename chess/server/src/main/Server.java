@@ -1,5 +1,3 @@
-package server;
-
 import handlers.*;
 import spark.Request;
 import spark.Response;
@@ -48,7 +46,7 @@ public class Server {
             } catch (Exception e) {
                 res.status(500);
                 res.type("application/json");
-                return "{\"error\":\"Internal server.Server Error: " + e.getMessage() + "\"}";
+                return "{\"error\":\"Internal Server Error: " + e.getMessage() + "\"}";
             }
         } else {
             res.status(404);
@@ -82,6 +80,6 @@ public class Server {
         Spark.stop();
 
         // Stop the Spark server
-        System.out.println("server.Server stopped successfully.");
+        System.out.println("Server stopped successfully.");
     }
 }
