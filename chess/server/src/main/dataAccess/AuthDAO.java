@@ -28,23 +28,35 @@ public class AuthDAO {
      * @throws DataAccessException if there's an error in the data access operation.
      */
     public void insertAuth(AuthToken authToken) throws DataAccessException {
+        // First, delete any existing token for the user
+        deleteExistingAuth(authToken.getUsername());
+
+        // Insert the new token
         String sql = "INSERT INTO AuthTokens (Token, Username) VALUES (?, ?);";
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
-            db.startTransaction(conn);
-            PreparedStatement stmt = conn.prepareStatement(sql);
-
-            conn.setAutoCommit(false); // Start the transaction
-
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, authToken.getToken());
             stmt.setString(2, authToken.getUsername());
             stmt.executeUpdate();
-
-            conn.commit(); // Commit the transaction
         } catch (SQLException e) {
-            db.rollback(conn, e); // Handle rollback
-            throw new DataAccessException("Error encountered while inserting auth token: " + e.getMessage());
+            throw new DataAccessException("Error inserting auth token: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Removes a token based on the username.
+     *
+     * @param username The authentication token to be removed.
+     * @throws DataAccessException if there's an error in the data access operation.
+     */
+    private void deleteExistingAuth(String username) throws DataAccessException {
+        String sql = "DELETE FROM AuthTokens WHERE Username = ?;";
+        try (Connection conn = db.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting existing auth token: " + e.getMessage());
         }
     }
 

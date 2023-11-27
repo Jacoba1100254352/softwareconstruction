@@ -2,6 +2,8 @@ package ui;
 
 import client.ChessClient;
 import com.google.gson.*;
+import dataAccess.AuthDAO;
+import dataAccess.DataAccessException;
 import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;
 
@@ -46,7 +48,7 @@ public class PostloginUI {
             try {
                 choice = scanner.nextInt();
                 processUserChoice(choice);
-            } catch (InputMismatchException e) {
+            } catch (InputMismatchException | DataAccessException e) {
                 System.out.println("Invalid input. Please enter a valid number.");
                 scanner.nextLine();
             }
@@ -54,12 +56,11 @@ public class PostloginUI {
     }
 
     private void displayAdminOptions() {
-        System.out.println("6. List All Users");
-        System.out.println("7. Remove User");
-        System.out.println("8. Remove All Users");
+        System.out.println("6. Remove User");
+        System.out.println("7. Reset Database");
     }
 
-    private void processUserChoice(int choice) {
+    private void processUserChoice(int choice) throws DataAccessException {
         switch (choice) {
             case 0 -> displayHelp();
             case 1 -> createGame();
@@ -67,9 +68,8 @@ public class PostloginUI {
             case 3 -> joinGame();
             case 4 -> joinAsObserver();
             case 5 -> logout();
-            case 6 -> { if (client.isAdmin()) listAllUsers(); else printInvalidChoice(); }
-            case 7 -> { if (client.isAdmin()) removeUser(); else printInvalidChoice(); }
-            case 8 -> { if (client.isAdmin()) removeAllUsers(); else printInvalidChoice(); }
+            case 6 -> { if (client.isAdmin()) removeUser(); else printInvalidChoice(); }
+            case 7 -> { if (client.isAdmin()) resetDatabase(); else printInvalidChoice(); }
             default -> printInvalidChoice();
         }
     }
@@ -128,7 +128,7 @@ public class PostloginUI {
 
                 int number = 1;
                 for (JsonElement game : games) {
-                    int gameId = game.getAsJsonObject().get("gameID").getAsInt();
+                    Integer gameId = game.getAsJsonObject().get("gameID").getAsInt();
                     String gameName = game.getAsJsonObject().get("gameName").getAsString();
                     System.out.println(number + ". " + gameName);
                     gameMap.put(number++, gameId); // Map list number to game ID
@@ -204,22 +204,16 @@ public class PostloginUI {
         }
     }
 
-    private void listAllUsers() {
-        try {
-            String response = serverFacade.sendGetRequest("/users", client.getAuthToken());
-            System.out.println(response);
-        } catch (Exception e) {
-            LOGGER.severe("Error listing users: " + e.getMessage());
-            System.out.println("Failed to list users.");
-        }
-    }
-
     private void removeUser() {
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Enter username to remove: ");
-        String username = scanner.nextLine();
+        String username = (new Scanner(System.in)).nextLine();
 
         try {
+            if (!client.isAdmin()) {
+                System.out.println("You are not authorized to perform this action.");
+                return;
+            }
+
             serverFacade.sendDeleteRequest("/user/" + username, null, client.getAuthToken());
             System.out.println("User removed successfully.");
         } catch (Exception e) {
@@ -228,13 +222,22 @@ public class PostloginUI {
         }
     }
 
-    private void removeAllUsers() {
+    private void resetDatabase() {
         try {
-            serverFacade.sendDeleteRequest("/users", null, client.getAuthToken());
-            System.out.println("All users removed successfully.");
+            if (!client.isAdmin()) {
+                System.out.println("You are not authorized to perform this action.");
+                return;
+            }
+
+            String authToken = client.getAuthToken();
+            System.out.println("Logging out admin...");
+            logout(); // Log out the admin
+            System.out.println("Resetting database...");
+            serverFacade.sendDeleteRequest("/db", null, authToken);
+            System.out.println("Database reset.");
         } catch (Exception e) {
-            LOGGER.severe("Error removing all users: " + e.getMessage());
-            System.out.println("Failed to remove all users.");
+            LOGGER.severe("Error resetting database: " + e.getMessage());
+            System.out.println("Failed to reset database.");
         }
     }
 }

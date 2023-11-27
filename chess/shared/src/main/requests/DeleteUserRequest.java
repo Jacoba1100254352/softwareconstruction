@@ -3,12 +3,17 @@ package requests;
 /**
  * Represents the request data required to clear the database.
  */
-public class ClearRequest {
+public class DeleteUserRequest {
 
     /**
-     * The authentication token of the user trying to clear the database.
+     * The authentication token of the user trying to delete the specified user.
      */
     private String authToken;
+
+    /**
+     * The username of the user to be deleted.
+     */
+    private String username;
 
 
     ///   Constructor   ///
@@ -18,8 +23,9 @@ public class ClearRequest {
      *
      * @param authToken The authentication token of the user.
      */
-    public ClearRequest(String authToken) {
+    public DeleteUserRequest(String authToken, String username) {
         this.authToken = authToken;
+        this.username = username;
     }
 
 
@@ -31,5 +37,13 @@ public class ClearRequest {
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+    	this.username = username;
     }
 }

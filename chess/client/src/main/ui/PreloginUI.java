@@ -61,17 +61,18 @@ public class PreloginUI {
         try {
             String response = serverFacade.sendPostRequest("/session", jsonRequest.toString(), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
-            System.out.println(responseObject.toString());
+
             if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();
                 boolean isAdmin = responseObject.has("isAdmin") && responseObject.get("isAdmin").getAsBoolean();
 
-                System.out.println("isAdmin: " + isAdmin);
+                System.out.println();
 
                 client.setAuthToken(authToken);
                 client.setAdmin(isAdmin);
                 client.transitionToPostloginUI();
-                System.out.println("Logged in successfully.");
+
+                System.out.println("Logged in successfully.\n");
             } else {
                 System.out.println("Login failed: " + responseObject.get("message").getAsString());
             }

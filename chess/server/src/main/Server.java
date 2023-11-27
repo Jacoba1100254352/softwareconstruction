@@ -27,6 +27,7 @@ public class Server {
         handlers.put("/game:GET", new ListGamesHandler());
         handlers.put("/game:POST", new CreateGameHandler());
         handlers.put("/game:PUT", new JoinGameHandler());
+        handlers.put("/user/:username:DELETE", new DeleteUserHandler()); // Admin: Delete specific user
     }
 
     public static void main(String[] args) {
@@ -74,6 +75,7 @@ public class Server {
         Spark.get("/game", this::handleRequest);
         Spark.post("/game", this::handleRequest);
         Spark.put("/game", this::handleRequest);
+        Spark.delete("/user/:username", this::handleRequest); // Admin: Delete specific user
 
         createAdminAccount(); // Ensure admin account exists
 
