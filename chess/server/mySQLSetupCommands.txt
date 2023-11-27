@@ -7,7 +7,6 @@ CREATE TABLE Users (
     Username VARCHAR(50) NOT NULL PRIMARY KEY,
     Password VARCHAR(255) NOT NULL, -- Storing a hashed password
     Email VARCHAR(100) NOT NULL UNIQUE,
-    IsAdmin BOOLEAN DEFAULT FALSE, -- New field indicating if the user is an admin
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

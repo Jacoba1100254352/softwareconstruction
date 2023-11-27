@@ -1,13 +1,13 @@
 package passoffTests.clientTests;
 
 import dataAccess.Database;
-import serverFacade.ServerFacade;
+import server.ServerFacade;
 import org.junit.jupiter.api.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import serverFacade.ServerFacadeException;
+import server.ServerFacadeException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

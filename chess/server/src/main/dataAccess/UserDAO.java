@@ -32,8 +32,7 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during insertion.
      */
     public void insertUser(User user) throws DataAccessException {
-        // Updated SQL query to include the isAdmin field
-        String sql = "INSERT INTO Users (Username, Password, Email, IsAdmin) VALUES (?, ?, ?, ?);";
+        String sql = "INSERT INTO Users (Username, Password, Email) VALUES (?, ?, ?);";
         Connection conn = null;
         try {
             conn = db.getConnection();
@@ -42,9 +41,9 @@ public class UserDAO {
                 stmt.setString(1, user.getUsername());
                 stmt.setString(2, hashPassword(user.getPassword()));
                 stmt.setString(3, user.getEmail());
-                stmt.setBoolean(4, user.getIsAdmin());
 
                 stmt.executeUpdate();
+
                 conn.commit();
             } catch (SQLException e) {
                 db.rollback(conn, e);
@@ -109,7 +108,7 @@ public class UserDAO {
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
 
-            return (rs.next()) ? new User(rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("IsAdmin")) : null;
+            return (rs.next()) ? new User(rs.getString("Username"), rs.getString("Password"), rs.getString("Email")) : null;
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while finding user: " + e.getMessage());
         }
@@ -122,14 +121,13 @@ public class UserDAO {
      * @throws DataAccessException if there's an error during update or user doesn't exist.
      */
     public void updateUser(User user) throws DataAccessException {
-        String sql = "UPDATE Users SET Password = ?, Email = ?, IsAdmin = ? WHERE Username = ?;";
+        String sql = "UPDATE Users SET Password = ?, Email = ? WHERE Username = ?;";
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getPassword());
             stmt.setString(2, user.getEmail());
-            stmt.setBoolean(3, user.getIsAdmin());
-            stmt.setString(4, user.getUsername());
+            stmt.setString(3, user.getUsername());
 
             if (stmt.executeUpdate() != 1) throw new DataAccessException("User update failed: User not found.");
         } catch (SQLException e) {

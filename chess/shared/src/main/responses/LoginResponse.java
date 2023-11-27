@@ -24,11 +24,6 @@ public class LoginResponse implements Response {
      */
     private boolean success;
 
-    /**
-     * Indicates if the logged-in user is an admin.
-     */
-    private boolean isAdmin;
-
 
     ///   Constructors   ///
 
@@ -38,12 +33,10 @@ public class LoginResponse implements Response {
      * @param authToken The authentication token for the logged-in user.
      * @param username  The username of the logged-in user.
      */
-    public LoginResponse(String authToken, String username, boolean isAdmin) {
+    public LoginResponse(String authToken, String username) {
         this.authToken = authToken;
         this.username = username;
-        this.message = null;
         this.success = true;  // true: successful login
-        this.isAdmin = isAdmin;
     }
 
     /**
@@ -54,7 +47,6 @@ public class LoginResponse implements Response {
     public LoginResponse(String message) {
         this.message = message;
         this.success = false; // false: failed login
-        this.isAdmin = false;
     }
 
 
@@ -94,13 +86,5 @@ public class LoginResponse implements Response {
     @Override
     public void setSuccess(boolean success) {
         this.success = success;
-    }
-
-    public boolean getIsAdmin() {
-        return isAdmin;
-    }
-
-    public void setIsAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
     }
 }

@@ -13,16 +13,10 @@ public class User {
      * The password of the user.
      */
     private String password;
-
     /**
      * The email of the user.
      */
     private String email;
-
-    /**
-     * Whether the user is an admin.
-     */
-    private boolean isAdmin;
 
 
     ///   Constructor   ///
@@ -38,22 +32,6 @@ public class User {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.isAdmin = false;
-    }
-
-    /**
-     * Constructor for a new user with the given attributes.
-     *
-     * @param username The username of the user.
-     * @param password The password of the user.
-     * @param email    The email address of the user.
-     * @param isAdmin  Whether the user is an admin.
-     */
-    public User(String username, String password, String email, boolean isAdmin) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.isAdmin = isAdmin;
     }
 
     public String getUsername() {
@@ -78,13 +56,5 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public boolean getIsAdmin() {
-        return this.isAdmin;
-    }
-
-    public void setIsAdmin(boolean isAdmin) {
-        this.isAdmin = isAdmin;
     }
 }
