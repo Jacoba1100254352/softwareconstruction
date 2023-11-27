@@ -1,10 +1,9 @@
-package passoffTests;
+package testFactory;
 
 import chess.*;
 
 /**
  * Used for testing your code
- * Add in code using your classes for each method for each FIXME
  */
 public class TestFactory {
 

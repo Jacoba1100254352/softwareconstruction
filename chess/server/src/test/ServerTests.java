@@ -1,5 +1,3 @@
-package passoffTests.serverTests;
-
 import chess.*;
 import dataAccess.*;
 import models.AuthToken;

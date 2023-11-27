@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import serverFacade.ServerFacadeException;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -21,19 +22,24 @@ public class PreloginUI {
 
     public void displayMenu() {
         System.out.println("Pre-login Menu:");
+        System.out.println("0. Help");
         System.out.println("1. Login");
         System.out.println("2. Register");
         System.out.println("3. Quit");
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter choice: ");
-        int choice = scanner.nextInt();
+        int choice = -1;
 
-        switch (choice) {
-            case 1: login(); break;
-            case 2: register(); break;
-            case 3: client.exit(); break;
-            default: System.out.println("Invalid choice.");
+        // Validate user input
+        while (choice < 0 || choice > 3) {
+            System.out.print("Enter choice (0-3): ");
+            try {
+                choice = scanner.nextInt();
+                processUserChoice(choice);
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                scanner.nextLine();
+            }
         }
     }
 
@@ -51,11 +57,18 @@ public class PreloginUI {
         try {
             String response = serverFacade.sendPostRequest("/session", jsonRequest.toString(), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
+
             if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();
+                boolean isAdmin = responseObject.has("isAdmin") && responseObject.get("isAdmin").getAsBoolean();
+
+                System.out.println();
+
                 client.setAuthToken(authToken);
+                client.setAdmin(isAdmin);
                 client.transitionToPostloginUI();
-                System.out.println("Logged in successfully.");
+
+                System.out.println("Logged in successfully.\n");
             } else {
                 System.out.println("Login failed: " + responseObject.get("message").getAsString());
             }
@@ -104,5 +117,25 @@ public class PreloginUI {
         } catch (Exception e) {
             LOGGER.severe("Unexpected error: " + e.getMessage());
         }
+    }
+
+    private void processUserChoice(int choice) {
+        switch (choice) {
+            case 0 -> displayHelp();
+            case 1 -> login();
+            case 2 -> register();
+            case 3 -> client.exit();
+            default -> System.out.println("Invalid choice. Please enter a number between 1 and 3.");
+        }
+    }
+
+    private void displayHelp() {
+        System.out.println();
+        System.out.println("Help Menu:");
+        System.out.println("0. Help - Displays this help menu.");
+        System.out.println("1. Login - Log in to the application.");
+        System.out.println("2. Register - Register a new user.");
+        System.out.println("3. Quit - Exits the program.");
+        System.out.println();
     }
 }

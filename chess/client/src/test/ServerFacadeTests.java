@@ -1,6 +1,3 @@
-package passoffTests.clientTests;
-
-import dataAccess.Database;
 import serverFacade.ServerFacade;
 import org.junit.jupiter.api.*;
 import java.io.IOException;
@@ -14,22 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerFacadeTests {
 
     private static ServerFacade serverFacade;
-    private static Database db; // Database instance solely for clearing the database when needed for testing purposes
 
     @BeforeAll
     public static void setupClass() {
         serverFacade = new ServerFacade("http://localhost:8080");
-        db = new Database();
-    }
-
-    @BeforeEach // Clear the database before each test
-    public void setup() throws Exception {
-        db.resetDatabase();
     }
 
     @AfterEach // Clear the database after each test
     public void tearDown() throws Exception {
-        db.resetDatabase();
+        serverFacade.sendDeleteRequest("/db", null, null);
     }
 
     private String registerAndLogin() throws IOException, URISyntaxException, ServerFacadeException {
@@ -54,6 +44,24 @@ public class ServerFacadeTests {
         String createGameResponse = serverFacade.sendPostRequest(createGameEndpoint, createGameJsonRequest.toString(), authToken);
         JsonObject createGameResponseObject = JsonParser.parseString(createGameResponse).getAsJsonObject();
         return createGameResponseObject.get("gameID").getAsInt();
+    }
+
+    @Test
+    @Order(0)
+    @DisplayName("BeforeAll Positive: sendDeleteRequest for database clearing")
+    // Note: this is essentially a @BeforeAll but is structured as a test for the purpose of making sure that
+    //       the database is cleared and that the method to clear it works as it should
+    public void sendDeleteRequestClearDatabaseSuccess() {
+        String endpoint = "/db";
+        String jsonRequestBody = "{}";
+
+        try {
+            String response = serverFacade.sendDeleteRequest(endpoint, jsonRequestBody, null);
+            assertNotNull(response, "Response should not be null");
+            assertTrue(response.contains("\"success\":true")); // Check for success in the response
+        } catch (Exception e) {
+            fail("Exception \"" + e.getMessage() + "\" should not be thrown");
+        }
     }
 
     @Test

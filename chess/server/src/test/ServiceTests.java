@@ -1,5 +1,3 @@
-package passoffTests.serviceTests;
-
 import models.User;
 import org.junit.jupiter.api.*;
 import requests.*;

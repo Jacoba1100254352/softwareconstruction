@@ -1,9 +1,8 @@
-package passoffTests.serverTests;
-
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import passoffTests.obfuscatedTestClasses.TestServerFacade;
 import passoffTests.testClasses.TestModels;
+import testFactory.TestFactory;
 
 import java.util.Objects;
 import java.util.Scanner;
@@ -28,7 +27,7 @@ public class PersistenceTest {
         newUser.password = "testPassword";
         newUser.email = "testEmail";
 
-        serverFacade = new TestServerFacade("localhost", passoffTests.TestFactory.getServerPort());
+        serverFacade = new TestServerFacade("localhost", TestFactory.getServerPort());
     }
 
 

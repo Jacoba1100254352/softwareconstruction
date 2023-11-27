@@ -8,6 +8,7 @@ public class ChessClient {
     private final PostloginUI postloginUI;
     private final GameplayUI gameplayUI;
     private String authToken;
+    private boolean isAdmin;
     private boolean isRunning;
     private boolean isLoggedIn;
 
@@ -51,6 +52,18 @@ public class ChessClient {
 
     public String getAuthToken() {
         return authToken;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
+    public void drawChessboard() {
+        gameplayUI.drawChessboard();
     }
 
     public static void main(String[] args) {
