@@ -41,6 +41,9 @@ public class PreloginUI {
                 scanner.nextLine();
             }
         }
+
+        // Formatting
+        System.out.println();
     }
 
     private void login() {
@@ -120,6 +123,9 @@ public class PreloginUI {
     }
 
     private void processUserChoice(int choice) {
+        // Formatting
+        System.out.println();
+
         switch (choice) {
             case 0 -> displayHelp();
             case 1 -> login();

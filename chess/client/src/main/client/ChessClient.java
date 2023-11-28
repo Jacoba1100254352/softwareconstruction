@@ -16,7 +16,7 @@ public class ChessClient {
         ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
         preloginUI = new PreloginUI(this, serverFacade);
         postloginUI = new PostloginUI(this, serverFacade);
-        gameplayUI = new GameplayUI(this);
+        gameplayUI = new GameplayUI();
         isRunning = true;
     }
 
@@ -67,7 +67,6 @@ public class ChessClient {
     }
 
     public static void main(String[] args) {
-        ChessClient client = new ChessClient();
-        client.run();
+        (new ChessClient()).run();
     }
 }

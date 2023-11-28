@@ -53,6 +53,9 @@ public class PostloginUI {
     }
 
     private void processUserChoice(int choice) {
+        // Formatting
+        System.out.println();
+
         switch (choice) {
             case 0 -> displayHelp();
             case 1 -> createGame();
@@ -116,9 +119,15 @@ public class PostloginUI {
 
                 int number = 1;
                 for (JsonElement game : games) {
+                    // Get game info
                     Integer gameId = game.getAsJsonObject().get("gameID").getAsInt();
                     String gameName = game.getAsJsonObject().get("gameName").getAsString();
-                    System.out.println(number + ". " + gameName);
+
+                    // Get Players
+                    String whitePlayer = game.getAsJsonObject().get("whiteUsername").isJsonNull() ? "None" : game.getAsJsonObject().get("whiteUsername").getAsString();
+                    String blackPlayer = game.getAsJsonObject().get("blackUsername").isJsonNull() ? "None" : game.getAsJsonObject().get("blackUsername").getAsString();
+
+                    System.out.println(number + ". " + gameName + "\tWHITE: " + whitePlayer + " BLACK: " + blackPlayer);
                     gameMap.put(number++, gameId); // Map list number to game ID
                 }
             } else {

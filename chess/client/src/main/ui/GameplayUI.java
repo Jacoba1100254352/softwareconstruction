@@ -1,14 +1,6 @@
 package ui;
 
-import client.ChessClient;
-
 public class GameplayUI {
-
-    private final ChessClient client;
-
-    public GameplayUI(ChessClient client) {
-        this.client = client;
-    }
 
     public void drawChessboard() {
         System.out.println("Initial Chessboard State:");
@@ -25,14 +17,13 @@ public class GameplayUI {
     private void drawBoard(boolean whiteAtBottom) {
         String[][] board = initializeChessboard();
 
-        if (!whiteAtBottom) {
+        if (!whiteAtBottom)
             reverseBoard(board);
-        }
 
         for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+            for (int j = 0; j < 8; j++)
                 System.out.print(board[i][j]);
-            }
+
             System.out.println();
         }
     }
@@ -52,9 +43,9 @@ public class GameplayUI {
             board[1][i] = EscapeSequences.BLACK_PAWN;
             board[6][i] = EscapeSequences.WHITE_PAWN;
             board[7][i] = whitePieces[i];
-            for (int j = 2; j < 6; j++) {
+
+            for (int j = 2; j < 6; j++)
                 board[j][i] = EscapeSequences.EMPTY;
-            }
         }
 
         return board;
