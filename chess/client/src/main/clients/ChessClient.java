@@ -1,7 +1,12 @@
 package clients;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import serverFacade.ServerFacade;
 import ui.*;
+import webSocketMessages.serverMessages.*;
+
+import java.net.URI;
 
 public class ChessClient {
     private final PreloginUI preloginUI;
@@ -11,14 +16,16 @@ public class ChessClient {
     private boolean isAdmin;
     private boolean isRunning;
     private boolean isLoggedIn;
-    private WebSocketClient webSocketClient;
 
     public ChessClient() {
         ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+
         preloginUI = new PreloginUI(this, serverFacade);
         postloginUI = new PostloginUI(this, serverFacade);
         gameplayUI = new GameplayUI();
         isRunning = true;
+
+        connectToGameServer();
     }
 
     public void run() {
@@ -32,14 +39,44 @@ public class ChessClient {
     }
 
     public void connectToGameServer() {
-        WebSocketClient webSocketClient = new WebSocketClient(new WebSocketClient.MessageHandler() {
-            public void handleMessage(String message) {
-                // Implement handling of incoming WebSocket messages
-                // For example, update the UI based on the message content
-                System.out.println("Message received from server: " + message);
-            }
-        });
-        webSocketClient.connectToWebSocket("ws://localhost:8081/ws");
+        try {
+            URI serverUri = new URI("ws://localhost:8081/ws");
+            WebSocketClient webSocketClient = new WebSocketClient(serverUri);
+            webSocketClient.addMessageHandler(this::handleWebSocketMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleWebSocketMessage(String message) {
+        Gson gson = new Gson();
+        JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
+        String messageType = jsonMessage.get("serverMessageType").getAsString();
+
+        switch (ServerMessage.ServerMessageType.valueOf(messageType)) {
+            case LOAD_GAME:
+                LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
+                // Assuming loadGameMessage contains necessary information about the game state
+                // FIXME: Update the game board with this new state
+                //gameplayUI.updateGameState(loadGameMessage.getLoadGameMessage());
+                break;
+
+            case ERROR:
+                ErrorMessage errorMessage = gson.fromJson(jsonMessage, ErrorMessage.class);
+                // Display the error message to the user
+                System.out.println("Error received: " + errorMessage.getErrorMessage());
+                // FIXME: You might also want to update the UI to reflect that an error occurred
+                //gameplayUI.displayError(errorMessage.getErrorMessage());
+                break;
+            case NOTIFICATION:
+                NotificationMessage notificationMessage = gson.fromJson(jsonMessage, NotificationMessage.class);
+                // Display the notification message
+                System.out.println("Notification: " + notificationMessage.getNotificationMessage());
+                // FIXME: Update the UI to show the notification, if necessary
+                //gameplayUI.showNotification(notificationMessage.getNotificationMessage());
+                break;
+
+        }
     }
 
     public void exit() {

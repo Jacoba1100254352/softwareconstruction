@@ -4,7 +4,7 @@ public class LoadGameMessage extends ServerMessage {
     private String loadGameMessage;
 
     public LoadGameMessage(String loadGameMessage) {
-        super(ServerMessageType.ERROR);
+        super(ServerMessageType.LOAD_GAME);
         this.loadGameMessage = loadGameMessage;
     }
 

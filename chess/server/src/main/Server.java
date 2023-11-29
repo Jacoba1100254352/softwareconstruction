@@ -1,8 +1,4 @@
-package servers;
-
-import adapters.ChessWebSocketAdapter;
 import handlers.*;
-import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import spark.Request;
 import spark.Response;
@@ -12,13 +8,13 @@ import org.eclipse.jetty.websocket.server.NativeWebSocketServletContainerInitial
 
 import java.util.HashMap;
 
-public class ChessServer {
+public class Server {
     /**
      * Handlers for service requests and responses.
      */
     private final HashMap<String, BaseHandler> handlers;
 
-    public ChessServer() {
+    public Server() {
         // Initialize handlers
         handlers = new HashMap<>();
 
@@ -37,7 +33,10 @@ public class ChessServer {
     }
 
     public static void main(String[] args) {
-        ChessServer server = new ChessServer();
+        // Setup server instance
+        Server server = new Server();
+
+        // Start the server
         server.start();
 
         // Register a shutdown hook
@@ -95,12 +94,12 @@ public class ChessServer {
 
     private void setupWebSocketServer() {
         int webSocketPort = 8081;
-        Server jettyServer = new Server(webSocketPort);
+        org.eclipse.jetty.server.Server jettyServer = new org.eclipse.jetty.server.Server(webSocketPort);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
 
         NativeWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
-            wsContainer.addMapping("/ws/*", ChessWebSocketAdapter.class);
+            wsContainer.addMapping("/ws/*", WebSocketHandler.class);
         });
 
         jettyServer.setHandler(context);
@@ -113,21 +112,13 @@ public class ChessServer {
         }
     }
 
-    /*public void broadcastMessage(String message) {
-        for (Session session : clientSessions) {
-            try {
-                session.getRemote().sendString(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
-
     public void stopServer() {
+        // TODO: Perform necessary shutdown logic, For example, gracefully close WebSocket connections, release resources, etc.
+
         // Stop the Spark server
         Spark.stop();
 
         // Stop the Spark server
-        System.out.println("server.Server stopped successfully.");
+        System.out.println("Server stopped successfully.");
     }
 }

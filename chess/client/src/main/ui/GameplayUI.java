@@ -58,4 +58,18 @@ public class GameplayUI {
             board[board.length - 1 - i] = temp;
         }
     }
+
+    public void handleWebSocketMessage(String message) {
+        // TODO: Process the incoming WebSocket message
+        // Update the game state, draw the board, show errors, etc.
+        System.out.println("Processing WebSocket message: " + message);
+        // Example: Update the chessboard based on the message
+    }
+
+    public void sendGameCommand(String command) {
+        // TODO: Send a game command through the WebSocket
+        // This method can be called by other parts of the UI
+        // Example: client.getWebSocketClient().sendMessage(command);
+    }
+
 }
