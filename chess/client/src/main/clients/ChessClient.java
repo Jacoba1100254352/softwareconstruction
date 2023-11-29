@@ -1,4 +1,4 @@
-package client;
+package clients;
 
 import serverFacade.ServerFacade;
 import ui.*;
@@ -11,6 +11,7 @@ public class ChessClient {
     private boolean isAdmin;
     private boolean isRunning;
     private boolean isLoggedIn;
+    private WebSocketClient webSocketClient;
 
     public ChessClient() {
         ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
@@ -28,6 +29,17 @@ public class ChessClient {
                 preloginUI.displayMenu();
             }
         }
+    }
+
+    public void connectToGameServer() {
+        WebSocketClient webSocketClient = new WebSocketClient(new WebSocketClient.MessageHandler() {
+            public void handleMessage(String message) {
+                // Implement handling of incoming WebSocket messages
+                // For example, update the UI based on the message content
+                System.out.println("Message received from server: " + message);
+            }
+        });
+        webSocketClient.connectToWebSocket("ws://localhost:8081/ws");
     }
 
     public void exit() {

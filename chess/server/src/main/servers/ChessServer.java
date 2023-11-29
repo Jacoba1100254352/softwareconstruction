@@ -1,21 +1,32 @@
+package servers;
+
+import adapters.ChessWebSocketAdapter;
 import handlers.*;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
 
+import org.eclipse.jetty.websocket.server.NativeWebSocketServletContainerInitializer;
+
 import java.util.HashMap;
 
-public class Server {
+public class ChessServer {
     /**
      * Handlers for service requests and responses.
      */
     private final HashMap<String, BaseHandler> handlers;
 
-    public Server() {
+    public ChessServer() {
         // Initialize handlers
         handlers = new HashMap<>();
 
         // Set up the handlers
+        setupHandlers();
+    }
+
+    private void setupHandlers() {
         handlers.put("/db:DELETE", new ClearHandler());
         handlers.put("/user:POST", new RegisterHandler());
         handlers.put("/session:POST", new LoginHandler());
@@ -26,7 +37,7 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        Server server = new Server();
+        ChessServer server = new ChessServer();
         server.start();
 
         // Register a shutdown hook
@@ -46,7 +57,7 @@ public class Server {
             } catch (Exception e) {
                 res.status(500);
                 res.type("application/json");
-                return "{\"error\":\"Internal Server Error: " + e.getMessage() + "\"}";
+                return "{\"error\":\"Internal server.Server Error: " + e.getMessage() + "\"}";
             }
         } else {
             res.status(404);
@@ -56,6 +67,13 @@ public class Server {
     }
 
     public void start() {
+        setupSparkServer();
+
+        // Start WebSocket server
+        setupWebSocketServer();
+    }
+
+    private void setupSparkServer() {
         // Set the Spark port
         Spark.port(8080);
 
@@ -75,11 +93,41 @@ public class Server {
         Spark.init();
     }
 
+    private void setupWebSocketServer() {
+        int webSocketPort = 8081;
+        Server jettyServer = new Server(webSocketPort);
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+
+        NativeWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
+            wsContainer.addMapping("/ws/*", ChessWebSocketAdapter.class);
+        });
+
+        jettyServer.setHandler(context);
+
+        try {
+            jettyServer.start();
+            System.out.println("WebSocket Server started on port " + webSocketPort);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*public void broadcastMessage(String message) {
+        for (Session session : clientSessions) {
+            try {
+                session.getRemote().sendString(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }*/
+
     public void stopServer() {
         // Stop the Spark server
         Spark.stop();
 
         // Stop the Spark server
-        System.out.println("Server stopped successfully.");
+        System.out.println("server.Server stopped successfully.");
     }
 }

@@ -1,6 +1,6 @@
 package ui;
 
-import client.ChessClient;
+import clients.ChessClient;
 import serverFacade.ServerFacade;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

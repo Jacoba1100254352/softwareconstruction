@@ -1,6 +1,6 @@
 package ui;
 
-import client.ChessClient;
+import clients.ChessClient;
 import com.google.gson.*;
 import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;

@@ -3,7 +3,8 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
-import passoffTests.TestFactory;
+
+import testFactory.TestFactory;
 import passoffTests.obfuscatedTestClasses.TestServerFacade;
 import passoffTests.testClasses.TestClient;
 import passoffTests.testClasses.TestModels;
