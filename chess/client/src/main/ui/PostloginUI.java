@@ -171,8 +171,8 @@ public class PostloginUI {
             String response = serverFacade.sendPutRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
-                // TODO: Notify the ChessClient that the game join was successful
-                client.joinGameSuccessful();
+                // FIXME: Notify the ChessClient that the game join was successful
+                //client.joinGameSuccessful();
 
                 System.out.println();
                 System.out.println(asObserver ? "Joined game as observer successfully." : "Joined game successfully.");

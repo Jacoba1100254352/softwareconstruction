@@ -13,6 +13,7 @@ public class Server {
      * Handlers for service requests and responses.
      */
     private final HashMap<String, BaseHandler> handlers;
+    private final HashMap<String, Integer> requestCounts = new HashMap<>();
 
     public Server() {
         // Initialize handlers
@@ -56,12 +57,12 @@ public class Server {
             } catch (Exception e) {
                 res.status(500);
                 res.type("application/json");
-                return "{\"error\":\"Internal server.Server Error: " + e.getMessage() + "\"}";
+                return "{\"error\":\"Internal server error: " + e.getMessage() + "\"}";
             }
         } else {
             res.status(404);
             res.type("application/json");
-            return "{\"error\":\"Not Found\"}";
+            return "{\"error\":\"Endpoint " + req.pathInfo() + " not found\"}";
         }
     }
 
@@ -76,8 +77,23 @@ public class Server {
         // Set the Spark port
         Spark.port(8080);
 
-        // Set the location for static files
-        Spark.externalStaticFileLocation("src/web");
+        // Set security headers
+        Spark.before((request, response) -> {
+            response.header("Content-Security-Policy", "default-src 'self'");
+            response.header("X-Content-Type-Options", "nosniff");
+            response.header("X-Frame-Options", "SAMEORIGIN");
+            response.header("X-XSS-Protection", "1; mode=block");
+        });
+
+        // Basic rate limiting
+        /*Spark.before((request, response) -> {
+            String ip = request.ip();
+            int count = requestCounts.getOrDefault(ip, 0);
+            if (count > 100) { // Limit of 100 requests per IP, adjust as needed
+                Spark.halt(429, "Too many requests");
+            }
+            requestCounts.put(ip, count + 1);
+        });*/
 
         // Set the Spark routes
         Spark.delete("/db", this::handleRequest);
@@ -87,6 +103,9 @@ public class Server {
         Spark.get("/game", this::handleRequest);
         Spark.post("/game", this::handleRequest);
         Spark.put("/game", this::handleRequest);
+
+        // Map the /connect route for WebSocket
+        Spark.get("/connect", this::handleRequest);
 
         // Initialize the Spark server
         Spark.init();
@@ -113,12 +132,19 @@ public class Server {
     }
 
     public void stopServer() {
-        // TODO: Perform necessary shutdown logic, For example, gracefully close WebSocket connections, release resources, etc.
+        try {
+            // TODO: Perform necessary shutdown logic
+            // For example, gracefully close WebSocket connections, release resources, etc.
 
-        // Stop the Spark server
-        Spark.stop();
+            // Stop the Spark server
+            Spark.stop();
 
-        // Stop the Spark server
-        System.out.println("Server stopped successfully.");
+            // Additional logic for shutting down other components, if necessary
+
+            System.out.println("Server stopped successfully.");
+        } catch (Exception e) {
+            System.err.println("Error during server shutdown: " + e.getMessage());
+        }
     }
+
 }

@@ -56,28 +56,23 @@ public class ChessClient {
         switch (ServerMessage.ServerMessageType.valueOf(messageType)) {
             case LOAD_GAME:
                 LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
-                // Assuming loadGameMessage contains necessary information about the game state
-                // FIXME: Update the game board with this new state
-                //gameplayUI.updateGameState(loadGameMessage.getLoadGameMessage());
+                gameplayUI.updateGameState(loadGameMessage.getLoadGameMessage());
                 break;
 
             case ERROR:
                 ErrorMessage errorMessage = gson.fromJson(jsonMessage, ErrorMessage.class);
-                // Display the error message to the user
                 System.out.println("Error received: " + errorMessage.getErrorMessage());
-                // FIXME: You might also want to update the UI to reflect that an error occurred
-                //gameplayUI.displayError(errorMessage.getErrorMessage());
-                break;
-            case NOTIFICATION:
-                NotificationMessage notificationMessage = gson.fromJson(jsonMessage, NotificationMessage.class);
-                // Display the notification message
-                System.out.println("Notification: " + notificationMessage.getNotificationMessage());
-                // FIXME: Update the UI to show the notification, if necessary
-                //gameplayUI.showNotification(notificationMessage.getNotificationMessage());
+                gameplayUI.displayError(errorMessage.getErrorMessage());
                 break;
 
+            case NOTIFICATION:
+                NotificationMessage notificationMessage = gson.fromJson(jsonMessage, NotificationMessage.class);
+                System.out.println("Notification: " + notificationMessage.getNotificationMessage());
+                gameplayUI.showNotification(notificationMessage.getNotificationMessage());
+                break;
         }
     }
+
 
     public void exit() {
         isRunning = false;

@@ -1,5 +1,9 @@
 package handlers;
 
+import chess.InvalidMoveException;
+import dataAccess.DataAccessException;
+import dataAccess.GameDAO;
+import models.Game;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import com.google.gson.Gson;
@@ -35,67 +39,98 @@ public class WebSocketHandler {
 
     private void processMessage(Session session, String message) {
         try {
-            UserGameCommand command = gson.fromJson(message, UserGameCommand.class);
-            // Determine the type of command and handle accordingly
-            switch (command.getCommandType()) {
-                case JOIN_PLAYER:
-                    handleJoinPlayer(session, gson.fromJson(message, JoinPlayerCommand.class));
-                    break;
-                case JOIN_OBSERVER:
-                    handleJoinObserver(session, gson.fromJson(message, JoinObserverCommand.class));
-                    break;
-                case MAKE_MOVE:
-                    handleMakeMove(session, gson.fromJson(message, MakeMoveCommand.class));
-                    break;
-                // Add cases for LEAVE and RESIGN
-                default:
-                    sendErrorMessage(session, "Unknown command type");
+            switch (gson.fromJson(message, UserGameCommand.class).getCommandType()) {
+                case JOIN_PLAYER -> handleJoinPlayer(session, gson.fromJson(message, JoinPlayerCommand.class));
+                case JOIN_OBSERVER -> handleJoinObserver(session, gson.fromJson(message, JoinObserverCommand.class));
+                case MAKE_MOVE -> handleMakeMove(session, gson.fromJson(message, MakeMoveCommand.class));
+                case LEAVE -> handleLeave(session, gson.fromJson(message, LeaveCommand.class));
+                case RESIGN -> handleResign(session, gson.fromJson(message, ResignCommand.class));
+                default -> sendErrorMessage(session, "Unknown command type");
             }
         } catch (Exception e) {
             sendErrorMessage(session, "Invalid message format");
         }
     }
 
-    private void handleJoinPlayer(Session session, JoinPlayerCommand command) {
-        // TODO: Add your game logic here
-        // Example: Add the player to the game with the specified ID and color
-        // If successful, send a confirmation message back to the client
-        // If not successful, send an error message
 
-        // Pseudocode:
-        // if (addPlayerToGame(command.getGameID(), command.getPlayerColor())) {
-        //     sendMessage(session, new NotificationMessage("Player joined: " + command.getPlayerColor()));
-        // } else {
-        //     sendErrorMessage(session, "Could not join player to game");
-        // }
+    private void handleJoinPlayer(Session session, JoinPlayerCommand command) {
+        try {
+            GameDAO gameDAO = new GameDAO();
+            Game game = gameDAO.findGameById(command.getGameID());
+            if (game != null) {
+                gameDAO.claimSpot(command.getGameID(), userSessions.get(session), command.getPlayerColor());
+                sendMessage(session, new NotificationMessage("Player joined: " + command.getPlayerColor()));
+            } else {
+                sendErrorMessage(session, "Game not found");
+            }
+        } catch (DataAccessException e) {
+            sendErrorMessage(session, "Database error: " + e.getMessage());
+        }
     }
 
-    private void handleJoinObserver(Session session, JoinObserverCommand command) {
-        // TODO: Add your game logic for an observer joining a game
-        // Similar to handleJoinPlayer, but for adding observers
 
-        // Pseudocode:
-        // if (addObserverToGame(command.getGameID())) {
-        //     sendMessage(session, new NotificationMessage("Observer joined game"));
-        // } else {
-        //     sendErrorMessage(session, "Could not add observer to game");
-        // }
+    private void handleJoinObserver(Session session, JoinObserverCommand command) {
+        try {
+            GameDAO gameDAO = new GameDAO();
+            Game game = gameDAO.findGameById(command.getGameID());
+            if (game != null) {
+                // FIXME: Assuming there's a method in Game to add an observer
+                // game.getGame().addObserver(session);
+                sendMessage(session, new NotificationMessage("Observer joined game ID: " + command.getGameID()));
+            } else {
+                sendErrorMessage(session, "Game not found");
+            }
+        } catch (DataAccessException e) {
+            sendErrorMessage(session, "Database error: " + e.getMessage());
+        }
     }
 
     private void handleMakeMove(Session session, MakeMoveCommand command) {
-        // TODO: Process the move made by a player
-        // Validate the move, update the game state, and notify all clients about the move
+        try {
+            GameDAO gameDAO = new GameDAO();
+            Game game = gameDAO.findGameById(command.getGameID());
+            if (game != null) {
+                try {
+                    game.getGame().makeMove(command.getMove());
+                    broadcastToAllClients(new LoadGameMessage("Updated game state for game ID: " + command.getGameID()));
+                } catch (InvalidMoveException e) {
+                    sendErrorMessage(session, "Invalid move: " + e.getMessage());
+                }
+            } else {
+                sendErrorMessage(session, "Game not found");
+            }
+        } catch (DataAccessException e) {
+            sendErrorMessage(session, "Error processing move: " + e.getMessage());
+        }
+    }
 
-        // Pseudocode:
-        // if (makeMoveInGame(command.getGameID(), command.getMove())) {
-        //     broadcastToAllClients(new LoadGameMessage("Updated game state"));
+    private void handleLeave(Session session, LeaveCommand command) {
+        try {
+            GameDAO gameDAO = new GameDAO();
+            Game game = gameDAO.findGameById(command.getGameID());
+            if (game != null) {
+                // FIXME: Assuming there's a method in Game to remove a player
+                //game.getGame().removePlayer(session);
+                sendMessage(session, new NotificationMessage("Player left game ID: " + command.getGameID()));
+            } else {
+                sendErrorMessage(session, "Game not found");
+            }
+        } catch (DataAccessException e) {
+            sendErrorMessage(session, "Database error: " + e.getMessage());
+        }
+    }
+
+
+    private void handleResign(Session session, ResignCommand command) {
+        // TODO: Add your game logic for a player resigning from a game
+
+        // Psuedocode:
+        // if (removePlayerFromGame(command.getGameID(), command.getPlayerColor())) {
+        //     sendMessage(session, new NotificationMessage("Player resigned: " + command.getPlayerColor()));
         // } else {
-        //     sendErrorMessage(session, "Invalid move");
+        //     sendErrorMessage(session, "Could not remove player from game");
         // }
     }
-    // These methods should interact with your game logic and send appropriate responses.
-
-    // TODO: Implement additional methods for LEAVE and RESIGN commands
 
     private void sendErrorMessage(Session session, String errorMessage) {
         try {
@@ -116,5 +151,14 @@ public class WebSocketHandler {
         }
     }
 
-    // Additional utility methods can be added as needed
+    private void broadcastToAllClients(ServerMessage message) {
+        String jsonMsg = gson.toJson(message);
+        userSessions.keySet().forEach(session -> {
+            try {
+                session.getRemote().sendString(jsonMsg);
+            } catch (IOException e) {
+                System.err.println("Error broadcasting message: " + e.getMessage());
+            }
+        });
+    }
 }

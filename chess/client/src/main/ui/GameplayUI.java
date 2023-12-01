@@ -1,5 +1,8 @@
 package ui;
 
+import com.google.gson.Gson;
+import webSocketMessages.serverMessages.*;
+
 public class GameplayUI {
 
     public void drawChessboard() {
@@ -59,17 +62,46 @@ public class GameplayUI {
         }
     }
 
+
+    ///   WebSocket Functions   ///
+
     public void handleWebSocketMessage(String message) {
-        // TODO: Process the incoming WebSocket message
-        // Update the game state, draw the board, show errors, etc.
-        System.out.println("Processing WebSocket message: " + message);
-        // Example: Update the chessboard based on the message
+        Gson gson = new Gson();
+        ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME:
+                LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+                updateGameState(loadGameMessage.getLoadGameMessage());
+                break;
+            case ERROR:
+                ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+                displayError(errorMessage.getErrorMessage());
+                break;
+            case NOTIFICATION:
+                NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+                showNotification(notificationMessage.getNotificationMessage());
+                break;
+            default:
+                System.out.println("Unknown message type received");
+                break;
+        }
     }
 
     public void sendGameCommand(String command) {
-        // TODO: Send a game command through the WebSocket
-        // This method can be called by other parts of the UI
-        // Example: client.getWebSocketClient().sendMessage(command);
+        // Assuming you have a WebSocketClient instance in your GameplayUI
+        // myWebSocketClient.sendMessage(command);
     }
 
+    public void updateGameState(String gameState) {
+        // TODO: Implement logic to update the game state based on the gameState string
+    }
+
+    public void displayError(String errorMessage) {
+        // TODO: Implement logic to display error messages to the user
+    }
+
+    public void showNotification(String notificationMessage) {
+        // TODO: Implement logic to show notifications to the user
+    }
 }
