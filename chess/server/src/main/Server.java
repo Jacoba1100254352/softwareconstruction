@@ -1,10 +1,7 @@
 import handlers.*;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-
-import org.eclipse.jetty.websocket.server.NativeWebSocketServletContainerInitializer;
 
 import java.util.HashMap;
 
@@ -13,7 +10,6 @@ public class Server {
      * Handlers for service requests and responses.
      */
     private final HashMap<String, BaseHandler> handlers;
-    private final HashMap<String, Integer> requestCounts = new HashMap<>();
 
     public Server() {
         // Initialize handlers
@@ -67,15 +63,10 @@ public class Server {
     }
 
     public void start() {
-        setupSparkServer();
-
-        // Start WebSocket server
-        setupWebSocketServer();
-    }
-
-    private void setupSparkServer() {
         // Set the Spark port
         Spark.port(8080);
+
+        Spark.webSocket("/connect", WebSocketHandler.class);
 
         // Set security headers
         Spark.before((request, response) -> {
@@ -104,31 +95,8 @@ public class Server {
         Spark.post("/game", this::handleRequest);
         Spark.put("/game", this::handleRequest);
 
-        // Map the /connect route for WebSocket
-        Spark.get("/connect", this::handleRequest);
-
         // Initialize the Spark server
         Spark.init();
-    }
-
-    private void setupWebSocketServer() {
-        int webSocketPort = 8081;
-        org.eclipse.jetty.server.Server jettyServer = new org.eclipse.jetty.server.Server(webSocketPort);
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-        NativeWebSocketServletContainerInitializer.configure(context, (servletContext, wsContainer) -> {
-            wsContainer.addMapping("/ws/*", WebSocketHandler.class);
-        });
-
-        jettyServer.setHandler(context);
-
-        try {
-            jettyServer.start();
-            System.out.println("WebSocket Server started on port " + webSocketPort);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void stopServer() {
@@ -146,5 +114,4 @@ public class Server {
             System.err.println("Error during server shutdown: " + e.getMessage());
         }
     }
-
 }
