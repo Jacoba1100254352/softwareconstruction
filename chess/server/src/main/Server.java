@@ -1,5 +1,4 @@
 import handlers.*;
-import handlers.httpHandlers.*;
 import handlers.webSocketHandlers.WebSocketHandler;
 import spark.Request;
 import spark.Response;

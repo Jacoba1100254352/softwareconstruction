@@ -13,7 +13,6 @@ import webSocketMessages.serverMessages.*;
 import java.util.logging.Logger;
 
 public class ChessClient {
-    private final Logger LOGGER = Logger.getLogger(ChessClient.class.getName());
     private final PreloginUI preloginUI;
     private final PostloginUI postloginUI;
     private final GameplayUI gameplayUI;

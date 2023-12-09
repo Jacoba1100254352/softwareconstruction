@@ -1,9 +1,8 @@
 import models.User;
 import org.junit.jupiter.api.*;
-import requests.httpRequests.*;
+import requests.*;
 import responses.*;
-import responses.httpResponses.*;
-import services.httpServices.*;
+import services.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ServiceTests {
