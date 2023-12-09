@@ -1,9 +1,32 @@
 package ui;
 
+import chess.*;
+import WebSocketFacade.WebSocketFacade;
+import clients.ChessClient;
 import com.google.gson.Gson;
-import webSocketMessages.serverMessages.*;
+import com.google.gson.JsonObject;
+import models.Game;
+
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static ui.EscapeSequences.*;
 
 public class GameplayUI {
+    private static final Logger LOGGER = Logger.getLogger(GameplayUI.class.getName());
+    private final WebSocketFacade webSocketFacade;
+    private final ChessClient chessClient;
+
+    // Constructor
+    public GameplayUI(ChessClient chessClient) {
+        this.chessClient = chessClient;
+        this.webSocketFacade = new WebSocketFacade(chessClient);
+
+        connectToGameServer();
+    }
+
+    ///   Gameplay Functions   ///
 
     public void drawChessboard() {
         System.out.println("Initial Chessboard State:");
@@ -31,7 +54,7 @@ public class GameplayUI {
         }
     }
 
-    private String[][] initializeChessboard() {
+    /*private String[][] initializeChessboard() {
         String[][] board = new String[8][8];
 
         String[] blackPieces = {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
@@ -52,7 +75,7 @@ public class GameplayUI {
         }
 
         return board;
-    }
+    }*/
 
     private void reverseBoard(String[][] board) {
         for (int i = 0; i < board.length / 2; i++) {
@@ -65,43 +88,125 @@ public class GameplayUI {
 
     ///   WebSocket Functions   ///
 
-    public void handleWebSocketMessage(String message) {
-        Gson gson = new Gson();
-        ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-
-        switch (serverMessage.getServerMessageType()) {
-            case LOAD_GAME:
-                LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
-                updateGameState(loadGameMessage.getLoadGameMessage());
-                break;
-            case ERROR:
-                ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
-                displayError(errorMessage.getErrorMessage());
-                break;
-            case NOTIFICATION:
-                NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
-                showNotification(notificationMessage.getNotificationMessage());
-                break;
-            default:
-                System.out.println("Unknown message type received");
-                break;
+    public void connectToGameServer() {
+        try {
+            webSocketFacade.connect("ws://localhost:8081/connect");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
         }
     }
 
-    public void sendGameCommand(String command) {
-        // Assuming you have a WebSocketClient instance in your GameplayUI
-        // myWebSocketClient.sendMessage(command);
-    }
+    public void updateGameState(String gameStateJson) {
+        // Parse the gameState JSON string to update the Game object
+        Gson gson = new Gson();
+        Game updatedGame = gson.fromJson(gameStateJson, Game.class);
 
-    public void updateGameState(String gameState) {
-        // TODO: Implement logic to update the game state based on the gameState string
+        // Assuming you have a method in ChessClient to update its game state
+        chessClient.updateGame(updatedGame);
+
+        // Redraw the board with the updated game state
+        // Note: You may need to adapt the redraw method to handle the Game object
+        redraw(updatedGame.getGame(), null, null);
     }
 
     public void displayError(String errorMessage) {
-        // TODO: Implement logic to display error messages to the user
+        System.out.println("Error: " + errorMessage);
+        // Add any additional UI handling for errors here
     }
 
     public void showNotification(String notificationMessage) {
-        // TODO: Implement logic to show notifications to the user
+        System.out.println("Notification: " + notificationMessage);
+        // Add any additional UI handling for notifications here
     }
+
+    // Method to redraw the chessboard
+    public void redraw(ChessGame game, ArrayList<ChessPosition> highlights, ChessPosition pieceToHighlight) {
+        String[][] board = initializeChessboard();
+        updateBoardWithPieces(board, game);
+        printBoard(board, highlights, pieceToHighlight);
+    }
+
+    // Initialize an empty chessboard
+    private String[][] initializeChessboard() {
+        String[][] board = new String[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = "   "; // Empty space
+            }
+        }
+        return board;
+    }
+
+    // Update the board with pieces from the game state
+    private void updateBoardWithPieces(String[][] board, ChessGame game) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPositionImpl position = new ChessPositionImpl(row, col);
+                ChessPiece piece = game.getBoard().getPiece(position);
+                if (piece != null) {
+                    board[row - 1][col - 1] = piece.getPieceType().name(); // Replace 'getSymbol' with your method to get piece representation
+                }
+            }
+        }
+    }
+
+    // Print the chessboard to the console
+    private void printBoard(String[][] board, ArrayList<ChessPosition> highlights, ChessPosition pieceToHighlight) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                String cell = board[i][j];
+                if (highlights != null && highlights.contains(new ChessPositionImpl(i + 1, j + 1))) {
+                    cell = "[" + cell + "]"; // Highlighted cell
+                }
+                if (pieceToHighlight != null && pieceToHighlight.equals(new ChessPositionImpl(i + 1, j + 1))) {
+                    cell = "{" + cell + "}"; // Specifically highlighted piece
+                }
+                System.out.print(cell + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void displayBoard(ChessBoard board, String color, ArrayList<ChessPosition> highlights, ChessPosition pieceToHighlight) {
+        String rowLabels, colLabels;
+        int startRow, endRow, stepRow;
+
+        if (color.equals("white")) {
+            rowLabels = "    a  b  c  d  e  f  g  h    ";
+            colLabels = "  8 7 6 5 4 3 2 1 ";
+            startRow = 8; endRow = 0; stepRow = -1;
+        } else {
+            rowLabels = "    h  g  f  e  d  c  b  a    ";
+            colLabels = "  1 2 3 4 5 6 7 8 ";
+            startRow = 1; endRow = 9; stepRow = 1;
+        }
+
+        System.out.println(rowLabels);
+        for (int row = startRow; row != endRow; row += stepRow) {
+            System.out.print((row % 8 + 1) + " ");
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition curPos = new ChessPositionImpl(row, col);
+                String bgColor = ((row + col) % 2 == 0) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
+
+                if (highlights != null && highlights.contains(curPos)) {
+                    bgColor = ((row + col) % 2 == 0) ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_GREEN;
+                }
+                if (pieceToHighlight != null && pieceToHighlight.equals(curPos)) {
+                    bgColor = SET_BG_COLOR_YELLOW;
+                }
+
+                String pieceStr = "   ";
+                ChessPiece piece = board.getPiece(curPos);
+                if (piece != null) {
+                    String pieceColor = (piece.teamColor() == ChessGame.TeamColor.WHITE) ? SET_TEXT_COLOR_RED : SET_TEXT_COLOR_BLUE;
+                    pieceStr = " " + piece.toString().toUpperCase() + " ";
+                    System.out.print(pieceColor);
+                }
+                System.out.print(bgColor + pieceStr);
+            }
+            System.out.println((row % 8 + 1));
+        }
+        System.out.println(colLabels);
+    }
+
 }

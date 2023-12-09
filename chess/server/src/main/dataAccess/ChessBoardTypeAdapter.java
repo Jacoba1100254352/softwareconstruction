@@ -11,16 +11,16 @@ import java.util.Map;
 class ChessBoardTypeAdapter extends TypeAdapter<ChessBoard> {
 
     @Override
-    public void write(JsonWriter out, ChessBoard value) throws IOException {
+    public void write(JsonWriter out, ChessBoard board) throws IOException {
         // Return if value is null
-        if (value == null) {
+        if (board == null) {
             out.nullValue();
             return;
         }
 
         // Serialize the board's state without casting to ChessBoardImpl or ChessPieceImpl
         out.beginObject();
-        for (Map.Entry<ChessPosition, ChessPiece> entry : ((ChessBoardImpl) value).getBoard().entrySet()) {
+        for (Map.Entry<ChessPosition, ChessPiece> entry : ((ChessBoardImpl) board).getBoard().entrySet()) {
             ChessPosition pos = entry.getKey();
             ChessPiece piece = entry.getValue();
             String position = pos.getRow() + ":" + pos.getCol();

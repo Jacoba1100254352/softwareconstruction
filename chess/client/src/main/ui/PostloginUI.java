@@ -1,5 +1,6 @@
 package ui;
 
+import chess.*;
 import clients.ChessClient;
 import com.google.gson.*;
 import serverFacade.ServerFacade;
@@ -63,6 +64,8 @@ public class PostloginUI {
             case 3 -> joinGame();
             case 4 -> joinAsObserver();
             case 5 -> logout();
+            case 6 -> resignGame();
+            case 7 -> leaveGame();
             default -> printInvalidChoice();
         }
     }
@@ -158,34 +161,81 @@ public class PostloginUI {
             return;
         }
 
-        JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("gameID", gameId);
+        try {
+            if (asObserver) {
+                client.joinObserver(gameId);
+                System.out.println("Joined game as observer successfully.");
+            } else {
+                System.out.print("Enter color (WHITE/BLACK): ");
+                String color = scanner.next().toUpperCase();
+                client.joinPlayer(color, gameId);
+                System.out.println("Joined game successfully.");
+                // Prompt user for a move if they're joining as a player
+                promptForMove();
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Join game error: " + e.getMessage());
+            System.out.println("Failed to join game: " + e.getMessage());
+        }
+    }
 
-        if (!asObserver) {
-            System.out.print("Enter color (WHITE/BLACK): ");
-            String color = scanner.next().toUpperCase();
-            jsonRequest.addProperty("playerColor", color);
+    private void promptForMove() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter your move (e.g., e2 e4, or e7 e8 Q for pawn promotion): ");
+        String moveInput = scanner.nextLine();
+        String[] moveParts = moveInput.split(" ");
+
+        // Check for standard move format or move with promotion
+        if (moveParts.length != 2 && moveParts.length != 3) {
+            System.out.println("Invalid move format.");
+            return;
         }
 
         try {
-            String response = serverFacade.sendPutRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
-            JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
-            if (responseObject.get("success").getAsBoolean()) {
-                // FIXME: Notify the ChessClient that the game join was successful
-                //client.joinGameSuccessful();
+            // Use the third part of the input as the promotion piece if provided
+            String promotionPiece = (moveParts.length == 3) ? moveParts[2] : null;
+            ChessMove move = parseMoveInput(moveParts[0], moveParts[1], promotionPiece);
+            client.makeMove(move);
+            System.out.println("Move made successfully.");
+        } catch (Exception e) {
+            LOGGER.severe("Make move error: " + e.getMessage());
+            System.out.println("Failed to make move: " + e.getMessage());
+        }
+    }
 
-                System.out.println();
-                System.out.println(asObserver ? "Joined game as observer successfully." : "Joined game successfully.");
-                System.out.println();
+    // You need to implement this method to convert user input into a ChessMove object
+    private ChessMove parseMoveInput(String from, String to, String promotion) throws IllegalArgumentException {
+        // Parse the 'from' and 'to' strings into ChessPositionImpl objects
+        ChessPositionImpl startPos = parsePosition(from);
+        ChessPositionImpl endPos = parsePosition(to);
 
-                // Display Game Board
-                client.drawChessboard();
-            } else {
-                System.out.println("Failed to join game: " + responseObject.get("message").getAsString());
-            }
-        } catch (ServerFacadeException | IOException | URISyntaxException e) {
-            LOGGER.severe("Join game error: " + e.getMessage());
-            System.out.println("Failed to join game: " + e.getMessage());
+        // Parse the promotion piece, if provided
+        ChessPiece.PieceType promotionPiece = parsePromotionPiece(promotion);
+
+        // Return a new ChessMove object
+        return new ChessMoveImpl(startPos, endPos, promotionPiece);
+    }
+
+    private ChessPositionImpl parsePosition(String position) throws IllegalArgumentException {
+        if (position.length() != 2)
+            throw new IllegalArgumentException("Invalid position format.");
+
+        char colChar = position.toLowerCase().charAt(0);
+        int row = Integer.parseInt(position.substring(1));
+        int col = colChar - 'a' + 1; // Assuming 'a' is 1, 'b' is 2, etc.
+
+        return new ChessPositionImpl(row, col);
+    }
+
+    private ChessPiece.PieceType parsePromotionPiece(String promotion) {
+        if (promotion == null || promotion.isEmpty()) {
+            return null; // No promotion piece specified
+        }
+
+        try {
+            return ChessPiece.PieceType.valueOf(promotion.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid promotion piece type.");
         }
     }
 
@@ -207,6 +257,26 @@ public class PostloginUI {
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("Logout error: " + e.getMessage());
             System.out.println("Failed to logout: " + e.getMessage());
+        }
+    }
+
+    private void resignGame() {
+        try {
+            client.resignGame();
+            System.out.println("You have resigned from the game.");
+        } catch (Exception e) {
+            LOGGER.severe("Error resigning from game: " + e.getMessage());
+            System.out.println("Failed to resign from game: " + e.getMessage());
+        }
+    }
+
+    private void leaveGame() {
+        try {
+            client.leaveGame();
+            System.out.println("You have left the game.");
+        } catch (Exception e) {
+            LOGGER.severe("Error leaving game: " + e.getMessage());
+            System.out.println("Failed to leave game: " + e.getMessage());
         }
     }
 }
