@@ -18,7 +18,6 @@ public class ChessClient {
     private boolean isPlayer;
     private boolean canMove;
     private Integer curID; // Current game ID
-    private ChessGame.TeamColor currentPlayerColor; // Add a field to store the current player
     private String authToken;
 
     private String clientUsername; // Username of the current user
@@ -45,41 +44,6 @@ public class ChessClient {
             } else {
                 preloginUI.displayMenu();
             }
-        }
-    }
-
-    public void updateGame(ChessGame updatedGame) {
-        ChessGame.TeamColor currentTeamTurn = updatedGame.getTeamTurn();
-
-        // Note: If this is necessary, remove "&& false" segment
-        if (this.authToken != null && false) {
-            // Assuming currentUsername is set when user logs in or joins a game
-            // FIXME: if this is necessary the change from null
-            this.currentPlayerColor = getUserTeamColor(null, null); // Implement this method based on your application's logic
-
-            if (this.currentPlayerColor == currentTeamTurn) {
-                this.isPlayer = true;
-                this.canMove = true; // Implement logic to determine if the player can move
-            } else {
-                this.currentPlayerColor = null;
-                this.isPlayer = false;
-                this.canMove = false;
-            }
-        }
-
-        // Update the UI with the new game state
-        this.gameplayUI.redraw(updatedGame, null, null); // Adapt parameters as needed
-    }
-
-    private ChessGame.TeamColor getUserTeamColor(String whiteUsername, String blackUsername) {
-        if (clientUsername.equals(whiteUsername) && isPlayer) {
-            return ChessGame.TeamColor.WHITE;
-        } else if (clientUsername.equals(blackUsername) && isPlayer) {
-            return ChessGame.TeamColor.BLACK;
-        } else {
-            if (!isPlayer)
-                System.out.println("Error: Could not determine current player color or status");
-            return null;
         }
     }
 
@@ -157,7 +121,6 @@ public class ChessClient {
         this.isPlayer = true;
         this.canMove = true; // This might be true or false depending on the game logic
         this.curID = gameID;
-        this.currentPlayerColor = (colorStr.equals("WHITE")) ? ChessGame.TeamColor.WHITE : (colorStr.equals("BLACK")) ? ChessGame.TeamColor.BLACK : null;;
     }
 
     // Method to join a game as an observer
@@ -175,7 +138,6 @@ public class ChessClient {
         this.isPlayer = false;
         this.canMove = false;
         this.curID = gameID;
-        this.currentPlayerColor = null;
     }
 
     // Method to notify the user about various types of messages

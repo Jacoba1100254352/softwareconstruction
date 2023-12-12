@@ -14,11 +14,9 @@ import static ui.EscapeSequences.*;
 public class GameplayUI {
     private static final Logger LOGGER = Logger.getLogger(GameplayUI.class.getName());
     private final WebSocketFacade webSocketFacade;
-    private final ChessClient chessClient;
 
     // Constructor
     public GameplayUI(ChessClient chessClient) {
-        this.chessClient = chessClient;
         this.webSocketFacade = new WebSocketFacade(chessClient);
 
         connectToGameServer();
@@ -92,14 +90,6 @@ public class GameplayUI {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
         }
-    }
-
-    public void updateGameState(ChessGame updatedGame) {
-        // Update the ChessClient's game state
-        //chessClient.updateGame(updatedGame);
-
-        // Redraw the board with the updated game state
-        redraw(updatedGame, null, null);
     }
 
     public void displayError(String errorMessage) {

@@ -52,7 +52,7 @@ public class WebSocketFacade extends Endpoint {
             case LOAD_GAME:
                 LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
                 ChessGame updatedGame = loadGameMessage.getGame();
-                chessClient.getGameplayUI().updateGameState(updatedGame);
+                chessClient.getGameplayUI().redraw(updatedGame, null, null);
                 break;
 
             case ERROR:
@@ -68,6 +68,8 @@ public class WebSocketFacade extends Endpoint {
                 break;
         }
     }
+
+
 
     public void connect(String uri) throws Exception {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
