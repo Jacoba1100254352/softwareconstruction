@@ -1,5 +1,7 @@
 package services;
 
+import chess.ChessGame;
+import chess.ChessGameImpl;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
@@ -29,8 +31,10 @@ public class CreateGameService {
                 return new CreateGameResponse("Error: unauthorized");
 
             // Create a new Game object
+            ChessGame game = new ChessGameImpl();
+            game.getBoard().resetBoard();
             Integer gameID = (!gameDAO.findAllGames().isEmpty()) ? gameDAO.getCurrentGameId() : 0;
-            Game newGame = new Game(gameID, request.getGameName());
+            Game newGame = new Game(gameID, request.getGameName(), game);
 
             // Insert the new Game object into the data store
             gameDAO.insertGame(newGame);

@@ -31,17 +31,18 @@ public class Game {
     ///   Constructor   ///
 
     /**
-     * Constructor for a new game with the given attributes. (Other attributes can be set later)
+     * Constructor for a new game with the given attributes.
      *
-     * @param gameID   The unique ID of the game.
-     * @param gameName The name of the game.
+     * @param gameID        The unique ID of the game.
+     * @param gameName      The name of the game.
+     * @param game          The Chess Game object.
      */
-    public Game(Integer gameID, String gameName) {
+    public Game(Integer gameID, String gameName, ChessGame game) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = null;
         this.blackUsername = null;
-        this.game = null;
+        this.game = game;
     }
 
     /**

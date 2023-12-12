@@ -22,7 +22,6 @@ public class CreateGameHandler extends BaseHandler {
                 case "Error: unauthorized" -> response.status(401);
                 default -> response.status(500);
             }
-            return result;
         }
 
         return result;
