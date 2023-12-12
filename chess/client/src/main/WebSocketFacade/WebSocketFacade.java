@@ -43,68 +43,50 @@ public class WebSocketFacade extends Endpoint {
         chessClient.notifyUser("Error: " + throwable.getMessage());
     }
 
-    @OnMessage
-    public void onMessage(String message) {
-        System.out.println("Raw message received: " + message);
-
-        Gson gson = new Gson();
-        JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
-        String messageType = jsonMessage.get("serverMessageType").getAsString();
-
-        switch ((new Gson().fromJson(message, ServerMessage.class)).getServerMessageType()) {//ServerMessage.ServerMessageType.valueOf(messageType)) {
-            case LOAD_GAME:
-                LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
-                ChessGame updatedGame = loadGameMessage.getGame();
-                chessClient.getGameplayUI().redraw(updatedGame, null, null);
-                break;
-
-            case ERROR:
-                ErrorMessage errorMessage = gson.fromJson(jsonMessage, ErrorMessage.class);
-                System.out.println("Error received: " + errorMessage.getErrorMessage());
-                chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
-                break;
-
-            case NOTIFICATION:
-                NotificationMessage notificationMessage = gson.fromJson(jsonMessage, NotificationMessage.class);
-                System.out.println("Notification: " + notificationMessage.getNotificationMessage());
-                chessClient.getGameplayUI().showNotification(notificationMessage.getNotificationMessage());
-                break;
-        }
-    }
-
-
-
     public void connect(String uri) throws Exception {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, new URI(uri));
 
         System.out.println("Connected to server");
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-            @Override
+            @OnMessage
             public void onMessage(String message) {
+                System.out.println("Raw message received: " + message);
+
                 Gson gson = new Gson();
-                JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
-                switch ((new Gson().fromJson(message, ServerMessage.class)).getServerMessageType()) {//ServerMessage.ServerMessageType.valueOf(messageType)) {
+                ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+
+                switch (serverMessage.getServerMessageType()) {
                     case LOAD_GAME:
-                        LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
-                        ChessGame updatedGame = loadGameMessage.getGame();
-                        chessClient.getGameplayUI().redraw(updatedGame, null, null);
+                        handleLoadGame(message);
                         break;
-
                     case ERROR:
-                        ErrorMessage errorMessage = gson.fromJson(jsonMessage, ErrorMessage.class);
-                        System.out.println("Error received: " + errorMessage.getErrorMessage());
-                        chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
+                        handleError(message);
                         break;
-
                     case NOTIFICATION:
-                        NotificationMessage notificationMessage = gson.fromJson(jsonMessage, NotificationMessage.class);
-                        System.out.println("Notification: " + notificationMessage.getNotificationMessage());
-                        chessClient.getGameplayUI().showNotification(notificationMessage.getNotificationMessage());
+                        handleNotification(message);
                         break;
                 }
             }
         });
+    }
+
+    private void handleLoadGame(String message) {
+        LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+        ChessGame updatedGame = loadGameMessage.getGame();
+        chessClient.getGameplayUI().redraw(updatedGame, null, null);
+    }
+
+    private void handleError(String message) {
+        ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+        System.out.println("Error received: " + errorMessage.getErrorMessage());
+        chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
+    }
+
+    private void handleNotification(String message) {
+        NotificationMessage notificationMessage = new Gson().fromJson(message, NotificationMessage.class);
+        System.out.println("Notification: " + notificationMessage.getNotificationMessage());
+        chessClient.getGameplayUI().showNotification(notificationMessage.getNotificationMessage());
     }
 
     public void sendMessage(String message) {

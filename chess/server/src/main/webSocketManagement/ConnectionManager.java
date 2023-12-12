@@ -1,44 +1,55 @@
 package webSocketManagement;
 
-import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class ConnectionManager {
-    // Concurrent to be thread safe
-    public final ConcurrentHashMap<String, ConnectionInstance> connections;
+    private final ConcurrentHashMap<String, ConnectionInstance> connections;
+    private final ConcurrentHashMap<Integer, Set<ConnectionInstance>> gameSessions;
 
     public ConnectionManager() {
         connections = new ConcurrentHashMap<>();
+        gameSessions = new ConcurrentHashMap<>();
     }
 
-    public void add(String username, Session session) {
-        connections.put(username, new ConnectionInstance(session, username));
+    public void add(String username, Session session, Integer gameID) {
+        ConnectionInstance instance = new ConnectionInstance(session, username);
+        connections.put(username, instance);
+        gameSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(instance);
     }
 
-    public void remove(String username) {
-        connections.remove(username);
+    public void remove(String username, Integer gameID) {
+        ConnectionInstance instance = connections.remove(username);
+        if (instance != null && gameID != null) {
+            Set<ConnectionInstance> gameSet = gameSessions.get(gameID);
+            if (gameSet != null) {
+                gameSet.remove(instance);
+                if (gameSet.isEmpty()) {
+                    gameSessions.remove(gameID);
+                }
+            }
+        }
     }
 
     public void removeAll() {
         connections.clear();
+        gameSessions.clear();
     }
 
-    public void sendToAll(String exceptUserName, Object notification) {
-        String jsonMessage = new Gson().toJson(notification);
-        for (ConnectionInstance connection : connections.values()) {
-            try {
-                if (connection.session.isOpen() && !connection.userName.equals(exceptUserName)) {
-                    connection.send(jsonMessage);
-                }
-            } catch (IOException e) {
-                System.out.println("Error sending message to " + connection.userName + ": " + e.getMessage());
-                // Optionally remove the session if it's not open anymore
-                if (!connection.session.isOpen()) {
-                    remove(connection.userName);
-                }
+    public Map<String, Session> getSessionsFromGame(Integer gameID) {
+        Map<String, Session> sessions = new HashMap<>();
+        Set<ConnectionInstance> gameSet = gameSessions.get(gameID);
+        if (gameSet != null) {
+            for (ConnectionInstance instance : gameSet) {
+                sessions.put(instance.userName, instance.session);
             }
         }
+        return sessions;
+    }
+
+    public Collection<Session> getAllSessions() {
+        return connections.values().stream().map(ConnectionInstance::getSession).collect(Collectors.toList());
     }
 }

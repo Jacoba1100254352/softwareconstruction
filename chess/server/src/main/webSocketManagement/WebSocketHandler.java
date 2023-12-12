@@ -18,13 +18,15 @@ public class WebSocketHandler {
     private final GameDAO gameDAO;
     private final ConnectionManager connectionManager;
     private final ObserverManager observerManager;
+    private final MessageDispatcher messageDispatcher;
     private final Gson gson;
 
     public WebSocketHandler() {
         gameDAO = new GameDAO();
         connectionManager = new ConnectionManager();
-        observerManager = new ObserverManager(); // Initialize ObserverManager
-        //gson = new GsonBuilder().registerTypeAdapter(ChessPosition.class, new PosAdapter()).registerTypeAdapter(ChessMove.class, new MoveAdapter()).create();
+        observerManager = new ObserverManager();
+        messageDispatcher = new MessageDispatcher(connectionManager, observerManager);
+        //gson = new GsonBuilder().registerTypeAdapter(ChessPosition.class, new ChessPosAdapter()).registerTypeAdapter(ChessMove.class, new ChessMoveAdapter()).create();
         gson = new Gson();// new GsonBuilder().registerTypeAdapter(ChessBoard.class, new ChessBoardTypeAdapter()).create();
     }
 
@@ -61,43 +63,39 @@ public class WebSocketHandler {
     }
 
     private void handleJoinObserver(Session session, JoinObserverCommand gameCmd) throws Exception {
-        Integer gameId = gameCmd.getGameID();
-        Game game = gameDAO.findGameByID(gameId);
+        Integer gameID = gameCmd.getGameID();
+        Game game = gameDAO.findGameByID(gameID);
 
         // Find the game by ID and handle cases where the game doesn't exist
         if (game == null || game.getGameName() == null) {
-            sendError(session, "Error 403: Bad request, game id not in database");
+            ErrorMessage errorMessage = new ErrorMessage("Error 403: Bad request, game id not in database"); // "Error 404: Game not found"
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
         // Find the username from the auth token
         String userName = findUser(session, gameCmd.getAuthString());
         if (userName == null) {
-            sendError(session, "Error 401: Unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Error 401: Unauthorized");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
         // Add the user as an observer if they are not already observing
-        observerManager.addObserver(gameId, session);
+        observerManager.addObserver(gameID, session);
+        connectionManager.add(userName, session, gameID);
 
-        // Notify all users about the new observer and update the game state
-        NotificationMessage notification = new NotificationMessage(userName + " now observing");
-
-        System.out.println("User " + userName + " is being added as an observer for game " + gameId);
-        System.out.println("Sending notification: " + notification.getNotificationMessage());
-
-        connectionManager.add(userName, session);
-        connectionManager.sendToAll(userName, notification);
-
-        // Send a notification to all users about the new observer
-        broadcastToGame(gameCmd.getGameID(), new NotificationMessage(userName + " now observing"));
-
-        // Send game state to the new observer
+        // Send game state to the new observer first
         if (game.getGame() != null) {
-            sendMessage(session, new LoadGameMessage(game.getGame()));
+            messageDispatcher.sendMessage(session, new LoadGameMessage(game.getGame()));
         } else {
-            sendError(session, "Error: Unable to load game data");
+            ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
+            messageDispatcher.sendMessage(session, errorMessage);
         }
+
+        // Prepare and broadcast notification to all players and observers in the game, except the new observer
+        NotificationMessage notification = new NotificationMessage(userName + " now observing");
+        messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
     }
 
     /**
@@ -117,7 +115,8 @@ public class WebSocketHandler {
 
         // Check if the game is valid
         if (game == null) {
-            sendError(session, "Error 404: Game not found");
+            ErrorMessage errorMessage = new ErrorMessage("Error 404: Game not found");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
@@ -127,13 +126,15 @@ public class WebSocketHandler {
         // Identify the user from the session
         String userName = findUser(session, gameCmd.getAuthString());
         if (userName == null) {
-            sendError(session, "Error 401: Unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Error 401: Unauthorized");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
         // Check if the color is already taken
         if (!userName.equals(userInGame)) {
-            sendError(session, "Error 403: Color already taken");
+            ErrorMessage errorMessage = new ErrorMessage("Error 403: Color already taken");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
@@ -145,13 +146,13 @@ public class WebSocketHandler {
         // Update the game with the new player
         gameDao.updateGame(game);
 
-        // Notify all connected clients about the new player
-        NotificationMessage notification = new NotificationMessage(userName + " joined as " + color);
-        connectionManager.add(userName, session);
-        connectionManager.sendToAll(userName, notification);
+        // Prepare and send LOAD_GAME message to the joining player first
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
+        messageDispatcher.sendMessage(session, loadGameMessage);
 
-        // Send the updated game state to the joining player
-        session.getRemote().sendString(gson.toJson(new LoadGameMessage(game.getGame())));
+        // Prepare and broadcast notification to all players and observers in the game, except the joining player
+        NotificationMessage notification = new NotificationMessage(userName + " joined game as " + gameCmd.getPlayerColor().toString()+".");
+        messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
     }
 
     /**
@@ -164,7 +165,8 @@ public class WebSocketHandler {
         // Identify the user from the session
         String userName = findUser(session, gameCmd.getAuthString());
         if (userName == null) {
-            sendError(session, "Error 401: Unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Error 401: Unauthorized");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
@@ -172,7 +174,8 @@ public class WebSocketHandler {
         GameDAO gameDao = new GameDAO();
         Game game = gameDao.findGameByID(gameCmd.getGameID());
         if (game == null) {
-            sendError(session, "Error 404: Game not found");
+            ErrorMessage errorMessage = new ErrorMessage("Error 404: Game not found");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
@@ -187,13 +190,14 @@ public class WebSocketHandler {
         // Process the move
         processPlayerMove(session, gameCmd, game, userName);
 
-        // Send updated game state to all clients in the game
+        // Prepare and send updated game state to all clients in the game
         LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
-        broadcastToGame(gameCmd.getGameID(), loadGameMessage);
+        messageDispatcher.broadcastToGame(gameCmd.getGameID(), loadGameMessage, session);
 
-        // Send a notification about the move to all clients
-        String moveDescription = gameCmd.getMove().toString(); // Format this as needed
-        broadcastToGame(gameCmd.getGameID(), new NotificationMessage(userName + " made a move: " + moveDescription));
+        // Prepare and broadcast move notification
+        String moveDescription = gameCmd.getMove().toString(); // Format as needed
+        NotificationMessage notification = new NotificationMessage(userName + " made a move: " + moveDescription);
+        messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
     }
 
     /**
@@ -206,21 +210,24 @@ public class WebSocketHandler {
      * @throws IOException If there's an error in sending the message.
      */
     private boolean canPlayerMove(Session session, Game game, ChessGame.TeamColor color, String userName) throws IOException {
-        // Check if the user is an observer or it's not their turn
+        // Check if the user is an observer, or it's not their turn
         if (color == null || !color.equals(game.getGame().getTeamTurn())) {
-            sendError(session, "Error: Invalid move");
+            ErrorMessage errorMessage = new ErrorMessage("Error: Invalid move"); // "Error: Not your turn"
+            messageDispatcher.sendMessage(session, errorMessage);
             return false;
         }
 
         // Check if the user is connected
-        if (!connectionManager.connections.containsKey(userName)) {
-            sendError(session, "Error: Not connected");
+        if (!connectionManager.getSessionsFromGame(game.getGameID()).containsKey(userName)) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: Not connected");
+            messageDispatcher.sendMessage(session, errorMessage);
             return false;
         }
 
         // Check if the game is over
         if (game.getGame().getTeamTurn() == null) {
-            sendError(session, "Error: Game over");
+            ErrorMessage errorMessage = new ErrorMessage("Error: Game over");
+            messageDispatcher.sendMessage(session, errorMessage);
             return false;
         }
 
@@ -240,7 +247,8 @@ public class WebSocketHandler {
         try {
             game.getGame().makeMove(gameCmd.getMove());
         } catch (Exception e) {
-            sendError(session, "Error: " + e.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage("Error: " + e.getMessage());
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
@@ -250,6 +258,14 @@ public class WebSocketHandler {
         // Notify all clients about the move
         sendMoveNotification(game, userName, gameCmd.getMove());
         checkForCheckAndCheckmate(game);
+
+        // Send updated game state to all clients in the game
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
+        messageDispatcher.broadcastToGame(gameCmd.getGameID(), loadGameMessage, session);
+
+        // Send a notification about the move to all clients
+        NotificationMessage notification = new NotificationMessage(userName + " made a move: " + gameCmd.getMove());
+        messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
     }
 
     /**
@@ -257,36 +273,34 @@ public class WebSocketHandler {
      * @param game The game object.
      * @param userName The username of the player who made the move.
      * @param move The move that was made.
-     * @throws IOException If there's an error in sending the message.
      */
-    private void sendMoveNotification(Game game, String userName, ChessMove move) throws IOException {
+    private void sendMoveNotification(Game game, String userName, ChessMove move) {
         NotificationMessage notification = new NotificationMessage(userName + " moved " + move);
         LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
-        connectionManager.sendToAll("", new Gson().toJson(loadGameMessage));
-        connectionManager.sendToAll(userName, new Gson().toJson(notification));
+        messageDispatcher.broadcastToAll(loadGameMessage);
+        messageDispatcher.broadcastToAll(notification);
     }
 
     /**
      * Checks for check and checkmate situations and sends notifications if applicable.
      * @param game The game object.
-     * @throws IOException If there's an error in sending the message.
      */
-    private void checkForCheckAndCheckmate(Game game) throws IOException, DataAccessException {
+    private void checkForCheckAndCheckmate(Game game) throws DataAccessException {
         if (game.getGame().isInCheck(ChessGame.TeamColor.WHITE)) {
-            connectionManager.sendToAll("", new Gson().toJson(new NotificationMessage(game.getWhiteUsername() + " is in check!")));
+            messageDispatcher.broadcastToAll(new NotificationMessage(game.getWhiteUsername() + " is in check!"));
         }
         if (game.getGame().isInCheck(ChessGame.TeamColor.BLACK)) {
-            connectionManager.sendToAll("", new Gson().toJson(new NotificationMessage(game.getBlackUsername() + " is in check!")));
+            messageDispatcher.broadcastToAll(new NotificationMessage(game.getBlackUsername() + " is in check!"));
         }
         if (game.getGame().isInCheckmate(ChessGame.TeamColor.WHITE)) {
             game.getGame().setTeamTurn(null);
             gameDAO.updateGame(game);
-            connectionManager.sendToAll("", new Gson().toJson(new NotificationMessage(game.getWhiteUsername() + " got checkmated!")));
+            messageDispatcher.broadcastToAll(new NotificationMessage(game.getWhiteUsername() + " got checkmated!"));
         }
         if (game.getGame().isInCheckmate(ChessGame.TeamColor.BLACK)) {
             game.getGame().setTeamTurn(null);
             gameDAO.updateGame(game);
-            connectionManager.sendToAll("", new Gson().toJson(new NotificationMessage(game.getBlackUsername() + " got checkmated!")));
+            messageDispatcher.broadcastToAll(new NotificationMessage(game.getBlackUsername() + " got checkmated!"));
         }
     }
 
@@ -303,13 +317,15 @@ public class WebSocketHandler {
 
         // Check if the user is an observer using ObserverManager
         if (observerManager.getObservers(gameCmd.getGameID()).contains(session)) {
-            sendError(session, "Observer can't resign");
+            ErrorMessage errorMessage = new ErrorMessage("Error: Observer can't resign");
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
         // Check if the game is already concluded
         if (game.getGame().getTeamTurn() == null) {
-            sendError(session, "Cannot resign after game conclusion");
+            ErrorMessage errorMessage = new ErrorMessage("Error: Cannot resign after game conclusion"); // "Error: Game already concluded"
+            messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
 
@@ -319,7 +335,7 @@ public class WebSocketHandler {
 
         // Send a notification to all users about the resignation
         NotificationMessage notification = new NotificationMessage(userName + " resigned");
-        connectionManager.sendToAll("", new Gson().toJson(notification));
+        messageDispatcher.broadcastToAll(notification);
     }
 
     /**
@@ -341,9 +357,9 @@ public class WebSocketHandler {
             gameDAO.claimSpot(gameCmd.getGameID(), null, color); // Remove from player position
         }
 
-        connectionManager.remove(userName); // Remove from connection manager
+        connectionManager.remove(userName, gameCmd.getGameID()); // Remove from connection manager
         NotificationMessage notification = new NotificationMessage(userName + " left the game");
-        connectionManager.sendToAll(userName, new Gson().toJson(notification));
+        messageDispatcher.broadcastToAll(notification);
     }
 
     /**
@@ -357,8 +373,9 @@ public class WebSocketHandler {
             return ChessGame.TeamColor.WHITE;
         } else if (userName.equals(game.getBlackUsername())) {
             return ChessGame.TeamColor.BLACK;
+        } else {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -373,35 +390,9 @@ public class WebSocketHandler {
             AuthToken auth = new AuthDAO().findAuth(authToken);
             return auth.getUsername();
         } catch (Exception e) {
-            sendError(session, "Error 401: unauthorized");
+            ErrorMessage errorMessage = new ErrorMessage("Error 401: unauthorized. Exception: " + e.getMessage());
+            messageDispatcher.sendMessage(session, errorMessage);
             throw new Exception("Error 401: unauthorized");
         }
-    }
-
-    // Method to broadcast a message to all clients in a game
-    private void broadcastToGame(int gameId, Object message) {
-        String jsonMessage = new Gson().toJson(message);
-        observerManager.getObservers(gameId).forEach(clientSession -> {
-            try {
-                clientSession.getRemote().sendString(jsonMessage);
-            } catch (IOException e) {
-                System.out.println("Error broadcasting to game: " + e.getMessage());
-            }
-        });
-    }
-
-    // Improved method to send a targeted message
-    private void sendMessage(Session session, Object message) {
-        try {
-            String jsonMessage = gson.toJson(message);
-            session.getRemote().sendString(jsonMessage);
-        } catch (IOException e) {
-            System.out.println("Send message error: " + e.getMessage());
-        }
-    }
-
-    // Improved error sending method
-    private void sendError(Session session, String errorMessage) {
-        sendMessage(session, new ErrorMessage(errorMessage));
     }
 }
