@@ -3,7 +3,10 @@ package ui;
 import chess.*;
 import WebSocketFacade.WebSocketFacade;
 import clients.ChessClient;
+import com.google.gson.Gson;
 import testFactory.TestFactory;
+import webSocketMessages.serverMessages.ErrorMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -50,29 +53,6 @@ public class GameplayUI {
         }
     }
 
-    /*private String[][] initializeChessboard() {
-        String[][] board = new String[8][8];
-
-        String[] blackPieces = {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
-                EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP,
-                EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK};
-        String[] whitePieces = {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP,
-                EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP,
-                EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK};
-
-        for (int i = 0; i < 8; i++) {
-            board[0][i] = blackPieces[i];
-            board[1][i] = EscapeSequences.BLACK_PAWN;
-            board[6][i] = EscapeSequences.WHITE_PAWN;
-            board[7][i] = whitePieces[i];
-
-            for (int j = 2; j < 6; j++)
-                board[j][i] = EscapeSequences.EMPTY;
-        }
-
-        return board;
-    }*/
-
     private void reverseBoard(String[][] board) {
         for (int i = 0; i < board.length / 2; i++) {
             String[] temp = board[i];
@@ -87,19 +67,18 @@ public class GameplayUI {
     public void connectToGameServer() {
         try {
             webSocketFacade.connect("ws://localhost:" + TestFactory.getServerPort() + "/connect");
+            LOGGER.log(Level.INFO, "Connected to Server");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
         }
     }
 
     public void displayError(String errorMessage) {
-        System.out.println("Error: " + errorMessage);
-        // Add any additional UI handling for errors here
+        System.out.println(new Gson().fromJson(errorMessage, ErrorMessage.class).getErrorMessage());
     }
 
     public void showNotification(String notificationMessage) {
-        System.out.println("Notification: " + notificationMessage);
-        // Add any additional UI handling for notifications here
+        System.out.println(new Gson().fromJson(notificationMessage, NotificationMessage.class).getNotificationMessage());
     }
 
     // Method to redraw the chessboard
@@ -107,16 +86,29 @@ public class GameplayUI {
         String[][] board = initializeChessboard();
         updateBoardWithPieces(board, game);
         printBoard(board, highlights, pieceToHighlight);
+
+        /*
+                    System.out.println("Game updated.");
+            LoadMessage loadMessage = new Gson().fromJson(message, LoadMessage.class);
+            String gamestr = loadMessage.getGame();
+
+            var builder = new GsonBuilder();
+            builder.registerTypeAdapter(ChessBoard.class, new BoardAdapter());
+            builder.registerTypeAdapter(ChessPiece.class, new PieceAdapter());
+
+            game = builder.create().fromJson(gamestr, GameImpl.class);
+            System.out.println();
+            displayBoard(game.getBoard());
+            System.out.printf("%s >>> ", loggedIn ? "WELCOME" : "LOGIN");
+         */
     }
 
     // Initialize an empty chessboard
     private String[][] initializeChessboard() {
         String[][] board = new String[8][8];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                board[i][j] = "   "; // Empty space
-            }
-        }
+        for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
+                board[i][j] = "   ";
         return board;
     }
 
@@ -124,10 +116,9 @@ public class GameplayUI {
     private void updateBoardWithPieces(String[][] board, ChessGame game) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
-                ChessPositionImpl position = new ChessPositionImpl(row, col);
-                ChessPiece piece = game.getBoard().getPiece(position);
+                ChessPiece piece = game.getBoard().getPiece(new ChessPositionImpl(row, col));
                 if (piece != null) {
-                    board[row - 1][col - 1] = piece.getPieceType().name(); // Replace 'getSymbol' with your method to get piece representation
+                    board[row - 1][col - 1] = piece.getPieceType().name();
                 }
             }
         }
@@ -191,5 +182,4 @@ public class GameplayUI {
         }
         System.out.println(colLabels);
     }
-
 }

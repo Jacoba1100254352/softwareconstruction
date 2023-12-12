@@ -25,9 +25,7 @@ public class WebSocketHandler {
         connectionManager = new ConnectionManager();
         observerManager = new ObserverManager(); // Initialize ObserverManager
         //gson = new GsonBuilder().registerTypeAdapter(ChessPosition.class, new PosAdapter()).registerTypeAdapter(ChessMove.class, new MoveAdapter()).create();
-        gson = new GsonBuilder()
-                .registerTypeAdapter(ChessBoard.class, new ChessBoardTypeAdapter())
-                .create();
+        gson = new Gson();// new GsonBuilder().registerTypeAdapter(ChessBoard.class, new ChessBoardTypeAdapter()).create();
     }
 
     // Handle incoming WebSocket messages
@@ -46,9 +44,20 @@ public class WebSocketHandler {
         }
     }
 
+    @OnWebSocketConnect
+    public void onConnect(Session session) {
+        System.out.println("Connected: " + session.getRemoteAddress().getAddress());
+    }
+
+    @OnWebSocketClose
+    public void onClose(Session session, int statusCode, String reason) {
+        // Here, handle session removal when a connection is closed
+        System.out.println("Closed: " + reason);
+    }
+
     @OnWebSocketError
-    public void onError(Session session, Throwable t) throws IOException {
-        session.getRemote().sendString("Error "+t.getMessage());
+    public void onError(Session session, Throwable throwable) {
+        System.out.println("WebSocket Error: " + throwable.getMessage());
     }
 
     private void handleJoinObserver(Session session, JoinObserverCommand gameCmd) throws Exception {
@@ -73,9 +82,22 @@ public class WebSocketHandler {
 
         // Notify all users about the new observer and update the game state
         NotificationMessage notification = new NotificationMessage(userName + " now observing");
+
+        System.out.println("User " + userName + " is being added as an observer for game " + gameId);
+        System.out.println("Sending notification: " + notification.getNotificationMessage());
+
         connectionManager.add(userName, session);
         connectionManager.sendToAll(userName, notification);
-        session.getRemote().sendString(gson.toJson(new LoadGameMessage(game.getGame())));
+
+        // Send a notification to all users about the new observer
+        broadcastToGame(gameCmd.getGameID(), new NotificationMessage(userName + " now observing"));
+
+        // Send game state to the new observer
+        if (game.getGame() != null) {
+            sendMessage(session, new LoadGameMessage(game.getGame()));
+        } else {
+            sendError(session, "Error: Unable to load game data");
+        }
     }
 
     /**
@@ -164,6 +186,14 @@ public class WebSocketHandler {
 
         // Process the move
         processPlayerMove(session, gameCmd, game, userName);
+
+        // Send updated game state to all clients in the game
+        LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
+        broadcastToGame(gameCmd.getGameID(), loadGameMessage);
+
+        // Send a notification about the move to all clients
+        String moveDescription = gameCmd.getMove().toString(); // Format this as needed
+        broadcastToGame(gameCmd.getGameID(), new NotificationMessage(userName + " made a move: " + moveDescription));
     }
 
     /**
@@ -348,7 +378,30 @@ public class WebSocketHandler {
         }
     }
 
-    private void sendError(Session session, String errorMessage) throws IOException {
-        session.getRemote().sendString(gson.toJson(new ErrorMessage(errorMessage)));
+    // Method to broadcast a message to all clients in a game
+    private void broadcastToGame(int gameId, Object message) {
+        String jsonMessage = new Gson().toJson(message);
+        observerManager.getObservers(gameId).forEach(clientSession -> {
+            try {
+                clientSession.getRemote().sendString(jsonMessage);
+            } catch (IOException e) {
+                System.out.println("Error broadcasting to game: " + e.getMessage());
+            }
+        });
+    }
+
+    // Improved method to send a targeted message
+    private void sendMessage(Session session, Object message) {
+        try {
+            String jsonMessage = gson.toJson(message);
+            session.getRemote().sendString(jsonMessage);
+        } catch (IOException e) {
+            System.out.println("Send message error: " + e.getMessage());
+        }
+    }
+
+    // Improved error sending method
+    private void sendError(Session session, String errorMessage) {
+        sendMessage(session, new ErrorMessage(errorMessage));
     }
 }

@@ -25,10 +25,19 @@ public class ConnectionManager {
         connections.clear();
     }
 
-    public void sendToAll(String exceptUserName, Object notification) throws IOException {
+    public void sendToAll(String exceptUserName, Object notification) {
+        String jsonMessage = new Gson().toJson(notification);
         for (ConnectionInstance connection : connections.values()) {
-            if (connection.session.isOpen() && !connection.userName.equals(exceptUserName)) {
-                connection.send(new Gson().toJson(notification));
+            try {
+                if (connection.session.isOpen() && !connection.userName.equals(exceptUserName)) {
+                    connection.send(jsonMessage);
+                }
+            } catch (IOException e) {
+                System.out.println("Error sending message to " + connection.userName + ": " + e.getMessage());
+                // Optionally remove the session if it's not open anymore
+                if (!connection.session.isOpen()) {
+                    remove(connection.userName);
+                }
             }
         }
     }

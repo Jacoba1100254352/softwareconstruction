@@ -377,10 +377,6 @@ public class WebSocketTests {
             bobMessages = bobResult.get(waitTime, TimeUnit.MILLISECONDS);
         } catch (TimeoutException ignore) {
         }
-        System.out.println("Bob's errorMessage: " + bobMessages.getFirst().errorMessage);
-        System.out.println("Bob's messages: " + bobMessages.getFirst().message);
-        System.out.println("Bob's serverMessageType: " + bobMessages.getFirst().serverMessageType);
-        System.out.println("Bob's game: " + bobMessages.getFirst().game);
 
         //check received message
         Assertions.assertEquals(1, bobMessages.size(),

@@ -18,6 +18,7 @@ public class WebSocketFacade extends Endpoint {
     private static final Logger LOGGER = Logger.getLogger(WebSocketFacade.class.getName());
 
     public WebSocketFacade(ChessClient chessClient) {
+        System.out.println("WebSocketFacade constructor");
         this.chessClient = chessClient;
     }
 
@@ -44,11 +45,13 @@ public class WebSocketFacade extends Endpoint {
 
     @OnMessage
     public void onMessage(String message) {
+        System.out.println("Raw message received: " + message);
+
         Gson gson = new Gson();
         JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
         String messageType = jsonMessage.get("serverMessageType").getAsString();
 
-        switch (ServerMessage.ServerMessageType.valueOf(messageType)) {
+        switch ((new Gson().fromJson(message, ServerMessage.class)).getServerMessageType()) {//ServerMessage.ServerMessageType.valueOf(messageType)) {
             case LOAD_GAME:
                 LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
                 ChessGame updatedGame = loadGameMessage.getGame();
@@ -74,6 +77,34 @@ public class WebSocketFacade extends Endpoint {
     public void connect(String uri) throws Exception {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, new URI(uri));
+
+        System.out.println("Connected to server");
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            @Override
+            public void onMessage(String message) {
+                Gson gson = new Gson();
+                JsonObject jsonMessage = gson.fromJson(message, JsonObject.class);
+                switch ((new Gson().fromJson(message, ServerMessage.class)).getServerMessageType()) {//ServerMessage.ServerMessageType.valueOf(messageType)) {
+                    case LOAD_GAME:
+                        LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
+                        ChessGame updatedGame = loadGameMessage.getGame();
+                        chessClient.getGameplayUI().redraw(updatedGame, null, null);
+                        break;
+
+                    case ERROR:
+                        ErrorMessage errorMessage = gson.fromJson(jsonMessage, ErrorMessage.class);
+                        System.out.println("Error received: " + errorMessage.getErrorMessage());
+                        chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
+                        break;
+
+                    case NOTIFICATION:
+                        NotificationMessage notificationMessage = gson.fromJson(jsonMessage, NotificationMessage.class);
+                        System.out.println("Notification: " + notificationMessage.getNotificationMessage());
+                        chessClient.getGameplayUI().showNotification(notificationMessage.getNotificationMessage());
+                        break;
+                }
+            }
+        });
     }
 
     public void sendMessage(String message) {
