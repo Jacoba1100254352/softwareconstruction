@@ -4,6 +4,7 @@ import javax.websocket.*;
 import java.net.URI;
 import java.util.logging.Logger;
 
+import chess.ChessGame;
 import clients.ChessClient;
 import com.google.gson.*;
 import webSocketMessages.serverMessages.ErrorMessage;
@@ -50,7 +51,8 @@ public class WebSocketFacade extends Endpoint {
         switch (ServerMessage.ServerMessageType.valueOf(messageType)) {
             case LOAD_GAME:
                 LoadGameMessage loadGameMessage = gson.fromJson(jsonMessage, LoadGameMessage.class);
-                chessClient.getGameplayUI().updateGameState(loadGameMessage.getLoadGameMessage());
+                ChessGame updatedGame = loadGameMessage.getGame();
+                chessClient.getGameplayUI().updateGameState(updatedGame);
                 break;
 
             case ERROR:

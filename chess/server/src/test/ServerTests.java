@@ -292,7 +292,7 @@ public class ServerTests {
         gameDAO.insertGame(game);
 
         // Retrieve the game by name to check if it was inserted correctly
-        Game insertedGame = gameDAO.findGameById(game.getGameID());
+        Game insertedGame = gameDAO.findGameByID(game.getGameID());
         Assertions.assertNotNull(insertedGame);
         Assertions.assertEquals(gameName, insertedGame.getGameName());
     }
@@ -319,7 +319,7 @@ public class ServerTests {
 
         // Insert the game and retrieve it by ID
         gameDAO.insertGame(game);
-        Game retrievedGame = gameDAO.findGameById(game.getGameID());
+        Game retrievedGame = gameDAO.findGameByID(game.getGameID());
 
         // Assert
         Assertions.assertNotNull(retrievedGame);
@@ -333,10 +333,10 @@ public class ServerTests {
     public void findGameByIdFail() throws DataAccessException {
         // Find id not associated yet with a game in the database
         Integer id = 0;
-        while (gameDAO.findGameById(++id) != null) ;
+        while (gameDAO.findGameByID(++id) != null) ;
 
         // Test search for non-existing game
-        Assertions.assertNull(gameDAO.findGameById(9999));
+        Assertions.assertNull(gameDAO.findGameByID(9999));
     }
 
     // Positive Test for findAllGames
@@ -370,7 +370,7 @@ public class ServerTests {
         gameDAO.claimSpot(game.getGameID(), testUser, ChessGame.TeamColor.WHITE);
 
         // Retrieve the game and assert that the spot has been claimed
-        Game updatedGame = gameDAO.findGameById(game.getGameID());
+        Game updatedGame = gameDAO.findGameByID(game.getGameID());
         Assertions.assertEquals(testUser, updatedGame.getWhiteUsername());
     }
 
@@ -417,7 +417,7 @@ public class ServerTests {
         gameDAO.updateGame(game);
 
         // Assert
-        Assertions.assertEquals(gameDAO.serializeChessGame(newGame), gameDAO.serializeChessGame(gameDAO.findGameById(game.getGameID()).getGame()), "Game state did not update correctly in the database.");
+        Assertions.assertEquals(gameDAO.serializeChessGame(newGame), gameDAO.serializeChessGame(gameDAO.findGameByID(game.getGameID()).getGame()), "Game state did not update correctly in the database.");
     }
 
     // Negative Test for updateGame (game does not exist)
@@ -427,7 +427,7 @@ public class ServerTests {
     public void updateGameFail() throws DataAccessException {
         // Find id not associated yet with a game in the database
         Integer id = 0;
-        while (gameDAO.findGameById(++id) != null) ;
+        while (gameDAO.findGameByID(++id) != null) ;
 
         // Create a game object for a non-existing game
         Game nonExistentGame = new Game(id, "NonExistentGame", "whitePlayer", "blackPlayer", new ChessGameImpl());

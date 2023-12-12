@@ -8,7 +8,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Map;
 
-class ChessBoardTypeAdapter extends TypeAdapter<ChessBoard> {
+public class ChessBoardTypeAdapter extends TypeAdapter<ChessBoard> {
 
     @Override
     public void write(JsonWriter out, ChessBoard board) throws IOException {

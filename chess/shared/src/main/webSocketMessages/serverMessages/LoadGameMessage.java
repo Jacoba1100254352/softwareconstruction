@@ -1,21 +1,20 @@
 package webSocketMessages.serverMessages;
 
-public class LoadGameMessage extends ServerMessage {
-    private String loadGameMessage;
+import chess.ChessGame;
 
-    public LoadGameMessage(String loadGameMessage) {
+public class LoadGameMessage extends ServerMessage {
+    ChessGame game;
+
+    public LoadGameMessage(ChessGame game) {
         super(ServerMessageType.LOAD_GAME);
-        this.loadGameMessage = loadGameMessage;
+        this.game = game;
     }
 
 
     ///   Getters and setters   ///
 
-    public String getLoadGameMessage() {
-        return loadGameMessage;
-    }
-
-    public void setLoadGameMessage(String loadGameMessage) {
-        this.loadGameMessage = loadGameMessage;
+    public ChessGame getGame() {
+        return game;
     }
 }
+

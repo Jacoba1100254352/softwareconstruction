@@ -62,13 +62,16 @@ public class PreloginUI {
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
 
             if (responseObject.get("success").getAsBoolean()) {
+                System.out.print("Login response object" + responseObject);
                 String authToken = responseObject.get("authToken").getAsString();
+                String clientUsername = responseObject.get("username").getAsString();
                 boolean isAdmin = responseObject.has("isAdmin") && responseObject.get("isAdmin").getAsBoolean();
 
                 System.out.println();
 
                 client.setAuthToken(authToken);
                 client.setAdmin(isAdmin);
+                client.setClientUsername(clientUsername);
                 client.transitionToPostloginUI();
 
                 System.out.println("Logged in successfully.\n");

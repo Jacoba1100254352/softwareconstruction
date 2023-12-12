@@ -3,9 +3,7 @@ package ui;
 import chess.*;
 import WebSocketFacade.WebSocketFacade;
 import clients.ChessClient;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import models.Game;
+import testFactory.TestFactory;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -90,23 +88,18 @@ public class GameplayUI {
 
     public void connectToGameServer() {
         try {
-            webSocketFacade.connect("ws://localhost:8081/connect");
+            webSocketFacade.connect("ws://localhost:" + TestFactory.getServerPort() + "/connect");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
         }
     }
 
-    public void updateGameState(String gameStateJson) {
-        // Parse the gameState JSON string to update the Game object
-        Gson gson = new Gson();
-        Game updatedGame = gson.fromJson(gameStateJson, Game.class);
-
-        // Assuming you have a method in ChessClient to update its game state
-        chessClient.updateGame(updatedGame);
+    public void updateGameState(ChessGame updatedGame) {
+        // Update the ChessClient's game state
+        //chessClient.updateGame(updatedGame);
 
         // Redraw the board with the updated game state
-        // Note: You may need to adapt the redraw method to handle the Game object
-        redraw(updatedGame.getGame(), null, null);
+        redraw(updatedGame, null, null);
     }
 
     public void displayError(String errorMessage) {

@@ -37,7 +37,7 @@ public class JoinGameService {
                 return new JoinGameResponse("Error: user not found", false);
 
             // Verify the game exists
-            if (gameDAO.findGameById(request.getGameID()) == null)
+            if (gameDAO.findGameByID(request.getGameID()) == null)
                 return new JoinGameResponse("Error: bad request", false);
 
             // Add player to game or watch status based on color

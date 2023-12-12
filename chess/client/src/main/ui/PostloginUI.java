@@ -167,8 +167,8 @@ public class PostloginUI {
                 System.out.println("Joined game as observer successfully.");
             } else {
                 System.out.print("Enter color (WHITE/BLACK): ");
-                String color = scanner.next().toUpperCase();
-                client.joinPlayer(color, gameId);
+                String colorStr = scanner.next().toUpperCase();
+                client.joinPlayer(colorStr, gameId);
                 System.out.println("Joined game successfully.");
                 // Prompt user for a move if they're joining as a player
                 promptForMove();

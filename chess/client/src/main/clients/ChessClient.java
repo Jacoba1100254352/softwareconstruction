@@ -4,37 +4,38 @@ import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import models.Game;
 import serverFacade.ServerFacade;
+import testFactory.TestFactory;
 import ui.*;
 import WebSocketFacade.WebSocketFacade;
 import webSocketMessages.serverMessages.*;
-
-import java.util.logging.Logger;
 
 public class ChessClient {
     private final PreloginUI preloginUI;
     private final PostloginUI postloginUI;
     private final GameplayUI gameplayUI;
     private final WebSocketFacade webSocketFacade;
-    private boolean playing = false;
-    private boolean canMove = false;
+    private boolean isPlayer;
+    private boolean canMove;
     private Integer curID; // Current game ID
-    private String currentPlayer; // Add a field to store the current player
+    private ChessGame.TeamColor currentPlayerColor; // Add a field to store the current player
     private String authToken;
-    private String currentUsername; // Username of the current user
+
+    private String clientUsername; // Username of the current user
     private boolean isAdmin;
     private boolean isRunning;
     private boolean isLoggedIn;
 
     public ChessClient() {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+        ServerFacade serverFacade = new ServerFacade("http://localhost:" + TestFactory.getServerPort());
 
         this.webSocketFacade = new WebSocketFacade(this);
         preloginUI = new PreloginUI(this, serverFacade);
         postloginUI = new PostloginUI(this, serverFacade);
         gameplayUI = new GameplayUI(this);
         isRunning = true;
+        isPlayer = false;
+        canMove = false;
     }
 
     public void run() {
@@ -47,38 +48,43 @@ public class ChessClient {
         }
     }
 
-    public void updateGame(Game updatedGame) {
-        // Add a field to store the current game state
-        ChessGame game = updatedGame.getGame(); // Update the ChessGame state
+    public void updateGame(ChessGame updatedGame) {
+        ChessGame.TeamColor currentTeamTurn = updatedGame.getTeamTurn();
 
-        // Determine the current player based on the usernames in the Game object
-        if (this.authToken != null) {
-            String currentUser = this.authToken; // Replace this with your method of getting the current username
-            if (currentUser.equals(updatedGame.getWhiteUsername())) {
-                this.currentPlayer = "white";
-            } else if (currentUser.equals(updatedGame.getBlackUsername())) {
-                this.currentPlayer = "black";
+        // Note: If this is necessary, remove "&& false" segment
+        if (this.authToken != null && false) {
+            // Assuming currentUsername is set when user logs in or joins a game
+            // FIXME: if this is necessary the change from null
+            this.currentPlayerColor = getUserTeamColor(null, null); // Implement this method based on your application's logic
+
+            if (this.currentPlayerColor == currentTeamTurn) {
+                this.isPlayer = true;
+                this.canMove = true; // Implement logic to determine if the player can move
             } else {
-                this.currentPlayer = "observer";
+                this.currentPlayerColor = null;
+                this.isPlayer = false;
+                this.canMove = false;
             }
         }
 
-        // Additional logic based on the game state
-        // For example, determining if the current user can move
-        if (this.currentPlayer.equals("white") || this.currentPlayer.equals("black")) {
-            this.playing = true;
-            this.canMove = true; // You might want to add more sophisticated logic to determine if the player can move
-        } else {
-            this.playing = false;
-            this.canMove = false;
-        }
-
         // Update the UI with the new game state
-        this.gameplayUI.redraw(game, null, null); // Adapt parameters as needed
+        this.gameplayUI.redraw(updatedGame, null, null); // Adapt parameters as needed
+    }
+
+    private ChessGame.TeamColor getUserTeamColor(String whiteUsername, String blackUsername) {
+        if (clientUsername.equals(whiteUsername) && isPlayer) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (clientUsername.equals(blackUsername) && isPlayer) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            if (!isPlayer)
+                System.out.println("Error: Could not determine current player color or status");
+            return null;
+        }
     }
 
     public void resignGame() throws Exception {
-        if (!playing) {
+        if (!isPlayer) {
             throw new Exception("Must be in a game to resign");
         }
         // Assuming a message format for resigning the game
@@ -91,12 +97,12 @@ public class ChessClient {
         webSocketFacade.sendMessage(resignMessage.toString());
 
         // Update client state
-        playing = false;
+        isPlayer = false;
         canMove = false;
     }
 
     public void leaveGame() throws Exception {
-        if (!playing) {
+        if (!isPlayer) {
             throw new Exception("Must be in a game to leave it");
         }
         // Assuming a message format for leaving the game
@@ -109,7 +115,7 @@ public class ChessClient {
         webSocketFacade.sendMessage(leaveMessage.toString());
 
         // Update client state
-        playing = false;
+        isPlayer = false;
         canMove = false;
     }
 
@@ -135,26 +141,27 @@ public class ChessClient {
     }
 
     // Method to join a game as a player
-    public void joinPlayer(String color, int gameID) {
+    public void joinPlayer(String colorStr, Integer gameID) {
+
         // Create a JSON object for joining as a player
         JsonObject joinJson = new JsonObject();
         joinJson.addProperty("type", "joinPlayer");
         joinJson.addProperty("gameID", gameID);
-        joinJson.addProperty("color", color);
+        joinJson.addProperty("color", colorStr);
         joinJson.addProperty("authToken", this.authToken);
 
         // Send the join message to the server or WebSocket
         webSocketFacade.sendMessage(joinJson.toString());
 
         // Update the client state
-        this.playing = true;
+        this.isPlayer = true;
         this.canMove = true; // This might be true or false depending on the game logic
         this.curID = gameID;
-        this.currentPlayer = color;
+        this.currentPlayerColor = (colorStr.equals("WHITE")) ? ChessGame.TeamColor.WHITE : (colorStr.equals("BLACK")) ? ChessGame.TeamColor.BLACK : null;;
     }
 
     // Method to join a game as an observer
-    public void joinObserver(int gameID) {
+    public void joinObserver(Integer gameID) {
         // Create a JSON object for joining as an observer
         JsonObject joinJson = new JsonObject();
         joinJson.addProperty("type", "joinObserver");
@@ -165,10 +172,10 @@ public class ChessClient {
         webSocketFacade.sendMessage(joinJson.toString());
 
         // Update the client state
-        this.playing = false;
+        this.isPlayer = false;
         this.canMove = false;
         this.curID = gameID;
-        this.currentPlayer = "observer";
+        this.currentPlayerColor = null;
     }
 
     // Method to notify the user about various types of messages
@@ -215,6 +222,14 @@ public class ChessClient {
 
     public String getAuthToken() {
         return authToken;
+    }
+
+    public String getClientUsername() {
+        return clientUsername;
+    }
+
+    public void setClientUsername(String clientUsername) {
+        this.clientUsername = clientUsername;
     }
 
     public boolean isAdmin() {

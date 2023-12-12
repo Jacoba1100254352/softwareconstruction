@@ -1,8 +1,9 @@
 import handlers.*;
-import handlers.webSocketHandlers.WebSocketHandler;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
+import testFactory.TestFactory;
+import webSocketManagement.WebSocketHandler;
 
 import java.util.HashMap;
 
@@ -65,7 +66,7 @@ public class Server {
 
     public void start() {
         // Set the Spark port
-        Spark.port(8080);
+        Spark.port(Integer.parseInt(TestFactory.getServerPort()));
 
         Spark.webSocket("/connect", WebSocketHandler.class);
 

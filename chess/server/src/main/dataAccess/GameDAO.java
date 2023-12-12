@@ -87,7 +87,7 @@ public class GameDAO {
      * @return The retrieved game object.
      * @throws DataAccessException if the operation fails.
      */
-    public Game findGameById(Integer gameID) throws DataAccessException {
+    public Game findGameByID(Integer gameID) throws DataAccessException {
         String sql = "SELECT * FROM Games WHERE GameID = ?;";
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
