@@ -1,19 +1,20 @@
 package webSocketManagement;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ObserverManager implements ClientManager {
-    private final Map<Integer, Set<ObserverInstance>> gameObservers;
+    private final ConcurrentHashMap<Integer, Set<ObserverInstance>> gameObservers;
 
     public ObserverManager() {
-        gameObservers = new HashMap<>();
+        gameObservers = new ConcurrentHashMap<>();
     }
 
     @Override
     public void add(Integer gameId, ClientInstance observer) {
-        if (observer instanceof ObserverInstance) {
-            gameObservers.computeIfAbsent(gameId, k -> new HashSet<>())
-                    .add((ObserverInstance)observer);
+        if (observer instanceof ObserverInstance observerInstance) {
+            gameObservers.computeIfAbsent(gameId, k -> ConcurrentHashMap.newKeySet())
+                    .add(observerInstance);
         }
     }
 
@@ -26,6 +27,12 @@ public class ObserverManager implements ClientManager {
                 gameObservers.remove(gameId);
             }
         }
+    }
+
+    public boolean isObserver(String username, Integer gameId) {
+        Set<ObserverInstance> observers = gameObservers.get(gameId);
+        return observers != null && observers.stream()
+                .anyMatch(observer -> observer.getUsername().equals(username));
     }
 
     public Set<ObserverInstance> getUsersFromGame(Integer gameId) {

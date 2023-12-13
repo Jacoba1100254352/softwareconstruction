@@ -78,22 +78,29 @@ public class WebSocketHandler {
             return;
         }
 
-        // Add the user as an observer if they are not already observing
-        observerManager.add(gameID, new ObserverInstance(session, userName));
-        connectionManager.add(gameID, new ConnectionInstance(session, userName));
+        // Check if the user is already an observer
+        if (!observerManager.isObserver(userName, gameID)) {
+            // Add the user as an observer if they are not already observing
+            observerManager.add(gameID, new ObserverInstance(session, userName));
+            connectionManager.add(gameID, new ConnectionInstance(session, userName));
 
-        // Send game state to the new observer first
-        if (game.getGame() != null) {
-            LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
-            messageDispatcher.sendMessage(session, loadGameMessage);
+            // Send game state to the new observer first
+            if (game.getGame() != null) {
+                LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
+                messageDispatcher.sendMessage(session, loadGameMessage);
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
+                messageDispatcher.sendMessage(session, errorMessage);
+            }
+
+            // Prepare and broadcast notification to all players and observers in the game, except the new observer
+            NotificationMessage notification = new NotificationMessage(userName + " now observing");
+            messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
         } else {
-            ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
+            // Handle the case where the user is already an observer
+            ErrorMessage errorMessage = new ErrorMessage(userName + " is already observing game " + gameID);
             messageDispatcher.sendMessage(session, errorMessage);
         }
-
-        // Prepare and broadcast notification to all players and observers in the game, except the new observer
-        NotificationMessage notification = new NotificationMessage(userName + " now observing");
-        messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
     }
 
     /**
@@ -136,6 +143,13 @@ public class WebSocketHandler {
             return;
         }
 
+        // Check if there are already two players in the game
+        if (game.getWhiteUsername() != null && game.getBlackUsername() != null) {
+            // Add user as an observer instead
+            handleJoinObserverAutomatically(session, gameID, userName);
+            return;
+        }
+
         // Set the turn to the joining player's color if it's WHITE
         if (color.equals(ChessGame.TeamColor.WHITE)) {
             game.getGame().setTeamTurn(ChessGame.TeamColor.WHITE);
@@ -154,6 +168,28 @@ public class WebSocketHandler {
             messageDispatcher.sendMessage(session, loadGameMessage);
         } else {
             ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
+            messageDispatcher.sendMessage(session, errorMessage);
+        }
+    }
+
+    // New method to automatically handle joining as an observer
+    private void handleJoinObserverAutomatically(Session session, Integer gameID, String userName) throws Exception {
+        if (!observerManager.isObserver(userName, gameID)) {
+            observerManager.add(gameID, new ObserverInstance(session, userName));
+            connectionManager.add(gameID, new ConnectionInstance(session, userName));
+
+            if (gameDAO.findGameByID(gameID).getGame() != null) {
+                LoadGameMessage loadGameMessage = new LoadGameMessage(gameDAO.findGameByID(gameID).getGame());
+                messageDispatcher.sendMessage(session, loadGameMessage);
+            } else {
+                ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
+                messageDispatcher.sendMessage(session, errorMessage);
+            }
+
+            NotificationMessage notification = new NotificationMessage(userName + " now observing");
+            messageDispatcher.broadcastToGame(gameID, notification, session);
+        } else {
+            ErrorMessage errorMessage = new ErrorMessage(userName + " is already observing game " + gameID);
             messageDispatcher.sendMessage(session, errorMessage);
         }
     }
@@ -178,6 +214,13 @@ public class WebSocketHandler {
         Game game = gameDao.findGameByID(gameCmd.getGameID());
         if (game == null) {
             ErrorMessage errorMessage = new ErrorMessage("Error 404: Game not found");
+            messageDispatcher.sendMessage(session, errorMessage);
+            return;
+        }
+
+        // Check if the game is over
+        if (game.getGame().getTeamTurn() == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: Cannot make a move, game already concluded");
             messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
@@ -315,8 +358,14 @@ public class WebSocketHandler {
         Game game = gameDao.findGameByID(gameCmd.getGameID());
         String userName = findUser(session, gameCmd.getAuthString());
 
-        // Check if the user is an observer using ObserverManager
-        if (observerManager.getUsersFromGame(gameCmd.getGameID()).contains(new ObserverInstance(session, userName))) {
+        if (userName == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: Unauthorized");
+            messageDispatcher.sendMessage(session, errorMessage);
+            return;
+        }
+
+        // Check if the user is an observer
+        if (observerManager.isObserver(userName, gameCmd.getGameID())) {
             ErrorMessage errorMessage = new ErrorMessage("Error: Observer can't resign");
             messageDispatcher.sendMessage(session, errorMessage);
             return;
@@ -324,7 +373,7 @@ public class WebSocketHandler {
 
         // Check if the game is already concluded
         if (game.getGame().getTeamTurn() == null) {
-            ErrorMessage errorMessage = new ErrorMessage("Error: Cannot resign after game conclusion"); // "Error: Game already concluded"
+            ErrorMessage errorMessage = new ErrorMessage("Error: Cannot resign after game conclusion");
             messageDispatcher.sendMessage(session, errorMessage);
             return;
         }
@@ -348,6 +397,13 @@ public class WebSocketHandler {
         String userName = findUser(session, gameCmd.getAuthString());
         Game game = gameDAO.findGameByID(gameCmd.getGameID());
 
+        // Check if the game is already concluded
+        if (game.getGame().getTeamTurn() == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: Cannot resign, game already concluded");
+            messageDispatcher.sendMessage(session, errorMessage);
+            return;
+        }
+
         // Determine the color of the player leaving
         ChessGame.TeamColor color = determinePlayerColor(game, userName);
 
@@ -358,6 +414,8 @@ public class WebSocketHandler {
         }
 
         connectionManager.remove(userName, gameCmd.getGameID()); // Remove from connection manager
+
+        // Send a notification about the player leaving the game
         NotificationMessage notification = new NotificationMessage(userName + " left the game");
         messageDispatcher.broadcastToAll(notification);
     }
