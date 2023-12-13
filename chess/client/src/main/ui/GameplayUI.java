@@ -3,6 +3,7 @@ package ui;
 import chess.*;
 import WebSocketFacade.WebSocketFacade;
 import clients.ChessClient;
+import clients.WebSocketClient;
 import com.google.gson.Gson;
 import testFactory.TestFactory;
 import webSocketMessages.serverMessages.ErrorMessage;
@@ -19,8 +20,8 @@ public class GameplayUI {
     private final WebSocketFacade webSocketFacade;
 
     // Constructor
-    public GameplayUI(ChessClient chessClient) {
-        this.webSocketFacade = new WebSocketFacade(chessClient);
+    public GameplayUI(ChessClient chessClient, WebSocketClient webSocketClient) {
+        this.webSocketFacade = new WebSocketFacade(chessClient, webSocketClient);
 
         connectToGameServer();
     }

@@ -2,6 +2,7 @@ package webSocketManagement;
 
 import org.eclipse.jetty.websocket.api.Session;
 import com.google.gson.Gson;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
 
@@ -16,10 +17,10 @@ public class MessageDispatcher {
         this.gson = new Gson();
     }
 
-    public void sendMessage(Session session, Object message) {
+    public void sendMessage(Session session, ServerMessage message) {
+        String jsonMessage = gson.toJson(message);
         try {
             if (session != null && session.isOpen()) {
-                String jsonMessage = gson.toJson(message);
                 session.getRemote().sendString(jsonMessage);
             }
         } catch (IOException e) {
@@ -27,9 +28,12 @@ public class MessageDispatcher {
         }
     }
 
-    public void broadcastToGame(Integer gameID, Object message, Session exceptSession) {
+    public void broadcastToGame(Integer gameID, ServerMessage message, Session exceptSession) {
         String jsonMessage = gson.toJson(message);
-        observerManager.getObservers(gameID).forEach(clientSession -> {
+
+        // Iterate through ObserverInstances, retrieve their Sessions, and send the message
+        observerManager.getUsersFromGame(gameID).forEach(observerInstance -> {
+            Session clientSession = observerInstance.getSession();
             if (clientSession != null && clientSession.isOpen() && (!clientSession.equals(exceptSession))) {
                 try {
                     clientSession.getRemote().sendString(jsonMessage);
@@ -40,20 +44,20 @@ public class MessageDispatcher {
         });
     }
 
-    public void broadcastMessage(Integer gameID, Object message, String userExcluded) {
+    public void broadcastToGameExcept(Integer gameID, ServerMessage message, String userExcluded) {
         String jsonMessage = gson.toJson(message);
         connectionManager.getSessionsFromGame(gameID).forEach((username, session) -> {
             if (!username.equals(userExcluded) && session != null && session.isOpen()) {
                 try {
                     session.getRemote().sendString(jsonMessage);
                 } catch (IOException e) {
-                    System.out.println("Error in broadcast: " + e);
+                    System.out.println("Error in broadcastToGameExcept: " + e.getMessage());
                 }
             }
         });
     }
 
-    public void broadcastToAll(Object message) {
+    public void broadcastToAll(ServerMessage message) {
         String jsonMessage = gson.toJson(message);
         connectionManager.getAllSessions().forEach(session -> {
             if (session != null && session.isOpen()) {

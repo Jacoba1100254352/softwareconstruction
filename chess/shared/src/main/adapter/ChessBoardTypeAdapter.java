@@ -1,4 +1,4 @@
-package dataAccess;
+package adapter;
 
 import chess.*;
 import com.google.gson.TypeAdapter;

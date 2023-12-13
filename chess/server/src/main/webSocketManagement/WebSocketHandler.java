@@ -2,7 +2,6 @@ package webSocketManagement;
 
 import chess.*;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dataAccess.*;
 import models.AuthToken;
 import models.Game;
@@ -10,8 +9,6 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
-
-import java.io.IOException;
 
 @WebSocket
 public class WebSocketHandler {
@@ -82,12 +79,13 @@ public class WebSocketHandler {
         }
 
         // Add the user as an observer if they are not already observing
-        observerManager.addObserver(gameID, session);
-        connectionManager.add(userName, session, gameID);
+        observerManager.add(gameID, new ObserverInstance(session, userName));
+        connectionManager.add(gameID, new ConnectionInstance(session, userName));
 
         // Send game state to the new observer first
         if (game.getGame() != null) {
-            messageDispatcher.sendMessage(session, new LoadGameMessage(game.getGame()));
+            LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
+            messageDispatcher.sendMessage(session, loadGameMessage);
         } else {
             ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
             messageDispatcher.sendMessage(session, errorMessage);
@@ -144,15 +142,20 @@ public class WebSocketHandler {
         }
 
         // Update the game with the new player
+        connectionManager.add(gameCmd.getGameID(), new ConnectionInstance(session, userName));
         gameDao.updateGame(game);
 
-        // Prepare and send LOAD_GAME message to the joining player first
-        LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
-        messageDispatcher.sendMessage(session, loadGameMessage);
+        // After the player joins successfully:
+        NotificationMessage notification = new NotificationMessage(userName + " joined as " + color);
+        messageDispatcher.broadcastToGameExcept(gameCmd.getGameID(), notification, userName);
 
-        // Prepare and broadcast notification to all players and observers in the game, except the joining player
-        NotificationMessage notification = new NotificationMessage(userName + " joined game as " + gameCmd.getPlayerColor().toString()+".");
-        messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification, session);
+        if (game.getGame() != null) {
+            LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
+            messageDispatcher.sendMessage(session, loadGameMessage);
+        } else {
+            ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
+            messageDispatcher.sendMessage(session, errorMessage);
+        }
     }
 
     /**
@@ -207,9 +210,8 @@ public class WebSocketHandler {
      * @param color The color of the player.
      * @param userName The username of the player.
      * @return True if the player can move, false otherwise.
-     * @throws IOException If there's an error in sending the message.
      */
-    private boolean canPlayerMove(Session session, Game game, ChessGame.TeamColor color, String userName) throws IOException {
+    private boolean canPlayerMove(Session session, Game game, ChessGame.TeamColor color, String userName) {
         // Check if the user is an observer, or it's not their turn
         if (color == null || !color.equals(game.getGame().getTeamTurn())) {
             ErrorMessage errorMessage = new ErrorMessage("Error: Invalid move"); // "Error: Not your turn"
@@ -276,9 +278,7 @@ public class WebSocketHandler {
      */
     private void sendMoveNotification(Game game, String userName, ChessMove move) {
         NotificationMessage notification = new NotificationMessage(userName + " moved " + move);
-        LoadGameMessage loadGameMessage = new LoadGameMessage(game.getGame());
-        messageDispatcher.broadcastToAll(loadGameMessage);
-        messageDispatcher.broadcastToAll(notification);
+        messageDispatcher.broadcastToGameExcept(game.getGameID(), notification, userName);
     }
 
     /**
@@ -295,12 +295,12 @@ public class WebSocketHandler {
         if (game.getGame().isInCheckmate(ChessGame.TeamColor.WHITE)) {
             game.getGame().setTeamTurn(null);
             gameDAO.updateGame(game);
-            messageDispatcher.broadcastToAll(new NotificationMessage(game.getWhiteUsername() + " got checkmated!"));
+            messageDispatcher.broadcastToGameExcept(game.getGameID(), new NotificationMessage(game.getWhiteUsername() + " got checkmated!"), null);
         }
         if (game.getGame().isInCheckmate(ChessGame.TeamColor.BLACK)) {
             game.getGame().setTeamTurn(null);
             gameDAO.updateGame(game);
-            messageDispatcher.broadcastToAll(new NotificationMessage(game.getBlackUsername() + " got checkmated!"));
+            messageDispatcher.broadcastToGameExcept(game.getGameID(), new NotificationMessage(game.getBlackUsername() + " got checkmated!"), null);
         }
     }
 
@@ -316,7 +316,7 @@ public class WebSocketHandler {
         String userName = findUser(session, gameCmd.getAuthString());
 
         // Check if the user is an observer using ObserverManager
-        if (observerManager.getObservers(gameCmd.getGameID()).contains(session)) {
+        if (observerManager.getUsersFromGame(gameCmd.getGameID()).contains(new ObserverInstance(session, userName))) {
             ErrorMessage errorMessage = new ErrorMessage("Error: Observer can't resign");
             messageDispatcher.sendMessage(session, errorMessage);
             return;
@@ -329,7 +329,7 @@ public class WebSocketHandler {
             return;
         }
 
-        // Set the game's turn to null to indicate game end
+        // Set the game's turn to null to indicate a game end
         game.getGame().setTeamTurn(null);
         gameDao.updateGame(game);
 
@@ -352,7 +352,7 @@ public class WebSocketHandler {
         ChessGame.TeamColor color = determinePlayerColor(game, userName);
 
         if (color == null) {
-            observerManager.removeObserver(gameCmd.getGameID(), session); // Remove as observer
+            observerManager.remove(userName, gameCmd.getGameID()); // Remove as observer
         } else {
             gameDAO.claimSpot(gameCmd.getGameID(), null, color); // Remove from player position
         }

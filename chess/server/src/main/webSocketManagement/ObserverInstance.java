@@ -2,11 +2,11 @@ package webSocketManagement;
 
 import org.eclipse.jetty.websocket.api.Session;
 
-public class ConnectionInstance implements ClientInstance {
+public class ObserverInstance implements ClientInstance {
     private final Session session;
     private final String userName;
 
-    public ConnectionInstance(Session session, String userName) {
+    public ObserverInstance(Session session, String userName) {
         this.session = session;
         this.userName = userName;
     }

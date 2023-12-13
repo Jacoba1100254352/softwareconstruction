@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class ConnectionManager {
+public class ConnectionManager implements ClientManager {
     private final ConcurrentHashMap<String, ConnectionInstance> connections;
     private final ConcurrentHashMap<Integer, Set<ConnectionInstance>> gameSessions;
 
@@ -14,12 +14,15 @@ public class ConnectionManager {
         gameSessions = new ConcurrentHashMap<>();
     }
 
-    public void add(String username, Session session, Integer gameID) {
-        ConnectionInstance instance = new ConnectionInstance(session, username);
-        connections.put(username, instance);
-        gameSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(instance);
+    @Override
+    public void add(Integer gameID, ClientInstance instance) {
+        if (instance instanceof ConnectionInstance connectionInstance) {
+            connections.put(connectionInstance.getUsername(), connectionInstance);
+            gameSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(connectionInstance);
+        }
     }
 
+    @Override
     public void remove(String username, Integer gameID) {
         ConnectionInstance instance = connections.remove(username);
         if (instance != null && gameID != null) {
@@ -43,7 +46,7 @@ public class ConnectionManager {
         Set<ConnectionInstance> gameSet = gameSessions.get(gameID);
         if (gameSet != null) {
             for (ConnectionInstance instance : gameSet) {
-                sessions.put(instance.userName, instance.session);
+                sessions.put(instance.getUsername(), instance.getSession());
             }
         }
         return sessions;
@@ -52,4 +55,5 @@ public class ConnectionManager {
     public Collection<Session> getAllSessions() {
         return connections.values().stream().map(ConnectionInstance::getSession).collect(Collectors.toList());
     }
+
 }

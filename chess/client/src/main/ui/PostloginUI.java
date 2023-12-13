@@ -2,6 +2,7 @@ package ui;
 
 import chess.*;
 import clients.ChessClient;
+import clients.WebSocketClient;
 import com.google.gson.*;
 import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;
@@ -15,13 +16,15 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class PostloginUI {
-    private final ChessClient client;
+    private final ChessClient chessClient;
+    private final WebSocketClient webSocketClient; // Added instance of WebSocketClient
     private final ServerFacade serverFacade;
     private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
     private final Map<Integer, Integer> gameMap = new HashMap<>();
 
-    public PostloginUI(ChessClient client, ServerFacade serverFacade) {
-        this.client = client;
+    public PostloginUI(ChessClient chessClient, WebSocketClient webSocketClient, ServerFacade serverFacade) {
+        this.chessClient = chessClient;
+        this.webSocketClient = webSocketClient; // Initialize WebSocketClient
         this.serverFacade = serverFacade;
     }
 
@@ -94,7 +97,7 @@ public class PostloginUI {
         jsonRequest.addProperty("gameName", gameName);
 
         try {
-            String response = serverFacade.sendPostRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
+            String response = serverFacade.sendPostRequest("/game", new Gson().toJson(jsonRequest), chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 System.out.println("Game created successfully. Game ID: " + responseObject.get("gameID").getAsInt());
@@ -110,7 +113,7 @@ public class PostloginUI {
     private void listGames() {
         gameMap.clear(); // Clear the previous mapping
         try {
-            String response = serverFacade.sendGetRequest("/game", client.getAuthToken());
+            String response = serverFacade.sendGetRequest("/game", chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 JsonArray games = responseObject.get("games").getAsJsonArray();
@@ -163,13 +166,17 @@ public class PostloginUI {
 
         try {
             if (asObserver) {
-                client.joinObserver(gameId);
+                webSocketClient.joinObserver(gameId);
                 System.out.println("Joined game as observer successfully.");
             } else {
                 System.out.print("Enter color (WHITE/BLACK): ");
                 String colorStr = scanner.next().toUpperCase();
-                client.joinPlayer(colorStr, gameId);
+                webSocketClient.joinPlayer(colorStr, gameId);
                 System.out.println("Joined game successfully.");
+
+                // Draw the board
+                chessClient.getGameplayUI().drawChessboard();
+
                 // Prompt user for a move if they're joining as a player
                 promptForMove();
             }
@@ -195,7 +202,7 @@ public class PostloginUI {
             // Use the third part of the input as the promotion piece if provided
             String promotionPiece = (moveParts.length == 3) ? moveParts[2] : null;
             ChessMove move = parseMoveInput(moveParts[0], moveParts[1], promotionPiece);
-            client.makeMove(move);
+            webSocketClient.makeMove(move);
             System.out.println("Move made successfully.");
         } catch (Exception e) {
             LOGGER.severe("Make move error: " + e.getMessage());
@@ -241,14 +248,14 @@ public class PostloginUI {
 
     private void logout() {
         JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("authToken", client.getAuthToken());
+        jsonRequest.addProperty("authToken", chessClient.getAuthToken());
 
         try {
-            String response = serverFacade.sendDeleteRequest("/session", new Gson().toJson(jsonRequest), client.getAuthToken());
+            String response = serverFacade.sendDeleteRequest("/session", new Gson().toJson(jsonRequest), chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
-                client.setAuthToken(null);
-                client.transitionToPreloginUI();
+                chessClient.setAuthToken(null);
+                chessClient.transitionToPreloginUI();
                 System.out.println("Logged out successfully.");
             } else {
                 LOGGER.severe("Logout error: " + responseObject.get("message").getAsString());
@@ -262,7 +269,7 @@ public class PostloginUI {
 
     private void resignGame() {
         try {
-            client.resignGame();
+            webSocketClient.resignGame();
             System.out.println("You have resigned from the game.");
         } catch (Exception e) {
             LOGGER.severe("Error resigning from game: " + e.getMessage());
@@ -272,7 +279,7 @@ public class PostloginUI {
 
     private void leaveGame() {
         try {
-            client.leaveGame();
+            webSocketClient.leaveGame();
             System.out.println("You have left the game.");
         } catch (Exception e) {
             LOGGER.severe("Error leaving game: " + e.getMessage());
