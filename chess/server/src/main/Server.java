@@ -12,23 +12,18 @@ public class Server {
      * Handlers for service requests and responses.
      */
     private final HashMap<String, BaseHandler> handlers;
+    /**
+     * Handler for WebSocket connections.
+     */
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         // Initialize handlers
         handlers = new HashMap<>();
+        webSocketHandler = new WebSocketHandler();
 
         // Set up the handlers
         setupHandlers();
-    }
-
-    private void setupHandlers() {
-        handlers.put("/db:DELETE", new ClearHandler());
-        handlers.put("/user:POST", new RegisterHandler());
-        handlers.put("/session:POST", new LoginHandler());
-        handlers.put("/session:DELETE", new LogoutHandler());
-        handlers.put("/game:GET", new ListGamesHandler());
-        handlers.put("/game:POST", new CreateGameHandler());
-        handlers.put("/game:PUT", new JoinGameHandler());
     }
 
     public static void main(String[] args) {
@@ -40,6 +35,16 @@ public class Server {
 
         // Register a shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(server::stopServer));
+    }
+
+    private void setupHandlers() {
+        handlers.put("/db:DELETE", new ClearHandler());
+        handlers.put("/user:POST", new RegisterHandler());
+        handlers.put("/session:POST", new LoginHandler());
+        handlers.put("/session:DELETE", new LogoutHandler());
+        handlers.put("/game:GET", new ListGamesHandler());
+        handlers.put("/game:POST", new CreateGameHandler());
+        handlers.put("/game:PUT", new JoinGameHandler());
     }
 
     public String handleRequest(Request req, Response res) {
@@ -68,6 +73,7 @@ public class Server {
         // Set the Spark port
         Spark.port(Integer.parseInt(TestFactory.getServerPort()));
 
+        // Set the WebSocket handler
         Spark.webSocket("/connect", WebSocketHandler.class);
 
         // Set security headers
@@ -77,16 +83,6 @@ public class Server {
             response.header("X-Frame-Options", "SAMEORIGIN");
             response.header("X-XSS-Protection", "1; mode=block");
         });
-
-        // Basic rate limiting
-        /*Spark.before((request, response) -> {
-            String ip = request.ip();
-            int count = requestCounts.getOrDefault(ip, 0);
-            if (count > 100) { // Limit of 100 requests per IP, adjust as needed
-                Spark.halt(429, "Too many requests");
-            }
-            requestCounts.put(ip, count + 1);
-        });*/
 
         // Set the Spark routes
         Spark.delete("/db", this::handleRequest);
@@ -103,13 +99,11 @@ public class Server {
 
     public void stopServer() {
         try {
-            // TODO: Perform necessary shutdown logic
-            // For example, gracefully close WebSocket connections, release resources, etc.
+            // Gracefully close WebSocket connections
+            webSocketHandler.clearSessions();
 
             // Stop the Spark server
             Spark.stop();
-
-            // Additional logic for shutting down other components, if necessary
 
             System.out.println("Server stopped successfully.");
         } catch (Exception e) {

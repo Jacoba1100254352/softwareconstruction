@@ -1,6 +1,7 @@
 package webSocketManagement;
 
 import org.eclipse.jetty.websocket.api.Session;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -16,26 +17,34 @@ public class ConnectionManager implements ClientManager {
 
     @Override
     public void add(Integer gameID, ClientInstance instance) {
-        if (instance instanceof ConnectionInstance connectionInstance) {
-            connections.put(connectionInstance.getUsername(), connectionInstance);
-            gameSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(connectionInstance);
+        try {
+            if (instance instanceof ConnectionInstance connectionInstance) {
+                // Update connection map
+                connections.put(connectionInstance.getUsername(), connectionInstance);
+                // Update game session map
+                gameSessions.computeIfAbsent(gameID, k -> ConcurrentHashMap.newKeySet()).add(connectionInstance);
+            }
+        } catch (Exception e) {
+            System.err.println("Error adding user: " + e.getMessage());
         }
     }
 
     @Override
     public void remove(String username, Integer gameID) {
-        ConnectionInstance instance = connections.remove(username);
-        if (instance != null && gameID != null) {
-            Set<ConnectionInstance> gameSet = gameSessions.get(gameID);
-            if (gameSet != null) {
-                gameSet.remove(instance);
-                if (gameSet.isEmpty()) {
-                    gameSessions.remove(gameID);
-                }
+        try {
+            ConnectionInstance instance = connections.remove(username);
+            if (instance != null && gameID != null) {
+                gameSessions.computeIfPresent(gameID, (k, v) -> {
+                    v.remove(instance);
+                    return v.isEmpty() ? null : v;
+                });
             }
+        } catch (Exception e) {
+            System.err.println("Error removing user: " + e.getMessage());
         }
     }
 
+    @Override
     public void removeAll() {
         connections.clear();
         gameSessions.clear();
@@ -53,7 +62,18 @@ public class ConnectionManager implements ClientManager {
     }
 
     public Collection<Session> getAllSessions() {
-        return connections.values().stream().map(ConnectionInstance::getSession).collect(Collectors.toList());
+        Collection<Session> allSessions = new ArrayList<>();
+        try {
+            allSessions = connections.values().stream().map(ConnectionInstance::getSession).collect(Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("Error getting all sessions: " + e.getMessage());
+        }
+
+        return allSessions;
     }
 
+    // Call this method when a game ends to clear the game sessions
+    public void clearGameSessions(Integer gameID) {
+        gameSessions.remove(gameID);
+    }
 }

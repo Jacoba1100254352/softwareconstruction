@@ -25,19 +25,19 @@ public class RegisterService {
      */
     public RegisterResponse register(RegisterRequest request) {
         try {
-            if (request.getUsername() == null || request.getUsername().isEmpty() ||
-                    request.getPassword() == null || request.getPassword().isEmpty() ||
-                    request.getEmail() == null || request.getEmail().isEmpty()) {
+            if (request.username() == null || request.username().isEmpty() ||
+                    request.password() == null || request.password().isEmpty() ||
+                    request.email() == null || request.email().isEmpty()) {
                 return new RegisterResponse("Error: bad request");
             }
 
-            if (userDAO.getUser(request.getUsername()) == null) {
-                userDAO.insertUser(new User(request.getUsername(), request.getPassword(), request.getEmail()));
+            if (userDAO.getUser(request.username()) == null) {
+                userDAO.insertUser(new User(request.username(), request.password(), request.email()));
 
                 String uniqueToken = UUID.randomUUID().toString();
-                authDAO.insertAuth(new AuthToken(uniqueToken, request.getUsername()));
+                authDAO.insertAuth(new AuthToken(uniqueToken, request.username()));
 
-                return new RegisterResponse(uniqueToken, request.getUsername());
+                return new RegisterResponse(uniqueToken, request.username());
             } else {
                 return new RegisterResponse("Error: already taken");
             }

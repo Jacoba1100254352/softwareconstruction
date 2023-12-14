@@ -10,21 +10,12 @@ import java.util.Objects;
  */
 public class UserGameCommand {
 
+    private final String authToken;
+    protected CommandType commandType;
+
     public UserGameCommand(String authToken) {
         this.authToken = authToken;
     }
-
-    public enum CommandType {
-        JOIN_PLAYER,
-        JOIN_OBSERVER,
-        MAKE_MOVE,
-        LEAVE,
-        RESIGN
-    }
-
-    protected CommandType commandType;
-
-    private final String authToken;
 
     public String getAuthString() {
         return authToken;
@@ -46,5 +37,13 @@ public class UserGameCommand {
     @Override
     public int hashCode() {
         return Objects.hash(getCommandType(), getAuthString());
+    }
+
+    public enum CommandType {
+        JOIN_PLAYER,
+        JOIN_OBSERVER,
+        MAKE_MOVE,
+        LEAVE,
+        RESIGN
     }
 }

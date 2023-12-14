@@ -1,22 +1,28 @@
 package WebSocketFacade;
 
+import chess.ChessGame;
+import clients.ChessClient;
+import clients.WebSocketClient;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import webSocketMessages.serverMessages.ErrorMessage;
+import webSocketMessages.serverMessages.LoadGameMessage;
+import webSocketMessages.serverMessages.NotificationMessage;
+
 import javax.websocket.*;
 import java.net.URI;
 import java.util.logging.Logger;
 
-import chess.ChessGame;
-import clients.*;
-import com.google.gson.*;
-import webSocketMessages.serverMessages.*;
-
 public class WebSocketFacade extends Endpoint {
-    private Session session;
+    private static final Logger LOGGER = Logger.getLogger(WebSocketFacade.class.getName());
     private final ChessClient chessClient;
     private final WebSocketClient webSocketClient;
-    private static final Logger LOGGER = Logger.getLogger(WebSocketFacade.class.getName());
+    private final Gson gson = new Gson();
+    private Session session;
 
     public WebSocketFacade(ChessClient chessClient, WebSocketClient webSocketClient) {
-        System.out.println("WebSocketFacade constructor");
         this.chessClient = chessClient;
         this.webSocketClient = webSocketClient;
     }
@@ -24,82 +30,84 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         LOGGER.info("WebSocket connection opened: " + config.toString());
-
-        // Initialize the session
         this.session = session;
     }
 
     @Override
     public void onClose(Session session, CloseReason closeReason) {
         LOGGER.info("WebSocket connection closed: " + closeReason.getReasonPhrase());
-
-        // Notify ChessClient about the closure
         webSocketClient.notifyUser("Connection closed: " + closeReason.getReasonPhrase());
     }
 
     @Override
     public void onError(Session session, Throwable throwable) {
-        LOGGER.severe("WebSocket error: " + throwable.getMessage());
-
-        // Notify ChessClient about the error
+        LOGGER.severe("WebSocketFacade error: " + throwable.getMessage());
         webSocketClient.notifyUser("Error: " + throwable.getMessage());
     }
 
     public void connect(String uri) throws Exception {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, new URI(uri));
-
-        System.out.println("Connected to server");
-        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-            @OnMessage
-            public void onMessage(String message) {
-                System.out.println("Raw message received: " + message);
-
-                ServerMessage serverMessage = (new Gson()).fromJson(message, ServerMessage.class);
-
-                switch (serverMessage.getServerMessageType()) {
-                    case LOAD_GAME:
-                        handleLoadGame(message);
-                        break;
-                    case ERROR:
-                        handleError(message);
-                        break;
-                    case NOTIFICATION:
-                        handleNotification(message);
-                        break;
-                }
-            }
-        });
-    }
-
-    private void handleLoadGame(String message) {
-        LoadGameMessage loadGameMessage = (new Gson()).fromJson(message, LoadGameMessage.class);
-        ChessGame updatedGame = loadGameMessage.getGame();
-        chessClient.getGameplayUI().redraw(updatedGame, null, null);
-    }
-
-    private void handleError(String message) {
-        ErrorMessage errorMessage = (new Gson()).fromJson(message, ErrorMessage.class);
-        System.out.println("Error received: " + errorMessage.getErrorMessage());
-        chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
-    }
-
-    private void handleNotification(String message) {
-        NotificationMessage notificationMessage = (new Gson()).fromJson(message, NotificationMessage.class);
-        System.out.println("Notification: " + notificationMessage.getNotificationMessage());
-        chessClient.getGameplayUI().showNotification(notificationMessage.getNotificationMessage());
+        LOGGER.info("Connected to server");
     }
 
     public void sendMessage(String message) {
         if (session != null && session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(message);
-                System.out.println("Message sent: " + message);
+                LOGGER.info("Message sent: " + message);
             } catch (Exception e) {
                 LOGGER.severe("Error sending message: " + e.getMessage());
-                // Notify ChessClient about the message sending error
                 webSocketClient.notifyUser("Error sending message: " + e.getMessage());
             }
         }
+    }
+
+    @OnMessage
+    public void onMessage(Session session, String message) {
+        if (this.session != session) {
+            LOGGER.warning("Received message from unknown session");
+            return;
+        }
+
+        LOGGER.info("Raw message received: " + message);
+        try {
+            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+            String messageType = jsonObject.get("serverMessageType").getAsString();
+
+            switch (messageType) {
+                case "LOAD_GAME":
+                    handleLoadGame(message);
+                    break;
+                case "ERROR":
+                    handleError(message);
+                    break;
+                case "NOTIFICATION":
+                    handleNotification(message);
+                    break;
+                default:
+                    LOGGER.warning("Unknown message type received: " + messageType);
+            }
+        } catch (JsonSyntaxException e) {
+            LOGGER.severe("Invalid JSON message format: " + e.getMessage());
+        }
+    }
+
+    private void handleLoadGame(String message) {
+        LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+        ChessGame updatedGame = loadGameMessage.getGame();
+        chessClient.getGameplayUI().redraw(updatedGame, null, null);
+    }
+
+    private void handleError(String message) {
+        ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+        LOGGER.info("Error received: " + errorMessage.getErrorMessage());
+        chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
+    }
+
+    private void handleNotification(String message) {
+        NotificationMessage notificationMessage = gson.fromJson(message, NotificationMessage.class);
+        LOGGER.info("Notification: " + notificationMessage.getNotificationMessage());
+        chessClient.getGameplayUI().showNotification(notificationMessage.getNotificationMessage());
     }
 }

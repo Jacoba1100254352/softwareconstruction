@@ -1,6 +1,9 @@
 package ui;
 
-import chess.*;
+import chess.ChessMove;
+import chess.ChessMoveImpl;
+import chess.ChessPiece;
+import chess.ChessPositionImpl;
 import clients.ChessClient;
 import clients.WebSocketClient;
 import com.google.gson.*;
@@ -16,10 +19,10 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class PostloginUI {
+    private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
     private final ChessClient chessClient;
     private final WebSocketClient webSocketClient; // Added instance of WebSocketClient
     private final ServerFacade serverFacade;
-    private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
     private final Map<Integer, Integer> gameMap = new HashMap<>();
 
     public PostloginUI(ChessClient chessClient, WebSocketClient webSocketClient, ServerFacade serverFacade) {

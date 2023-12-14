@@ -1,7 +1,5 @@
 package responses;
 
-import responses.Response;
-
 /**
  * Represents the result of a registration request.
  */
@@ -9,22 +7,22 @@ public class RegisterResponse implements Response {
     /**
      * The authentication token for the registered user.
      */
-    private String authToken;
+    private final String authToken;
 
     /**
      * The username of the registered user.
      */
-    private String username;
+    private final String username;
 
     /**
      * The error message.
      */
-    private String message;
+    private final String message;
 
     /**
      * Indicates the success of the register operation.
      */
-    private boolean success;
+    private final boolean success;
 
 
     ///   Constructors   ///
@@ -38,6 +36,7 @@ public class RegisterResponse implements Response {
     public RegisterResponse(String authToken, String username) {
         this.authToken = authToken;
         this.username = username;
+        this.message = null;
         this.success = true;  // true: successful registration
     }
 
@@ -47,6 +46,8 @@ public class RegisterResponse implements Response {
      * @param message The error message.
      */
     public RegisterResponse(String message) {
+        this.authToken = null;
+        this.username = null;
         this.message = message;
         this.success = false; // false: failed registration
     }
@@ -58,35 +59,17 @@ public class RegisterResponse implements Response {
         return authToken;
     }
 
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
-
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @Override
-    public String getMessage() {
+    public String message() {
         return message;
     }
 
     @Override
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public boolean isSuccess() {
+    public boolean success() {
         return success;
-    }
-
-    @Override
-    public void setSuccess(boolean success) {
-        this.success = success;
     }
 }

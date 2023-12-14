@@ -14,7 +14,7 @@ public class ClearHandler extends BaseHandler {
         ClearService clearService = new ClearService();
         responses.Response result = clearService.clearDatabase(new ClearRequest(authToken));
 
-        response.status(result.isSuccess() ? 200 : 500);
+        response.status(result.success() ? 200 : 500);
 
         return result;
     }

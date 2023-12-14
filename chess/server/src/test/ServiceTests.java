@@ -45,7 +45,7 @@ public class ServiceTests {
     public void successfulDatabaseClear() {
         ClearRequest clearRequest = new ClearRequest(existingAuth);
         Response response = clearService.clearDatabase(clearRequest);
-        Assertions.assertTrue(response.isSuccess(), "Failed to clear the database");
+        Assertions.assertTrue(response.success(), "Failed to clear the database");
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ServiceTests {
     public void unauthorizedGameCreation() {
         CreateGameRequest request = new CreateGameRequest("invalidAuthToken", "Chess Match");
         CreateGameResponse response = createGameService.createGame(request);
-        Assertions.assertEquals("Error: unauthorized", response.getMessage(), "Incorrect error message");
+        Assertions.assertEquals("Error: unauthorized", response.message(), "Incorrect error message");
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ServiceTests {
     public void unauthorizedGameListing() {
         ListGamesRequest request = new ListGamesRequest("invalidAuthToken");
         ListGamesResponse response = listGamesService.listAllGames(request);
-        Assertions.assertEquals("Error: unauthorized", response.getMessage(), "Incorrect error message");
+        Assertions.assertEquals("Error: unauthorized", response.message(), "Incorrect error message");
     }
 
     @Test
@@ -90,7 +90,7 @@ public class ServiceTests {
     public void joinGameSuccess() {
         JoinGameRequest request = new JoinGameRequest(existingAuth, createdGameID, "WHITE");
         JoinGameResponse response = joinGameService.joinGame(request);
-        Assertions.assertTrue(response.isSuccess(), "Failed to join the game");
+        Assertions.assertTrue(response.success(), "Failed to join the game");
     }
 
     @Test
@@ -99,7 +99,7 @@ public class ServiceTests {
     public void invalidGameID() {
         JoinGameRequest request = new JoinGameRequest(existingAuth, -1, "WHITE");
         JoinGameResponse response = joinGameService.joinGame(request);
-        Assertions.assertFalse(response.isSuccess(), "Joined game with an invalid ID");
+        Assertions.assertFalse(response.success(), "Joined game with an invalid ID");
     }
 
     @Test
@@ -117,7 +117,7 @@ public class ServiceTests {
     public void invalidCredentials() {
         LoginRequest request = new LoginRequest("invalidUsername", "invalidPassword");
         LoginResponse response = loginService.login(request);
-        Assertions.assertEquals("Error: unauthorized", response.getMessage(), "Incorrect error message");
+        Assertions.assertEquals("Error: unauthorized", response.message(), "Incorrect error message");
     }
 
     @Test
@@ -126,7 +126,7 @@ public class ServiceTests {
     public void successfulLogout() {
         LogoutRequest request = new LogoutRequest(existingAuth);
         LogoutResponse response = logoutService.logout(request);
-        Assertions.assertTrue(response.isSuccess(), "Failed to logout");
+        Assertions.assertTrue(response.success(), "Failed to logout");
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ServiceTests {
     public void invalidAuthTokenLogout() {
         LogoutRequest request = new LogoutRequest("invalidToken");
         LogoutResponse response = logoutService.logout(request);
-        Assertions.assertEquals("Error: Invalid authentication token.", response.getMessage(), "Incorrect error message");
+        Assertions.assertEquals("Error: Invalid authentication token.", response.message(), "Incorrect error message");
     }
 
     @Test
@@ -153,6 +153,6 @@ public class ServiceTests {
     public void duplicateUsername() {
         RegisterRequest request = new RegisterRequest(existingUser.getUsername(), "password", "email@example.com");
         RegisterResponse response = registerService.register(request);
-        Assertions.assertEquals("Error: already taken", response.getMessage(), "Incorrect error message");
+        Assertions.assertEquals("Error: already taken", response.message(), "Incorrect error message");
     }
 }

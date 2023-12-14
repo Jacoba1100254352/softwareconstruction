@@ -11,13 +11,12 @@ public class CreateGameHandler extends BaseHandler {
     public Object handleRequest(Request request, Response response) {
         String authToken = request.headers("Authorization");
         CreateGameRequest createGameRequest = gson.fromJson(request.body(), CreateGameRequest.class);
-        createGameRequest.setAuthToken(authToken);
-        CreateGameResponse result = (new CreateGameService()).createGame(createGameRequest);
+        CreateGameResponse result = (new CreateGameService()).createGame(new CreateGameRequest(authToken, createGameRequest.gameName()));
 
-        if (result.isSuccess()) {
+        if (result.success()) {
             response.status(200);
         } else {
-            switch (result.getMessage()) {
+            switch (result.message()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 default -> response.status(500);

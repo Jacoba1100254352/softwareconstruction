@@ -13,10 +13,10 @@ public class RegisterHandler extends BaseHandler {
         RegisterService registerService = new RegisterService();
         RegisterResponse result = registerService.register(registerRequest);
 
-        if (result.isSuccess()) {
+        if (result.success()) {
             response.status(200);
         } else {
-            switch (result.getMessage()) {
+            switch (result.message()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: already taken" -> response.status(403);
                 default -> response.status(500);

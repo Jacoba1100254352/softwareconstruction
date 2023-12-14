@@ -57,13 +57,16 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void insertGame(Game game) throws DataAccessException {
-        String sql = "INSERT INTO Games (GameName, WhiteUsername, BlackUsername, GameState) VALUES (?, ?, ?, ?);";
+        String sql = "INSERT INTO Games (GameName, WhiteUsername, BlackUsername, ChessGame) VALUES (?, ?, ?, ?);";
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             db.startTransaction(conn); // Start transaction
 
-            prepareGameStatement(game, stmt);
+            stmt.setString(1, game.getGameName());
+            stmt.setString(2, game.getWhiteUsername());
+            stmt.setString(3, game.getBlackUsername());
+            stmt.setString(4, serializeChessGame(game.getChessGame()));
 
             if (stmt.executeUpdate() == 0) throw new DataAccessException("Creating game failed, no rows affected.");
 
@@ -100,7 +103,7 @@ public class GameDAO {
                     rs.getString("GameName"),
                     rs.getString("WhiteUsername"),
                     rs.getString("BlackUsername"),
-                    deserializeChessGame(rs.getString("GameState"))
+                    deserializeChessGame(rs.getString("ChessGame"))
             ) : null;
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while finding game: " + e.getMessage());
@@ -124,7 +127,7 @@ public class GameDAO {
                         rs.getString("GameName"),
                         rs.getString("WhiteUsername"),
                         rs.getString("BlackUsername"),
-                        deserializeChessGame(rs.getString("GameState"))
+                        deserializeChessGame(rs.getString("ChessGame"))
                 ));
             return games;
         } catch (SQLException e) {
@@ -142,14 +145,27 @@ public class GameDAO {
      */
     public void claimSpot(Integer gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
         String columnToUpdate = (color == ChessGame.TeamColor.WHITE) ? "WhiteUsername" : "BlackUsername";
-        String sql = "UPDATE Games SET " + columnToUpdate + " = ? WHERE GameID = ? AND " + columnToUpdate + " IS NULL;";
+        String sql;
+        if (username == null) {
+            // If username is null, set the column to NULL explicitly
+            sql = "UPDATE Games SET " + columnToUpdate + " = NULL WHERE GameID = ?;";
+        } else {
+            // If username is not null, proceed as before
+            sql = "UPDATE Games SET " + columnToUpdate + " = ? WHERE GameID = ? AND " + columnToUpdate + " IS NULL;";
+        }
+
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.setInt(2, gameID);
+            if (username != null) {
+                stmt.setString(1, username);
+                stmt.setInt(2, gameID);
+            } else {
+                stmt.setInt(1, gameID);
+            }
 
-            if (stmt.executeUpdate() == 0)
+            if (stmt.executeUpdate() == 0 && username != null) {
                 throw new DataAccessException(color + " player spot is already taken or game does not exist.");
+            }
         } catch (SQLException e) {
             throw new DataAccessException("Error encountered while claiming spot: " + e.getMessage());
         }
@@ -162,14 +178,17 @@ public class GameDAO {
      * @throws DataAccessException if the operation fails.
      */
     public void updateGame(Game game) throws DataAccessException {
-        String sql = "UPDATE Games SET GameName = ?, WhiteUsername = ?, BlackUsername = ?, GameState = ? WHERE GameID = ?;";
+        String sql = "UPDATE Games SET GameName = ?, WhiteUsername = ?, BlackUsername = ?, ChessGame = ? WHERE GameID = ?;";
         Connection conn = null;
         try {
             conn = db.getConnection();
             conn.setAutoCommit(false); // Start transaction
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                prepareGameStatement(game, stmt);
+                stmt.setString(1, game.getGameName());
+                stmt.setString(2, game.getWhiteUsername());
+                stmt.setString(3, game.getBlackUsername());
+                stmt.setString(4, serializeChessGame(game.getChessGame()));
                 stmt.setInt(5, game.getGameID());
 
                 if (stmt.executeUpdate() == 0) throw new DataAccessException("Updating game failed, no rows affected.");
@@ -184,20 +203,6 @@ public class GameDAO {
         } finally {
             db.closeConnection(conn);
         }
-    }
-
-    /**
-     * Prepares a PreparedStatement with game data for insert or update operations.
-     *
-     * @param game The game object containing the data.
-     * @param stmt The PreparedStatement to prepare.
-     * @throws SQLException if a database access error occurs or this method is called on a closed PreparedStatement.
-     */
-    private void prepareGameStatement(Game game, PreparedStatement stmt) throws SQLException {
-        stmt.setString(1, game.getGameName());
-        stmt.setString(2, game.getWhiteUsername());
-        stmt.setString(3, game.getBlackUsername());
-        stmt.setString(4, serializeChessGame(game.getGame()));
     }
 
     /**

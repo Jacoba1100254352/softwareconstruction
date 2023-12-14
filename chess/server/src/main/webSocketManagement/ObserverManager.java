@@ -1,6 +1,6 @@
 package webSocketManagement;
 
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ObserverManager implements ClientManager {
@@ -29,13 +29,14 @@ public class ObserverManager implements ClientManager {
         }
     }
 
-    public boolean isObserver(String username, Integer gameId) {
-        Set<ObserverInstance> observers = gameObservers.get(gameId);
-        return observers != null && observers.stream()
-                .anyMatch(observer -> observer.getUsername().equals(username));
+    @Override
+    public void removeAll() {
+        gameObservers.clear();
     }
 
-    public Set<ObserverInstance> getUsersFromGame(Integer gameId) {
-        return gameObservers.getOrDefault(gameId, Collections.emptySet());
+    public boolean isObserver(String username, Integer gameId) {
+        Set<ObserverInstance> observers = gameObservers.get(gameId);
+        return observers == null || observers.stream()
+                .noneMatch(observer -> observer.getUsername().equals(username));
     }
 }

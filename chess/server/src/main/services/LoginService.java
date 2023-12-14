@@ -24,8 +24,8 @@ public class LoginService {
      */
     public LoginResponse login(LoginRequest request) {
         try {
-            if (userDAO.validatePassword(request.getUsername(), request.getPassword())) {
-                AuthToken newToken = new AuthToken(UUID.randomUUID().toString(), request.getUsername());
+            if (userDAO.validatePassword(request.username(), request.password())) {
+                AuthToken newToken = new AuthToken(UUID.randomUUID().toString(), request.username());
                 authDAO.insertAuth(newToken);
                 return new LoginResponse(newToken.getToken(), newToken.getUsername());
             } else {

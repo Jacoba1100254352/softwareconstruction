@@ -1,7 +1,5 @@
 package responses;
 
-import responses.Response;
-
 /**
  * Represents the result of a login request.
  */
@@ -9,22 +7,22 @@ public class LoginResponse implements Response {
     /**
      * The authentication token for the logged-in user.
      */
-    private String authToken;
+    private final String authToken;
 
     /**
      * The username of the logged-in user.
      */
-    private String username;
+    private final String username;
 
     /**
      * The error message.
      */
-    private String message;
+    private final String message;
 
     /**
      * Indicates if the login operation was successful.
      */
-    private boolean success;
+    private final boolean success;
 
 
     ///   Constructors   ///
@@ -38,6 +36,7 @@ public class LoginResponse implements Response {
     public LoginResponse(String authToken, String username) {
         this.authToken = authToken;
         this.username = username;
+        this.message = null;
         this.success = true;  // true: successful login
     }
 
@@ -47,6 +46,8 @@ public class LoginResponse implements Response {
      * @param message The error message.
      */
     public LoginResponse(String message) {
+        this.authToken = null;
+        this.username = null;
         this.message = message;
         this.success = false; // false: failed login
     }
@@ -58,35 +59,17 @@ public class LoginResponse implements Response {
         return authToken;
     }
 
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
-
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     @Override
-    public String getMessage() {
+    public String message() {
         return message;
     }
 
     @Override
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public boolean isSuccess() {
+    public boolean success() {
         return success;
-    }
-
-    @Override
-    public void setSuccess(boolean success) {
-        this.success = success;
     }
 }

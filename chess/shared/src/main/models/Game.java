@@ -25,7 +25,7 @@ public class Game {
     /**
      * The chess game.
      */
-    private ChessGame game;
+    private ChessGame chessGame;
 
 
     ///   Constructor   ///
@@ -33,16 +33,16 @@ public class Game {
     /**
      * Constructor for a new game with the given attributes.
      *
-     * @param gameID        The unique ID of the game.
-     * @param gameName      The name of the game.
-     * @param game          The Chess Game object.
+     * @param gameID    The unique ID of the game.
+     * @param gameName  The name of the game.
+     * @param chessGame The Chess Game object.
      */
-    public Game(Integer gameID, String gameName, ChessGame game) {
+    public Game(Integer gameID, String gameName, ChessGame chessGame) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = null;
         this.blackUsername = null;
-        this.game = game;
+        this.chessGame = chessGame;
     }
 
     /**
@@ -52,14 +52,14 @@ public class Game {
      * @param gameName      The name of the game.
      * @param whiteUsername The username of the white player.
      * @param blackUsername The username of the black player.
-     * @param game          The Chess Game object.
+     * @param chessGame     The Chess Game object.
      */
-    public Game(Integer gameID, String gameName, String whiteUsername, String blackUsername, ChessGame game) {
+    public Game(Integer gameID, String gameName, String whiteUsername, String blackUsername, ChessGame chessGame) {
         this.gameID = gameID;
         this.gameName = gameName;
         this.whiteUsername = whiteUsername;
         this.blackUsername = blackUsername;
-        this.game = game;
+        this.chessGame = chessGame;
     }
 
 
@@ -97,11 +97,11 @@ public class Game {
         this.gameName = gameName;
     }
 
-    public ChessGame getGame() {
-        return game;
+    public ChessGame getChessGame() {
+        return chessGame;
     }
 
-    public void setGame(ChessGame game) {
-        this.game = game;
+    public void setGame(ChessGame chessGame) {
+        this.chessGame = chessGame;
     }
 }

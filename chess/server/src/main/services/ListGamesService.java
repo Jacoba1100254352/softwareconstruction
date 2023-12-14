@@ -22,7 +22,7 @@ public class ListGamesService {
 
     public ListGamesResponse listAllGames(ListGamesRequest request) {
         try {
-            if (authDAO.findAuth(request.getAuthToken()) == null)
+            if (authDAO.findAuth(request.authToken()) == null)
                 return new ListGamesResponse("Error: unauthorized", false);
             else
                 return new ListGamesResponse(gameDAO.findAllGames());

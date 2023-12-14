@@ -1,7 +1,7 @@
 package ui;
 
-import chess.*;
 import WebSocketFacade.WebSocketFacade;
+import chess.*;
 import clients.ChessClient;
 import clients.WebSocketClient;
 import com.google.gson.Gson;
@@ -149,11 +149,15 @@ public class GameplayUI {
         if (color.equals("white")) {
             rowLabels = "    a  b  c  d  e  f  g  h    ";
             colLabels = "  8 7 6 5 4 3 2 1 ";
-            startRow = 8; endRow = 0; stepRow = -1;
+            startRow = 8;
+            endRow = 0;
+            stepRow = -1;
         } else {
             rowLabels = "    h  g  f  e  d  c  b  a    ";
             colLabels = "  1 2 3 4 5 6 7 8 ";
-            startRow = 1; endRow = 9; stepRow = 1;
+            startRow = 1;
+            endRow = 9;
+            stepRow = 1;
         }
 
         System.out.println(rowLabels);

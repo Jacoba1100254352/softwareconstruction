@@ -12,10 +12,10 @@ public class LogoutHandler extends BaseHandler {
         String authToken = request.headers("Authorization");
         LogoutResponse result = (new LogoutService()).logout(new LogoutRequest(authToken));
 
-        if (result.isSuccess())
+        if (result.success())
             response.status(200);
         else
-            response.status(result.getMessage().equals("Error: unauthorized") ? 500 : 401);
+            response.status(result.message().equals("Error: unauthorized") ? 500 : 401);
 
         return result;
     }

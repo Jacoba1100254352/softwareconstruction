@@ -3,8 +3,8 @@ package webSocketMessages.userCommands;
 import chess.ChessMove;
 
 public class MakeMoveCommand extends UserGameCommand {
-    private Integer gameID;
-    private ChessMove move;
+    private final Integer gameID;
+    private final ChessMove move;
 
     public MakeMoveCommand(String authToken, Integer gameID, ChessMove move) {
         super(authToken);
@@ -20,15 +20,7 @@ public class MakeMoveCommand extends UserGameCommand {
         return gameID;
     }
 
-    public void setGameID(Integer gameID) {
-        this.gameID = gameID;
-    }
-
     public ChessMove getMove() {
         return move;
-    }
-
-    public void setMove(ChessMove move) {
-        this.move = move;
     }
 }

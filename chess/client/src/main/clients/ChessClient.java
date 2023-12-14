@@ -2,14 +2,14 @@ package clients;
 
 import serverFacade.ServerFacade;
 import testFactory.TestFactory;
-import ui.*;
+import ui.GameplayUI;
+import ui.PostloginUI;
+import ui.PreloginUI;
 
 public class ChessClient {
     private final PreloginUI preloginUI;
     private final PostloginUI postloginUI;
     private final GameplayUI gameplayUI;
-
-    private final WebSocketClient webSocketClient; // Add WebSocketClient as a member
 
     private String authToken;
 
@@ -21,13 +21,18 @@ public class ChessClient {
     public ChessClient() {
         ServerFacade serverFacade = new ServerFacade("http://localhost:" + TestFactory.getServerPort());
 
-        this.webSocketClient = new WebSocketClient(this);
+        // Add WebSocketClient as a member
+        WebSocketClient webSocketClient = new WebSocketClient(this);
 
         preloginUI = new PreloginUI(this, serverFacade);
         postloginUI = new PostloginUI(this, webSocketClient, serverFacade);
         gameplayUI = new GameplayUI(this, webSocketClient);
 
         isRunning = true;
+    }
+
+    public static void main(String[] args) {
+        (new ChessClient()).run();
     }
 
     public void run() {
@@ -39,7 +44,6 @@ public class ChessClient {
             }
         }
     }
-
 
     public void exit() {
         isRunning = false;
@@ -57,39 +61,19 @@ public class ChessClient {
         isLoggedIn = false;
     }
 
-    public boolean currentUserIsLoggedIn() {
-        return isLoggedIn;
+    public String getAuthToken() {
+        return authToken;
     }
 
     public void setAuthToken(String token) {
         this.authToken = token;
     }
 
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public String getClientUsername() {
-        return clientUsername;
-    }
-
     public void setClientUsername(String clientUsername) {
         this.clientUsername = clientUsername;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
     public void setAdmin(boolean admin) {
         isAdmin = admin;
-    }
-
-    public void drawChessboard() {
-        gameplayUI.drawChessboard();
-    }
-
-    public static void main(String[] args) {
-        (new ChessClient()).run();
     }
 }

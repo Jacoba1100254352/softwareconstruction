@@ -20,7 +20,7 @@ public class LogoutService {
      */
     public LogoutResponse logout(LogoutRequest request) {
         try {
-            AuthToken authToken = authDAO.findAuth(request.getAuthToken());
+            AuthToken authToken = authDAO.findAuth(request.authToken());
             if (authToken != null) {
                 authDAO.deleteAuth(authToken);
                 return new LogoutResponse("Logged out successfully.", true);

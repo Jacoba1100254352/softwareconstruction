@@ -5,27 +5,30 @@ import responses.JoinGameResponse;
 import services.JoinGameService;
 import spark.Request;
 import spark.Response;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class JoinGameHandler extends BaseHandler {
     @Override
     public Object handleRequest(Request request, Response response) {
         String authToken = request.headers("Authorization");
 
-        // Deserialize the JoinGameRequest from the request body
-        JoinGameRequest joinGameRequest = gson.fromJson(request.body(), JoinGameRequest.class);
+        // Parse the request body to a JsonObject
+        JsonObject requestBody = JsonParser.parseString(request.body()).getAsJsonObject();
 
-        if (joinGameRequest.getPlayerColor() == null)
-            joinGameRequest.setPlayerColor("OBSERVER");  // NOTE: This can be set to any non-null string
+        // Extract gameID and playerColor from the request body
+        Integer gameID = requestBody.has("gameID") ? requestBody.get("gameID").getAsInt() : null;
+        String playerColor = requestBody.has("playerColor") ? requestBody.get("playerColor").getAsString() : "OBSERVER";
 
-        // Set the authToken of the JoinGameRequest object
-        joinGameRequest.setAuthToken(authToken);
+        // Construct the JoinGameRequest record
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameID, playerColor);
 
         JoinGameResponse result = (new JoinGameService()).joinGame(joinGameRequest);
 
-        if (result.isSuccess()) {
+        if (result.success()) {
             response.status(200);
         } else {
-            switch (result.getMessage()) {
+            switch (result.message()) {
                 case "Error: bad request" -> response.status(400);
                 case "Error: unauthorized" -> response.status(401);
                 case "Error: already taken" -> response.status(403);

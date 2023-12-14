@@ -20,6 +20,7 @@ public class WebSocketClient {
     public WebSocketClient(ChessClient chessClient) {
         this.authToken = chessClient.getAuthToken();
         this.gameID = null;
+
         this.isPlayer = false;
         this.canMove = false;
 
@@ -32,15 +33,19 @@ public class WebSocketClient {
             throw new Exception("Must be in a game to resign");
         }
 
-        ResignCommand command = new ResignCommand(this.authToken, this.gameID);
-        String message = new Gson().toJson(command);
+        try {
+            ResignCommand command = new ResignCommand(this.authToken, this.gameID);
+            String message = new Gson().toJson(command);
 
-        // Send the message to the server or WebSocket
-        webSocketFacade.sendMessage(message);
+            // Send the message to the server or WebSocket
+            webSocketFacade.sendMessage(message);
 
-        // Update client state
-        isPlayer = false;
-        canMove = false;
+            // Update client state
+            isPlayer = false;
+            canMove = false;
+        } catch (Exception e) {
+            System.err.println("Error in resignGame: " + e.getMessage());
+        }
     }
 
     public void leaveGame() throws Exception {
@@ -48,15 +53,19 @@ public class WebSocketClient {
             throw new Exception("Must be in a game to leave it");
         }
 
-        LeaveCommand command = new LeaveCommand(this.authToken, this.gameID);
-        String message = new Gson().toJson(command);
+        try {
+            LeaveCommand command = new LeaveCommand(this.authToken, this.gameID);
+            String message = new Gson().toJson(command);
 
-        // Send the message to the server or WebSocket
-        webSocketFacade.sendMessage(message);
+            // Send the move message to the server or WebSocket
+            webSocketFacade.sendMessage(message);
 
-        // Update client state
-        isPlayer = false;
-        canMove = false;
+            // Update the client's state
+            isPlayer = false;
+            canMove = false;
+        } catch (Exception e) {
+            System.err.println("Error in leaveGame: " + e.getMessage());
+        }
     }
 
     // Method to make a move in the game
@@ -65,14 +74,18 @@ public class WebSocketClient {
             throw new Exception("It's not your turn to move.");
         }
 
-        MakeMoveCommand command = new MakeMoveCommand(this.authToken, this.gameID, move);
-        String message = new Gson().toJson(command);
+        try {
+            MakeMoveCommand command = new MakeMoveCommand(this.authToken, this.gameID, move);
+            String message = new Gson().toJson(command);
 
-        // Send the move message to the server or WebSocket
-        webSocketFacade.sendMessage(message);
+            // Send the move message to the server or WebSocket
+            webSocketFacade.sendMessage(message);
 
-        // Update the client's state if necessary
-        this.canMove = false;
+            // Update the client's state
+            this.canMove = false;
+        } catch (Exception e) {
+            System.err.println("Error in makeMove: " + e.getMessage());
+        }
     }
 
     // Method to join a game as a player
@@ -87,29 +100,37 @@ public class WebSocketClient {
             this.canMove = false;
         }
 
-        JoinPlayerCommand command = new JoinPlayerCommand(this.authToken, gameID, teamColor);
-        String message = new Gson().toJson(command);
+        try {
+            JoinPlayerCommand command = new JoinPlayerCommand(this.authToken, gameID, teamColor);
+            String message = new Gson().toJson(command);
 
-        // Send the join message to the server or WebSocket
-        webSocketFacade.sendMessage(message);
+            // Send the join message to the server or WebSocket
+            webSocketFacade.sendMessage(message);
 
-        // Update the client state
-        this.isPlayer = true;
-        this.gameID = gameID;
+            // Update the client state
+            this.isPlayer = true;
+            this.gameID = gameID;
+        } catch (Exception e) {
+            System.err.println("Error in joinPlayer: " + e.getMessage());
+        }
     }
 
     // Method to join a game as an observer
     public void joinObserver(Integer gameID) {
-        JoinObserverCommand command = new JoinObserverCommand(this.authToken, gameID);
-        String message = new Gson().toJson(command);
+        try {
+            JoinObserverCommand command = new JoinObserverCommand(this.authToken, gameID);
+            String message = new Gson().toJson(command);
 
-        // Send the join message to the server or WebSocket
-        webSocketFacade.sendMessage(message);
+            // Send the join message to the server or WebSocket
+            webSocketFacade.sendMessage(message);
 
-        // Update the client state
-        this.isPlayer = false;
-        this.canMove = false;
-        this.gameID = gameID;
+            // Update the client state
+            this.isPlayer = false;
+            this.canMove = false;
+            this.gameID = gameID;
+        } catch (Exception e) {
+            System.err.println("Error in joinObserver: " + e.getMessage());
+        }
     }
 
     // Method to notify the user about various types of messages
@@ -121,7 +142,7 @@ public class WebSocketClient {
         } else if (message.contains("ERROR")) {
             // Extract and process the error message
             ErrorMessage error = new Gson().fromJson(message, ErrorMessage.class);
-            System.out.println("\nError: " + error.getErrorMessage());
+            System.err.println("\nError: " + error.getErrorMessage());
         } else {
             // Default handling for other types of messages
             System.out.println("\n" + message);

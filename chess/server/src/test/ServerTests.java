@@ -417,7 +417,7 @@ public class ServerTests {
         gameDAO.updateGame(game);
 
         // Assert
-        Assertions.assertEquals(gameDAO.serializeChessGame(newGame), gameDAO.serializeChessGame(gameDAO.findGameByID(game.getGameID()).getGame()), "Game state did not update correctly in the database.");
+        Assertions.assertEquals(gameDAO.serializeChessGame(newGame), gameDAO.serializeChessGame(gameDAO.findGameByID(game.getGameID()).getChessGame()), "Game state did not update correctly in the database.");
     }
 
     // Negative Test for updateGame (game does not exist)

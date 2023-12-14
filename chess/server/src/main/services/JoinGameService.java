@@ -27,7 +27,7 @@ public class JoinGameService {
     public JoinGameResponse joinGame(JoinGameRequest request) {
         try {
             // Verify authToken exists
-            AuthToken authToken = authDAO.findAuth(request.getAuthToken());
+            AuthToken authToken = authDAO.findAuth(request.authToken());
             if (authToken == null)
                 return new JoinGameResponse("Error: unauthorized", false);
 
@@ -37,14 +37,14 @@ public class JoinGameService {
                 return new JoinGameResponse("Error: user not found", false);
 
             // Verify the game exists
-            if (gameDAO.findGameByID(request.getGameID()) == null)
+            if (gameDAO.findGameByID(request.gameID()) == null)
                 return new JoinGameResponse("Error: bad request", false);
 
             // Add player to game or watch status based on color
-            if (request.getPlayerColor().equalsIgnoreCase("WHITE"))
-                gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.WHITE);
-            else if (request.getPlayerColor().equalsIgnoreCase("BLACK"))
-                gameDAO.claimSpot(request.getGameID(), user.getUsername(), ChessGame.TeamColor.BLACK);
+            if (request.playerColor().equalsIgnoreCase("WHITE"))
+                gameDAO.claimSpot(request.gameID(), user.getUsername(), ChessGame.TeamColor.WHITE);
+            else if (request.playerColor().equalsIgnoreCase("BLACK"))
+                gameDAO.claimSpot(request.gameID(), user.getUsername(), ChessGame.TeamColor.BLACK);
             else // Watching
                 return new JoinGameResponse("Successfully watching the game", true);
 

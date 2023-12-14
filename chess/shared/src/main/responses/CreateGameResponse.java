@@ -1,7 +1,5 @@
 package responses;
 
-import responses.Response;
-
 /**
  * Represents the response after attempting to create a game.
  */
@@ -9,17 +7,17 @@ public class CreateGameResponse implements Response {
     /**
      * The unique ID of the created game.
      */
-    private Integer gameID;
+    private final Integer gameID;
 
     /**
      * A message providing success or error info.
      */
-    private String message;
+    private final String message;
 
     /**
      * Indicates the success of the create game operation.
      */
-    private boolean success;
+    private final boolean success;
 
 
     ///   Constructors   ///
@@ -31,6 +29,7 @@ public class CreateGameResponse implements Response {
      */
     public CreateGameResponse(Integer gameID) {
         this.gameID = gameID;
+        this.message = null;
         this.success = true;
     }
 
@@ -40,6 +39,7 @@ public class CreateGameResponse implements Response {
      * @param message A message providing error info.
      */
     public CreateGameResponse(String message) {
+        this.gameID = null;
         this.message = message;
         this.success = false;
     }
@@ -51,27 +51,13 @@ public class CreateGameResponse implements Response {
         return gameID;
     }
 
-    public void setGameID(Integer gameID) {
-        this.gameID = gameID;
-    }
-
     @Override
-    public String getMessage() {
+    public String message() {
         return message;
     }
 
     @Override
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public boolean isSuccess() {
+    public boolean success() {
         return success;
-    }
-
-    @Override
-    public void setSuccess(boolean success) {
-        this.success = success;
     }
 }

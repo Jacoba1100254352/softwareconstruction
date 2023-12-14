@@ -1,7 +1,6 @@
 package responses;
 
 import models.Game;
-import responses.Response;
 
 import java.util.Collection;
 
@@ -13,17 +12,17 @@ public class ListGamesResponse implements Response {
     /**
      * A list of games.
      */
-    private Collection<Game> games;
+    private final Collection<Game> games;
 
     /**
      * A message providing details or an error description.
      */
-    private String message;
+    private final String message;
 
     /**
      * The game listing was successful
      */
-    private boolean success;
+    private final boolean success;
 
 
     ///   Constructors   ///
@@ -35,6 +34,7 @@ public class ListGamesResponse implements Response {
      */
     public ListGamesResponse(Collection<Game> games) {
         this.games = games;
+        this.message = null;
         this.success = true; // true: successful list games
     }
 
@@ -45,6 +45,7 @@ public class ListGamesResponse implements Response {
      * @param success Indicates the success of the List Game Response.
      */
     public ListGamesResponse(String message, boolean success) {
+        this.games = null;
         this.message = message;
         this.success = success;
     }
@@ -56,27 +57,13 @@ public class ListGamesResponse implements Response {
         return games;
     }
 
-    public void setGames(Collection<Game> games) {
-        this.games = games;
-    }
-
     @Override
-    public String getMessage() {
+    public String message() {
         return message;
     }
 
     @Override
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public boolean isSuccess() {
+    public boolean success() {
         return success;
-    }
-
-    @Override
-    public void setSuccess(boolean success) {
-        this.success = success;
     }
 }

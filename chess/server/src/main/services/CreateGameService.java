@@ -24,17 +24,17 @@ public class CreateGameService {
      */
     public CreateGameResponse createGame(CreateGameRequest request) {
         try {
-            if (request.getGameName() == null || request.getGameName().isEmpty())
+            if (request.gameName() == null || request.gameName().isEmpty())
                 return new CreateGameResponse("Error: bad request");
 
-            if (authDAO.findAuth(request.getAuthToken()) == null)
+            if (authDAO.findAuth(request.authToken()) == null)
                 return new CreateGameResponse("Error: unauthorized");
 
             // Create a new Game object
             ChessGame game = new ChessGameImpl();
             game.getBoard().resetBoard();
             Integer gameID = (!gameDAO.findAllGames().isEmpty()) ? gameDAO.getCurrentGameId() : 0;
-            Game newGame = new Game(gameID, request.getGameName(), game);
+            Game newGame = new Game(gameID, request.gameName(), game);
 
             // Insert the new Game object into the data store
             gameDAO.insertGame(newGame);

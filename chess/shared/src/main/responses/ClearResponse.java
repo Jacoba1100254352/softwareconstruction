@@ -1,55 +1,10 @@
 package responses;
 
-import responses.Response;
-
 /**
  * Represents the response after attempting to clear the database.
+ *
+ * @param message A message providing success or error info.
+ * @param success Indicates the success of the clear operation.
  */
-public class ClearResponse implements Response {
-    /**
-     * A message providing success or error info.
-     */
-    private String message;
-
-    /**
-     * Indicates the success of the clear operation.
-     */
-    private boolean success;
-
-
-    ///   Constructor   ///
-
-    /**
-     * Constructor for the clear response success or failure.
-     *
-     * @param message A message providing success or error info.
-     * @param success Indicates the success of the clear operation.
-     */
-    public ClearResponse(String message, boolean success) {
-        this.message = message;
-        this.success = success;
-    }
-
-
-    ///   Getters and setters   ///
-
-    @Override
-    public String getMessage() {
-        return message;
-    }
-
-    @Override
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public boolean isSuccess() {
-        return success;
-    }
-
-    @Override
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
+public record ClearResponse(String message, boolean success) implements Response {
 }

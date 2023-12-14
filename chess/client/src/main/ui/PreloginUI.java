@@ -1,9 +1,9 @@
 package ui;
 
 import clients.ChessClient;
-import serverFacade.ServerFacade;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;
 
 import java.util.InputMismatchException;
