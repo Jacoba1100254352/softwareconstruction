@@ -7,6 +7,8 @@ import ui.PostloginUI;
 import ui.PreloginUI;
 
 public class ChessClient {
+    private final boolean DEBUG_MODE = false;
+
     private final PreloginUI preloginUI;
     private final PostloginUI postloginUI;
     private final GameplayUI gameplayUI;
@@ -65,5 +67,9 @@ public class ChessClient {
 
     public void setAuthToken(String token) {
         this.authToken = token;
+    }
+
+    public boolean isDebugMode() {
+        return DEBUG_MODE;
     }
 }

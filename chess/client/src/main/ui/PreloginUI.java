@@ -12,11 +12,11 @@ import java.util.logging.Logger;
 
 public class PreloginUI {
     private static final Logger LOGGER = Logger.getLogger(PreloginUI.class.getName());
-    private final ChessClient client;
+    private final ChessClient chessClient;
     private final ServerFacade serverFacade;
 
-    public PreloginUI(ChessClient client, ServerFacade serverFacade) {
-        this.client = client;
+    public PreloginUI(ChessClient chessClient, ServerFacade serverFacade) {
+        this.chessClient = chessClient;
         this.serverFacade = serverFacade;
     }
 
@@ -37,7 +37,7 @@ public class PreloginUI {
                 choice = scanner.nextInt();
                 processUserChoice(choice);
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
+                LOGGER.warning("Invalid input. Please enter a valid number.");
                 scanner.nextLine();
             }
         }
@@ -62,21 +62,25 @@ public class PreloginUI {
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
 
             if (responseObject.get("success").getAsBoolean()) {
+                if (chessClient.isDebugMode()) {
                 System.out.print("Login response object" + responseObject);
+                }
+
                 String authToken = responseObject.get("authToken").getAsString();
 
+                // Formatting
                 System.out.println();
 
-                client.setAuthToken(authToken);
-                client.transitionToPostloginUI();
+                chessClient.setAuthToken(authToken);
+                chessClient.transitionToPostloginUI();
 
-                System.out.println("Logged in successfully.\n");
+                LOGGER.info("Logged in successfully.\n");
             } else {
-                System.out.println("Login failed: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Login failed: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException e) {
             if (e.getMessage().contains("HTTP response code: 401")) {
-                System.out.println("Invalid username or password.");
+                LOGGER.warning("Invalid username or password.");
             } else {
                 LOGGER.severe("Login error: " + e.getMessage());
             }
@@ -104,15 +108,15 @@ public class PreloginUI {
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();
-                client.setAuthToken(authToken);
-                client.transitionToPostloginUI();
-                System.out.println("Registered and logged in successfully.");
+                chessClient.setAuthToken(authToken);
+                chessClient.transitionToPostloginUI();
+                LOGGER.info("Registered and logged in successfully.");
             } else {
-                System.out.println("Registration failed: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Registration failed: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException e) {
             if (e.getMessage().contains("HTTP response code: 403")) {
-                System.out.println("Username already taken. Please choose a different username or log in.");
+                LOGGER.warning("Username already taken. Please choose a different username or log in.");
             } else {
                 LOGGER.severe("Registration error: " + e.getMessage());
             }
@@ -129,8 +133,8 @@ public class PreloginUI {
             case 0 -> displayHelp();
             case 1 -> login();
             case 2 -> register();
-            case 3 -> client.exit();
-            default -> System.out.println("Invalid choice. Please enter a number between 1 and 3.");
+            case 3 -> chessClient.exit();
+            default -> LOGGER.warning("Invalid choice. Please enter a number between 1 and 3.");
         }
     }
 

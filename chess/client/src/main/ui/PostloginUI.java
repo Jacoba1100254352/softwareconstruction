@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessMove;
-import chess.ChessMoveImpl;
-import chess.ChessPiece;
-import chess.ChessPositionImpl;
+import chess.*;
 import clients.ChessClient;
 import clients.WebSocketClient;
 import com.google.gson.*;
@@ -13,7 +10,6 @@ import serverFacade.ServerFacadeException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -21,17 +17,24 @@ import java.util.logging.Logger;
 public class PostloginUI {
     private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
     private final ChessClient chessClient;
-    private final WebSocketClient webSocketClient; // Added instance of WebSocketClient
+    private final WebSocketClient webSocketClient;
     private final ServerFacade serverFacade;
     private final Map<Integer, Integer> gameMap = new HashMap<>();
 
+    private boolean isInGame = false;
+
     public PostloginUI(ChessClient chessClient, WebSocketClient webSocketClient, ServerFacade serverFacade) {
         this.chessClient = chessClient;
-        this.webSocketClient = webSocketClient; // Initialize WebSocketClient
+        this.webSocketClient = webSocketClient;
         this.serverFacade = serverFacade;
     }
 
     public void displayMenu() {
+        if (isInGame) {
+            displayInGameMenu();
+            return;
+        }
+
         System.out.println("Post-login Menu:");
         System.out.println("0. Help");
         System.out.println("1. Create Game");
@@ -41,28 +44,37 @@ public class PostloginUI {
         System.out.println("5. Logout");
 
         Scanner scanner = new Scanner(System.in);
-        int choice = -1;
+        int choice = getInput(scanner, 0, 5);
+        processUserChoice(choice);
+    }
 
-        // Validate user input
-        while (choice < 0 || choice > 5) {
+    private void displayInGameMenu() {
+        System.out.println("In-Game Menu:");
+        System.out.println("1. Make Move");
+        System.out.println("2. Resign Game");
+        System.out.println("3. Leave Game");
+        System.out.println("4. Return to Main Menu");
+
+        Scanner scanner = new Scanner(System.in);
+        int choice = getInput(scanner, 1, 4);
+        processInGameChoice(choice);
+    }
+
+    private int getInput(Scanner scanner, int min, int max) {
+        int choice = -1;
+        while (choice < min || choice > max) {
             System.out.print("Enter choice: ");
             try {
                 choice = scanner.nextInt();
-                processUserChoice(choice);
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
+            } catch (Exception e) {
+                LOGGER.warning("Invalid input. Please enter a valid number.");
                 scanner.nextLine();
             }
         }
-
-        // Formatting
-        System.out.println();
+        return choice;
     }
 
     private void processUserChoice(int choice) {
-        // Formatting
-        System.out.println();
-
         switch (choice) {
             case 0 -> displayHelp();
             case 1 -> createGame();
@@ -72,15 +84,15 @@ public class PostloginUI {
             case 5 -> logout();
             case 6 -> resignGame();
             case 7 -> leaveGame();
-            default -> printInvalidChoice();
+            default -> LOGGER.warning("Invalid choice selected: " + choice);
         }
     }
 
-    private void printInvalidChoice() {
-        System.out.println("Invalid choice.");
-    }
-
     private void displayHelp() {
+        if (chessClient.isDebugMode()) {
+            LOGGER.info("Displaying Help Menu");
+        }
+
         System.out.println("Help Menu:");
         System.out.println("0. Help - Displays this help menu.");
         System.out.println("1. Create Game - Create a new game on the server.");
@@ -105,16 +117,15 @@ public class PostloginUI {
             if (responseObject.get("success").getAsBoolean()) {
                 System.out.println("Game created successfully. Game ID: " + responseObject.get("gameID").getAsInt());
             } else {
-                System.out.println("Failed to create game: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Failed to create game: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("Create game error: " + e.getMessage());
-            System.out.println("Failed to create game: " + e.getMessage());
         }
     }
 
     private void listGames() {
-        gameMap.clear(); // Clear the previous mapping
+        gameMap.clear(); // Clear the previous game list mapping
         try {
             String response = serverFacade.sendGetRequest("/game", chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
@@ -140,11 +151,10 @@ public class PostloginUI {
                     gameMap.put(number++, gameId); // Map list number to game ID
                 }
             } else {
-                System.out.println("Failed to list games: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Failed to list games: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("List games error: " + e.getMessage());
-            System.out.println("Failed to list games: " + e.getMessage());
         }
     }
 
@@ -163,19 +173,20 @@ public class PostloginUI {
         Integer gameId = gameMap.get(gameNumber);
 
         if (gameId == null) {
-            System.out.println("Invalid game number.");
+            LOGGER.warning("Invalid game number.");
             return;
         }
 
         try {
             if (asObserver) {
                 webSocketClient.joinObserver(gameId);
-                System.out.println("Joined game as observer successfully.");
+                LOGGER.info("Joined game as observer successfully.");
             } else {
                 System.out.print("Enter color (WHITE/BLACK): ");
                 String colorStr = scanner.next().toUpperCase();
                 webSocketClient.joinPlayer(colorStr, gameId);
-                System.out.println("Joined game successfully.");
+
+                LOGGER.info("Joined game successfully.");
 
                 // Draw the board
                 chessClient.getGameplayUI().drawChessboard();
@@ -185,19 +196,58 @@ public class PostloginUI {
             }
         } catch (Exception e) {
             LOGGER.severe("Join game error: " + e.getMessage());
-            System.out.println("Failed to join game: " + e.getMessage());
+        }
+    }
+
+    private void processInGameChoice(int choice) {
+        switch (choice) {
+            case 1 -> promptForMove();
+            case 2 -> resignGame();
+            case 3 -> leaveGame();
+            case 4 -> {
+                isInGame = false;
+                displayMenu();
+            }
+            default -> LOGGER.warning("Invalid in-game choice selected: " + choice);
         }
     }
 
     private void promptForMove() {
         Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Options:");
+            System.out.println("1. Make Move");
+            System.out.println("2. Resign Game");
+            System.out.println("3. Leave Game");
+            System.out.println("Enter your choice:");
+
+            int choice = getInput(scanner, 1, 3);
+
+            switch (choice) {
+                case 1:
+                    makeMove(scanner);
+                    return; // Return after move is made
+                case 2:
+                    resignGame();
+                    return; // Return after resigning
+                case 3:
+                    leaveGame();
+                    return; // Return after leaving
+                default:
+                    LOGGER.warning("Invalid choice. Please select a valid option.");
+            }
+        }
+    }
+
+    private void makeMove(Scanner scanner) {
         System.out.println("Enter your move (e.g., e2 e4, or e7 e8 Q for pawn promotion): ");
         String moveInput = scanner.nextLine();
         String[] moveParts = moveInput.split(" ");
 
         // Check for standard move format or move with promotion
         if (moveParts.length != 2 && moveParts.length != 3) {
-            System.out.println("Invalid move format.");
+            LOGGER.warning("Invalid move format. Please enter a valid move.");
             return;
         }
 
@@ -206,14 +256,15 @@ public class PostloginUI {
             String promotionPiece = (moveParts.length == 3) ? moveParts[2] : null;
             ChessMove move = parseMoveInput(moveParts[0], moveParts[1], promotionPiece);
             webSocketClient.makeMove(move);
-            System.out.println("Move made successfully.");
+
+            LOGGER.info("Move made successfully.");
         } catch (Exception e) {
             LOGGER.severe("Make move error: " + e.getMessage());
-            System.out.println("Failed to make move: " + e.getMessage());
         }
     }
 
-    // You need to implement this method to convert user input into a ChessMove object
+
+    // Convert user input into a ChessMove object
     private ChessMove parseMoveInput(String from, String to, String promotion) throws IllegalArgumentException {
         // Parse the 'from' and 'to' strings into ChessPositionImpl objects
         ChessPositionImpl startPos = parsePosition(from);
@@ -232,14 +283,14 @@ public class PostloginUI {
 
         char colChar = position.toLowerCase().charAt(0);
         int row = Integer.parseInt(position.substring(1));
-        int col = colChar - 'a' + 1; // Assuming 'a' is 1, 'b' is 2, etc.
+        int col = colChar - 'a' + 1;
 
         return new ChessPositionImpl(row, col);
     }
 
     private ChessPiece.PieceType parsePromotionPiece(String promotion) {
         if (promotion == null || promotion.isEmpty()) {
-            return null; // No promotion piece specified
+            return null;
         }
 
         try {
@@ -259,34 +310,35 @@ public class PostloginUI {
             if (responseObject.get("success").getAsBoolean()) {
                 chessClient.setAuthToken(null);
                 chessClient.transitionToPreloginUI();
-                System.out.println("Logged out successfully.");
+
+                if (chessClient.isDebugMode()) {
+                    LOGGER.info("Logged out successfully.");
+                }
             } else {
-                LOGGER.severe("Logout error: " + responseObject.get("message").getAsString());
-                System.out.println("Failed to logout: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Logout error: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("Logout error: " + e.getMessage());
-            System.out.println("Failed to logout: " + e.getMessage());
         }
     }
 
     private void resignGame() {
         try {
             webSocketClient.resignGame();
-            System.out.println("You have resigned from the game.");
+            LOGGER.info("Resigned from game successfully.");
+            isInGame = false;
         } catch (Exception e) {
             LOGGER.severe("Error resigning from game: " + e.getMessage());
-            System.out.println("Failed to resign from game: " + e.getMessage());
         }
     }
 
     private void leaveGame() {
         try {
             webSocketClient.leaveGame();
-            System.out.println("You have left the game.");
+            LOGGER.info("Left game successfully.");
+            isInGame = false;
         } catch (Exception e) {
             LOGGER.severe("Error leaving game: " + e.getMessage());
-            System.out.println("Failed to leave game: " + e.getMessage());
         }
     }
 }

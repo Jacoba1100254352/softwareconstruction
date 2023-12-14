@@ -17,11 +17,13 @@ import static ui.EscapeSequences.*;
 
 public class GameplayUI {
     private static final Logger LOGGER = Logger.getLogger(GameplayUI.class.getName());
+    private final ChessClient chessClient;
     private final WebSocketFacade webSocketFacade;
 
     // Constructor
     public GameplayUI(ChessClient chessClient, WebSocketClient webSocketClient) {
         this.webSocketFacade = new WebSocketFacade(chessClient, webSocketClient);
+        this.chessClient = chessClient;
 
         connectToGameServer();
     }
@@ -68,7 +70,9 @@ public class GameplayUI {
     public void connectToGameServer() {
         try {
             webSocketFacade.connect("ws://localhost:" + TestFactory.getServerPort() + "/connect");
-            LOGGER.log(Level.INFO, "Connected to Server");
+            if (chessClient.isDebugMode()) {
+                LOGGER.log(Level.INFO, "Connected to Server");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
         }

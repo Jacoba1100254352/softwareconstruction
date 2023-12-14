@@ -102,7 +102,7 @@ public class WebSocketFacade extends Endpoint {
 
     private void handleError(String message) {
         ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
-        LOGGER.info("Error received: " + errorMessage.getErrorMessage());
+        LOGGER.severe("Error received: " + errorMessage.getErrorMessage());
         chessClient.getGameplayUI().displayError(errorMessage.getErrorMessage());
     }
 
