@@ -27,12 +27,12 @@ public class LoginService {
             if (userDAO.validatePassword(request.username(), request.password())) {
                 AuthToken newToken = new AuthToken(UUID.randomUUID().toString(), request.username());
                 authDAO.insertAuth(newToken);
-                return new LoginResponse(newToken.getToken(), newToken.getUsername());
+                return new LoginResponse(newToken.getToken(), request.username(), null, true);
             } else {
-                return new LoginResponse("Error: unauthorized");
+                return new LoginResponse(null, null, "Error: unauthorized", false);
             }
         } catch (DataAccessException e) {
-            return new LoginResponse("Error: " + e.getMessage());
+            return new LoginResponse(null, null, "Error: " + e.getMessage(), false);
         }
     }
 }

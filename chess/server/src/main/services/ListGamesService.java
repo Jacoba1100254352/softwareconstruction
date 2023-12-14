@@ -23,11 +23,11 @@ public class ListGamesService {
     public ListGamesResponse listAllGames(ListGamesRequest request) {
         try {
             if (authDAO.findAuth(request.authToken()) == null)
-                return new ListGamesResponse("Error: unauthorized", false);
+                return new ListGamesResponse(null, "Error: unauthorized", false);
             else
-                return new ListGamesResponse(gameDAO.findAllGames());
+                return new ListGamesResponse(gameDAO.findAllGames(), null, true);
         } catch (DataAccessException e) {
-            return new ListGamesResponse("Error: " + e.getMessage(), false);
+            return new ListGamesResponse(null, "Error: " + e.getMessage(), false);
         }
     }
 }

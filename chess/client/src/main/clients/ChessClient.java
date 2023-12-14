@@ -13,8 +13,6 @@ public class ChessClient {
 
     private String authToken;
 
-    private String clientUsername; // Username of the current user
-    private boolean isAdmin;
     private boolean isRunning;
     private boolean isLoggedIn;
 
@@ -67,13 +65,5 @@ public class ChessClient {
 
     public void setAuthToken(String token) {
         this.authToken = token;
-    }
-
-    public void setClientUsername(String clientUsername) {
-        this.clientUsername = clientUsername;
-    }
-
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
     }
 }

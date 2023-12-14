@@ -31,12 +31,12 @@ public class ServiceTests {
 
         RegisterRequest registerRequest = new RegisterRequest(existingUser.getUsername(), existingUser.getPassword(), existingUser.getEmail());
         RegisterResponse regResponse = registerService.register(registerRequest);
-        existingAuth = regResponse.getAuthToken();
+        existingAuth = regResponse.authToken();
 
         // Create a game and store its ID for use in join game tests
         CreateGameRequest gameRequest = new CreateGameRequest(existingAuth, "Chess Match");
         CreateGameResponse gameResponse = createGameService.createGame(gameRequest);
-        createdGameID = gameResponse.getGameID();
+        createdGameID = gameResponse.gameID();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ServiceTests {
     public void successfulGameCreation() {
         CreateGameRequest request = new CreateGameRequest(existingAuth, "Chess Match");
         CreateGameResponse response = createGameService.createGame(request);
-        Assertions.assertNotNull(response.getGameID(), "Failed to create game");
+        Assertions.assertNotNull(response.gameID(), "Failed to create game");
     }
 
     @Test
@@ -72,7 +72,7 @@ public class ServiceTests {
     public void successfulGameListing() {
         ListGamesRequest request = new ListGamesRequest(existingAuth);
         ListGamesResponse response = listGamesService.listAllGames(request);
-        Assertions.assertNotNull(response.getGames(), "Failed to list games");
+        Assertions.assertNotNull(response.games(), "Failed to list games");
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ServiceTests {
     public void successfulLogin() {
         LoginRequest request = new LoginRequest(existingUser.getUsername(), existingUser.getPassword());
         LoginResponse response = loginService.login(request);
-        Assertions.assertNotNull(response.getAuthToken(), "Failed to login");
+        Assertions.assertNotNull(response.authToken(), "Failed to login");
     }
 
     @Test
@@ -144,7 +144,7 @@ public class ServiceTests {
     public void successfulRegistration() {
         RegisterRequest request = new RegisterRequest("newUsername", "newPassword", "newEmail@example.com");
         RegisterResponse response = registerService.register(request);
-        Assertions.assertNotNull(response.getAuthToken(), "Failed to register");
+        Assertions.assertNotNull(response.authToken(), "Failed to register");
     }
 
     @Test

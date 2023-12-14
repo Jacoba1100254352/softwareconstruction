@@ -28,7 +28,7 @@ public class RegisterService {
             if (request.username() == null || request.username().isEmpty() ||
                     request.password() == null || request.password().isEmpty() ||
                     request.email() == null || request.email().isEmpty()) {
-                return new RegisterResponse("Error: bad request");
+                return new RegisterResponse(null, null, "Error: bad request", false);
             }
 
             if (userDAO.getUser(request.username()) == null) {
@@ -37,12 +37,12 @@ public class RegisterService {
                 String uniqueToken = UUID.randomUUID().toString();
                 authDAO.insertAuth(new AuthToken(uniqueToken, request.username()));
 
-                return new RegisterResponse(uniqueToken, request.username());
+                return new RegisterResponse(uniqueToken, request.username(), null, true);
             } else {
-                return new RegisterResponse("Error: already taken");
+                return new RegisterResponse(null, null, "Error: already taken", false);
             }
         } catch (DataAccessException e) {
-            return new RegisterResponse("Error: " + e.getMessage());
+            return new RegisterResponse(null, null, "Error: " + e.getMessage(), false);
         }
     }
 }

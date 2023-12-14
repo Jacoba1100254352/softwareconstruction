@@ -45,51 +45,52 @@ public class WebSocketFacade extends Endpoint {
         webSocketClient.notifyUser("Error: " + throwable.getMessage());
     }
 
-    public void connect(String uri) throws Exception {
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        this.session = container.connectToServer(this, new URI(uri));
-        LOGGER.info("Connected to server");
+    public void connect(String uri) throws WebSocketFacadeException {
+        try {
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, new URI(uri));
+            LOGGER.info("Connected to server");
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @OnMessage
+                public void onMessage(String message) {
+                    LOGGER.info("Raw message received: " + message);
+                    try {
+                        JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
+                        String messageType = jsonObject.get("serverMessageType").getAsString();
+
+                        switch (messageType) {
+                            case "LOAD_GAME":
+                                handleLoadGame(message);
+                                break;
+                            case "ERROR":
+                                handleError(message);
+                                break;
+                            case "NOTIFICATION":
+                                handleNotification(message);
+                                break;
+                            default:
+                                LOGGER.warning("Unknown message type received: " + messageType);
+                        }
+                    } catch (JsonSyntaxException e) {
+                        LOGGER.severe("Invalid JSON message format: " + e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            throw new WebSocketFacadeException("Error connecting to server: " + uri, e);
+        }
     }
 
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws WebSocketFacadeException {
         if (session != null && session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(message);
                 LOGGER.info("Message sent: " + message);
             } catch (Exception e) {
-                LOGGER.severe("Error sending message: " + e.getMessage());
-                webSocketClient.notifyUser("Error sending message: " + e.getMessage());
+                throw new WebSocketFacadeException("Error sending message: " + message, e);
             }
-        }
-    }
-
-    @OnMessage
-    public void onMessage(Session session, String message) {
-        if (this.session != session) {
-            LOGGER.warning("Received message from unknown session");
-            return;
-        }
-
-        LOGGER.info("Raw message received: " + message);
-        try {
-            JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
-            String messageType = jsonObject.get("serverMessageType").getAsString();
-
-            switch (messageType) {
-                case "LOAD_GAME":
-                    handleLoadGame(message);
-                    break;
-                case "ERROR":
-                    handleError(message);
-                    break;
-                case "NOTIFICATION":
-                    handleNotification(message);
-                    break;
-                default:
-                    LOGGER.warning("Unknown message type received: " + messageType);
-            }
-        } catch (JsonSyntaxException e) {
-            LOGGER.severe("Invalid JSON message format: " + e.getMessage());
+        } else {
+            throw new WebSocketFacadeException("Session is not open or does not exist", null);
         }
     }
 

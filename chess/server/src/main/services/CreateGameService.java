@@ -25,10 +25,10 @@ public class CreateGameService {
     public CreateGameResponse createGame(CreateGameRequest request) {
         try {
             if (request.gameName() == null || request.gameName().isEmpty())
-                return new CreateGameResponse("Error: bad request");
+                return new CreateGameResponse(null, "Error: bad request", false);
 
             if (authDAO.findAuth(request.authToken()) == null)
-                return new CreateGameResponse("Error: unauthorized");
+                return new CreateGameResponse(null, "Error: unauthorized", false);
 
             // Create a new Game object
             ChessGame game = new ChessGameImpl();
@@ -39,9 +39,9 @@ public class CreateGameService {
             // Insert the new Game object into the data store
             gameDAO.insertGame(newGame);
 
-            return new CreateGameResponse(newGame.getGameID());
+            return new CreateGameResponse(newGame.getGameID(), null, true);
         } catch (DataAccessException e) {
-            return new CreateGameResponse("Error: " + e.getMessage());
+            return new CreateGameResponse(null, "Error: " + e.getMessage(), false);
         }
     }
 }
