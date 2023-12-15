@@ -143,8 +143,8 @@ public class WebSocketHandler {
         Integer gameID = gameCmd.getGameID();
 
         // Access the game from the database
-        GameDAO gameDao = new GameDAO();
-        Game game = gameDao.findGameByID(gameID);
+        GameDAO gameDAO = new GameDAO();
+        Game game = gameDAO.findGameByID(gameID);
 
         // Check if the game is valid
         if (game == null) {
@@ -165,7 +165,7 @@ public class WebSocketHandler {
         String userInGame = (color.equals(ChessGame.TeamColor.WHITE)) ? game.getWhiteUsername() : game.getBlackUsername();
 
         // Check if the color is already taken
-        if (!userName.equals(userInGame)) {
+        if (!userName.equals(userInGame)) { // userInGame != null &&
             ErrorMessage errorMessage = new ErrorMessage("Error 403: Color already taken");
             messageDispatcher.sendMessage(session, errorMessage);
             return;
@@ -183,14 +183,6 @@ public class WebSocketHandler {
             game.getChessGame().setTeamTurn(ChessGame.TeamColor.WHITE);
         }
 
-        // Update the game with the new player
-        connectionManager.add(gameCmd.getGameID(), new ConnectionInstance(session, userName));
-        gameDao.updateGame(game);
-
-        // After the player joins successfully:
-        NotificationMessage notification = new NotificationMessage(userName + " joined as " + color);
-        messageDispatcher.broadcastToGameExcept(gameCmd.getGameID(), notification, userName);
-
         if (game.getChessGame() != null) {
             LoadGameMessage loadGameMessage = new LoadGameMessage(game.getChessGame());
             messageDispatcher.sendMessage(session, loadGameMessage);
@@ -198,6 +190,14 @@ public class WebSocketHandler {
             ErrorMessage errorMessage = new ErrorMessage("Error: Unable to load game data");
             messageDispatcher.sendMessage(session, errorMessage);
         }
+
+        // Update the game with the new player
+        connectionManager.add(gameCmd.getGameID(), new ConnectionInstance(session, userName));
+        gameDAO.updateGame(game);
+
+        // After the player joins successfully:
+        NotificationMessage notification = new NotificationMessage(userName + " joined as " + color);
+        messageDispatcher.broadcastToGameExcept(gameCmd.getGameID(), notification, userName);
     }
 
     // New method to automatically handle joining as an observer

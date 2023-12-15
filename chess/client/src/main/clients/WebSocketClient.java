@@ -4,8 +4,6 @@ import WebSocketFacade.WebSocketFacade;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import webSocketMessages.serverMessages.ErrorMessage;
-import webSocketMessages.serverMessages.NotificationMessage;
 import webSocketMessages.userCommands.*;
 
 public class WebSocketClient {
@@ -25,7 +23,7 @@ public class WebSocketClient {
         this.canMove = false;
 
         // Initialize WebSocketFacade with this instance
-        this.webSocketFacade = new WebSocketFacade(chessClient, this);
+        this.webSocketFacade = new WebSocketFacade(chessClient);
     }
 
     public void resignGame() throws Exception {
@@ -133,19 +131,21 @@ public class WebSocketClient {
         }
     }
 
-    // Method to notify the user about various types of messages
-    public void notifyUser(String message) {
-        if (message.contains("NOTIFICATION")) {
-            // Extract and process the notification message
-            NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-            System.out.println("\nNotification: " + notification.getNotificationMessage());
-        } else if (message.contains("ERROR")) {
-            // Extract and process the error message
-            ErrorMessage error = new Gson().fromJson(message, ErrorMessage.class);
-            System.err.println("\nError: " + error.getErrorMessage());
-        } else {
-            // Default handling for other types of messages
-            System.out.println("\n" + message);
+    public String getPlayerColor() {
+        if (!isPlayer) {
+            return null;
         }
+        return canMove ? "WHITE" : "BLACK";
+    }
+
+    public ChessGame.TeamColor getPlayerTeamColor() {
+        if (!isPlayer) {
+            return null;
+        }
+        return canMove ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+    }
+
+    public WebSocketFacade getWebSocketFacade() {
+        return webSocketFacade;
     }
 }
