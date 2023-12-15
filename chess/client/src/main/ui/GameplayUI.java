@@ -1,15 +1,12 @@
 package ui;
 
-import WebSocketFacade.WebSocketFacade;
 import chess.*;
-import clients.ChessClient;
-import clients.WebSocketClient;
 import com.google.gson.Gson;
-import testFactory.TestFactory;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,66 +14,12 @@ import static ui.EscapeSequences.*;
 
 public class GameplayUI {
     private static final Logger LOGGER = Logger.getLogger(GameplayUI.class.getName());
-    private final ChessClient chessClient;
-    private final WebSocketFacade webSocketFacade;
 
-    // Constructor
-    public GameplayUI(ChessClient chessClient, WebSocketClient webSocketClient) {
-        this.webSocketFacade = new WebSocketFacade(chessClient, webSocketClient);
-        this.chessClient = chessClient;
-
-        connectToGameServer();
+    static {
+        LOGGER.setLevel(Level.WARNING);
     }
-
-    ///   Gameplay Functions   ///
-
-    public void drawChessboard() {
-        System.out.println("Initial Chessboard State:");
-
-        // Drawing chessboard with white pieces at bottom
-        System.out.println("White at bottom:");
-        drawBoard(true);
-
-        // Drawing chessboard with black pieces at bottom
-        System.out.println("Black at bottom:");
-        drawBoard(false);
-    }
-
-    private void drawBoard(boolean whiteAtBottom) {
-        String[][] board = initializeChessboard();
-
-        if (!whiteAtBottom)
-            reverseBoard(board);
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++)
-                System.out.print(board[i][j]);
-
-            System.out.println();
-        }
-    }
-
-    private void reverseBoard(String[][] board) {
-        for (int i = 0; i < board.length / 2; i++) {
-            String[] temp = board[i];
-            board[i] = board[board.length - 1 - i];
-            board[board.length - 1 - i] = temp;
-        }
-    }
-
 
     ///   WebSocket Functions   ///
-
-    public void connectToGameServer() {
-        try {
-            webSocketFacade.connect("ws://localhost:" + TestFactory.getServerPort() + "/connect");
-            if (chessClient.isDebugMode()) {
-                LOGGER.log(Level.INFO, "Connected to Server");
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
-        }
-    }
 
     public void displayError(String errorMessage) {
         System.out.println(new Gson().fromJson(errorMessage, ErrorMessage.class).getErrorMessage());
@@ -87,108 +30,87 @@ public class GameplayUI {
     }
 
     // Method to redraw the chessboard
-    public void redraw(ChessGame game, ArrayList<ChessPosition> highlights, ChessPosition pieceToHighlight) {
-        String[][] board = initializeChessboard();
-        updateBoardWithPieces(board, game);
-        printBoard(board, highlights, pieceToHighlight);
-
-        /*
-                    System.out.println("Game updated.");
-            LoadMessage loadMessage = new Gson().fromJson(message, LoadMessage.class);
-            String gamestr = loadMessage.getGame();
-
-            var builder = new GsonBuilder();
-            builder.registerTypeAdapter(ChessBoard.class, new BoardAdapter());
-            builder.registerTypeAdapter(ChessPiece.class, new PieceAdapter());
-
-            game = builder.create().fromJson(gamestr, GameImpl.class);
-            System.out.println();
-            displayBoard(game.getBoard());
-            System.out.printf("%s >>> ", loggedIn ? "WELCOME" : "LOGIN");
-         */
-    }
-
-    // Initialize an empty chessboard
-    private String[][] initializeChessboard() {
-        String[][] board = new String[8][8];
-        for (int i = 0; i < 8; i++)
-            for (int j = 0; j < 8; j++)
-                board[i][j] = "   ";
-        return board;
-    }
-
-    // Update the board with pieces from the game state
-    private void updateBoardWithPieces(String[][] board, ChessGame game) {
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPiece piece = game.getBoard().getPiece(new ChessPositionImpl(row, col));
-                if (piece != null) {
-                    board[row - 1][col - 1] = piece.getPieceType().name();
-                }
-            }
-        }
-    }
-
-    // Print the chessboard to the console
-    private void printBoard(String[][] board, ArrayList<ChessPosition> highlights, ChessPosition pieceToHighlight) {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                String cell = board[i][j];
-                if (highlights != null && highlights.contains(new ChessPositionImpl(i + 1, j + 1))) {
-                    cell = "[" + cell + "]"; // Highlighted cell
-                }
-                if (pieceToHighlight != null && pieceToHighlight.equals(new ChessPositionImpl(i + 1, j + 1))) {
-                    cell = "{" + cell + "}"; // Specifically highlighted piece
-                }
-                System.out.print(cell + " ");
-            }
-            System.out.println();
-        }
+    public void redrawGame(ChessGame game, String color) {
+        displayBoard(game.getBoard(), color, null, null);
     }
 
     public void displayBoard(ChessBoard board, String color, ArrayList<ChessPosition> highlights, ChessPosition pieceToHighlight) {
-        String rowLabels, colLabels;
-        int startRow, endRow, stepRow;
-
-        if (color.equals("white")) {
-            rowLabels = "    a  b  c  d  e  f  g  h    ";
-            colLabels = "  8 7 6 5 4 3 2 1 ";
-            startRow = 8;
-            endRow = 0;
-            stepRow = -1;
-        } else {
-            rowLabels = "    h  g  f  e  d  c  b  a    ";
-            colLabels = "  1 2 3 4 5 6 7 8 ";
-            startRow = 1;
-            endRow = 9;
-            stepRow = 1;
-        }
-
-        System.out.println(rowLabels);
-        for (int row = startRow; row != endRow; row += stepRow) {
-            System.out.print((row % 8 + 1) + " ");
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition curPos = new ChessPositionImpl(row, col);
-                String bgColor = ((row + col) % 2 == 0) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-
-                if (highlights != null && highlights.contains(curPos)) {
-                    bgColor = ((row + col) % 2 == 0) ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_GREEN;
-                }
-                if (pieceToHighlight != null && pieceToHighlight.equals(curPos)) {
-                    bgColor = SET_BG_COLOR_YELLOW;
-                }
-
-                String pieceStr = "   ";
-                ChessPiece piece = board.getPiece(curPos);
-                if (piece != null) {
-                    String pieceColor = (piece.teamColor() == ChessGame.TeamColor.WHITE) ? SET_TEXT_COLOR_RED : SET_TEXT_COLOR_BLUE;
-                    pieceStr = " " + piece.toString().toUpperCase() + " ";
-                    System.out.print(pieceColor);
-                }
-                System.out.print(bgColor + pieceStr);
+        String[][] boardArr = new String[8][8];
+        for (int i = 1; i <= 8; i++) {
+            String[] row = new String[8];
+            for (int j = 1; j <= 8; j++) {
+                ChessPiece piece = board.getPiece(new ChessPositionImpl(i, j));
+                row[j - 1] = piece == null ? EMPTY : getPieceString(piece.getPieceType(), piece.teamColor());
             }
-            System.out.println((row % 8 + 1));
+            boardArr[i - 1] = row;
         }
-        System.out.println(colLabels);
+
+        // Highlighting logic (if needed)
+        if (highlights != null && !highlights.isEmpty()) {
+            highlightBoard(board, highlights, boardArr);
+        }
+
+        // Determine orientation based on player color
+        boolean reverse = !color.equals("white");
+        printBoard(boardArr, reverse);
     }
+
+    // Method for highlighting the board
+    private static void highlightBoard(ChessBoard board, Collection<ChessPosition> highlights, String[][] boardArr) {
+        for (ChessPosition highlight : highlights) {
+            int row = highlight.getRow() - 1;
+            int col = highlight.getCol() - 1;
+            String pieceString = boardArr[row][col];
+            boardArr[row][col] = "X" + pieceString; // Highlight the cell
+        }
+    }
+
+    // Convert a row array to a string for display
+    private static String rowtoString(String[] row, int rownum, boolean blackStart, boolean reverse) {
+        StringBuilder rowString = new StringBuilder(SET_BG_COLOR_DARK_GREEN + " " + rownum + " " + (blackStart ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY));
+        boolean black = !blackStart;
+        for (int i = reverse ? 7 : 0; reverse ? i >= 0 : i < 8; i += reverse ? -1 : 1) {
+            String piece = row[i];
+            if (piece.startsWith("X")) {
+                piece = piece.substring(1);
+                rowString.append(black ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN);
+            }
+            rowString.append(piece.equals(" ") ? "   " : piece);
+            rowString.append(black ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_LIGHT_GREY);
+            black = !black;
+        }
+        return rowString + SET_BG_COLOR_DARK_GREEN + " " + rownum + " " + RESET_BG_COLOR;
+    }
+
+    // Print the entire board
+    private static void printBoard(String[][] board, boolean reverse) {
+        // Label for columns
+        String labels = reverse ? "    h  g  f  e  d  c  b  a    " : "    a  b  c  d  e  f  g  h    ";
+
+        // Print column labels
+        System.out.println(SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + labels + RESET_BG_COLOR);
+
+        // Print each row of the board
+        for (int i = reverse ? 0 : 7; reverse ? i < 8 : i >= 0; i += reverse ? 1 : -1) {
+            System.out.println(rowtoString(board[i], i + 1, i % 2 != (reverse ? 1 : 0), reverse));
+        }
+
+        // Print column labels again at the bottom
+        System.out.println(SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR_WHITE + labels + RESET_BG_COLOR);
+    }
+
+    // Get string representation of a chess piece
+    private static String getPieceString(ChessPiece.PieceType pieceType, ChessGame.TeamColor teamColor) {
+        // Use constants from EscapeSequences class
+        return switch (pieceType) {
+            case KING -> teamColor == ChessGame.TeamColor.WHITE ? WHITE_KING : BLACK_KING;
+            case QUEEN -> teamColor == ChessGame.TeamColor.WHITE ? WHITE_QUEEN : BLACK_QUEEN;
+            case BISHOP -> teamColor == ChessGame.TeamColor.WHITE ? WHITE_BISHOP : BLACK_BISHOP;
+            case KNIGHT -> teamColor == ChessGame.TeamColor.WHITE ? WHITE_KNIGHT : BLACK_KNIGHT;
+            case ROOK -> teamColor == ChessGame.TeamColor.WHITE ? WHITE_ROOK : BLACK_ROOK;
+            case PAWN -> teamColor == ChessGame.TeamColor.WHITE ? WHITE_PAWN : BLACK_PAWN;
+            default -> EMPTY;
+        };
+    }
+
 }

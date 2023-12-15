@@ -1,13 +1,17 @@
 package ui;
 
 import clients.ChessClient;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import requests.LoginRequest;
+import requests.RegisterRequest;
 import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PreloginUI {
@@ -18,6 +22,10 @@ public class PreloginUI {
     public PreloginUI(ChessClient chessClient, ServerFacade serverFacade) {
         this.chessClient = chessClient;
         this.serverFacade = serverFacade;
+    }
+
+    static {
+        LOGGER.setLevel(Level.WARNING);
     }
 
     public void displayMenu() {
@@ -53,12 +61,9 @@ public class PreloginUI {
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
-        JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("username", username);
-        jsonRequest.addProperty("password", password);
-
         try {
-            String response = serverFacade.sendPostRequest("/session", jsonRequest.toString(), null);
+            LoginRequest loginRequest = new LoginRequest(username, password);
+            String response = serverFacade.sendPostRequest("/session", (new Gson()).toJson(loginRequest), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
 
             if (responseObject.get("success").getAsBoolean()) {
@@ -98,13 +103,9 @@ public class PreloginUI {
         System.out.print("Enter email: ");
         String email = scanner.nextLine();
 
-        JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("username", username);
-        jsonRequest.addProperty("password", password);
-        jsonRequest.addProperty("email", email);
-
         try {
-            String response = serverFacade.sendPostRequest("/user", jsonRequest.toString(), null);
+            RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+            String response = serverFacade.sendPostRequest("/user", (new Gson()).toJson(registerRequest), null);
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 String authToken = responseObject.get("authToken").getAsString();

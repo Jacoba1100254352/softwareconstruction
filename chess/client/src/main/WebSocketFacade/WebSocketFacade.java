@@ -1,30 +1,46 @@
 package WebSocketFacade;
 
+import GameStateUpdateListener.GameStateUpdateListener;
 import chess.ChessGame;
 import clients.ChessClient;
-import clients.WebSocketClient;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import testFactory.TestFactory;
 import webSocketMessages.serverMessages.ErrorMessage;
 import webSocketMessages.serverMessages.LoadGameMessage;
 import webSocketMessages.serverMessages.NotificationMessage;
 
 import javax.websocket.*;
 import java.net.URI;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class WebSocketFacade extends Endpoint {
+    private GameStateUpdateListener gameStateUpdateListener;
     private static final Logger LOGGER = Logger.getLogger(WebSocketFacade.class.getName());
     private final ChessClient chessClient;
-    private final WebSocketClient webSocketClient;
     private final Gson gson = new Gson();
     private Session session;
 
-    public WebSocketFacade(ChessClient chessClient, WebSocketClient webSocketClient) {
+    public WebSocketFacade(ChessClient chessClient) {
         this.chessClient = chessClient;
-        this.webSocketClient = webSocketClient;
+
+        initializeConnection();
+    }
+
+    static {
+        //LOGGER.setLevel(Level.WARNING);
+    }
+
+    private void initializeConnection() {
+        try {
+            connect("ws://localhost:" + TestFactory.getServerPort() + "/connect");
+            LOGGER.info("Connected to server");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to connect to game server", e);
+        }
     }
 
     @Override
@@ -36,13 +52,11 @@ public class WebSocketFacade extends Endpoint {
     @Override
     public void onClose(Session session, CloseReason closeReason) {
         LOGGER.info("WebSocket connection closed: " + closeReason.getReasonPhrase());
-        webSocketClient.notifyUser("Connection closed: " + closeReason.getReasonPhrase());
     }
 
     @Override
     public void onError(Session session, Throwable throwable) {
-        LOGGER.severe("WebSocketFacade error: " + throwable.getMessage());
-        webSocketClient.notifyUser("Error: " + throwable.getMessage());
+        //LOGGER.severe("WebSocketFacade error: " + throwable.getMessage());
     }
 
     public void connect(String uri) throws WebSocketFacadeException {
@@ -53,7 +67,6 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @OnMessage
                 public void onMessage(String message) {
-                    LOGGER.info("Raw message received: " + message);
                     try {
                         JsonObject jsonObject = JsonParser.parseString(message).getAsJsonObject();
                         String messageType = jsonObject.get("serverMessageType").getAsString();
@@ -81,11 +94,11 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+
     public void sendMessage(String message) throws WebSocketFacadeException {
         if (session != null && session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(message);
-                LOGGER.info("Message sent: " + message);
             } catch (Exception e) {
                 throw new WebSocketFacadeException("Error sending message: " + message, e);
             }
@@ -94,10 +107,17 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+    public void setGameStateUpdateListener(GameStateUpdateListener listener) {
+        this.gameStateUpdateListener = listener;
+    }
+
     private void handleLoadGame(String message) {
         LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
         ChessGame updatedGame = loadGameMessage.getGame();
-        chessClient.getGameplayUI().redraw(updatedGame, null, null);
+
+        if (gameStateUpdateListener != null) {
+            gameStateUpdateListener.onGameStateUpdate(updatedGame);
+        }
     }
 
     private void handleError(String message) {

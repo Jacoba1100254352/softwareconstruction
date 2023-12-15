@@ -7,10 +7,9 @@ import ui.PostloginUI;
 import ui.PreloginUI;
 
 public class ChessClient {
-    private final boolean DEBUG_MODE = false;
-
+    private final ServerFacade serverFacade;
     private final PreloginUI preloginUI;
-    private final PostloginUI postloginUI;
+    private PostloginUI postloginUI;
     private final GameplayUI gameplayUI;
 
     private String authToken;
@@ -19,14 +18,12 @@ public class ChessClient {
     private boolean isLoggedIn;
 
     public ChessClient() {
-        ServerFacade serverFacade = new ServerFacade("http://localhost:" + TestFactory.getServerPort());
-
-        // Add WebSocketClient as a member
-        WebSocketClient webSocketClient = new WebSocketClient(this);
+        serverFacade = new ServerFacade("http://localhost:" + TestFactory.getServerPort());
 
         preloginUI = new PreloginUI(this, serverFacade);
-        postloginUI = new PostloginUI(this, webSocketClient, serverFacade);
-        gameplayUI = new GameplayUI(this, webSocketClient);
+        // The postloginUI variable is initialized when transitioning to "logged in" when the chessClient has more info
+        postloginUI = null;
+        gameplayUI = new GameplayUI();
 
         isRunning = true;
     }
@@ -54,6 +51,7 @@ public class ChessClient {
     }
 
     public void transitionToPostloginUI() {
+        postloginUI = new PostloginUI(this, serverFacade);
         isLoggedIn = true;
     }
 
@@ -70,6 +68,6 @@ public class ChessClient {
     }
 
     public boolean isDebugMode() {
-        return DEBUG_MODE;
+        return false;
     }
 }

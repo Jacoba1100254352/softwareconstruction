@@ -4,34 +4,48 @@ import chess.*;
 import clients.ChessClient;
 import clients.WebSocketClient;
 import com.google.gson.*;
+import requests.JoinGameRequest;
 import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;
+import GameStateUpdateListener.GameStateUpdateListener;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
-public class PostloginUI {
+public class PostloginUI implements GameStateUpdateListener {
     private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
     private final ChessClient chessClient;
+    private ChessGame currentGame;
     private final WebSocketClient webSocketClient;
     private final ServerFacade serverFacade;
     private final Map<Integer, Integer> gameMap = new HashMap<>();
 
     private boolean isInGame = false;
 
-    public PostloginUI(ChessClient chessClient, WebSocketClient webSocketClient, ServerFacade serverFacade) {
+    public PostloginUI(ChessClient chessClient, ServerFacade serverFacade) {
         this.chessClient = chessClient;
-        this.webSocketClient = webSocketClient;
+        this.webSocketClient = new WebSocketClient(chessClient);
         this.serverFacade = serverFacade;
+        this.webSocketClient.getWebSocketFacade().setGameStateUpdateListener(this);
+    }
+
+    @Override
+    public void onGameStateUpdate(ChessGame updatedGame) {
+        this.currentGame = updatedGame;
+        String playerColor = webSocketClient.getPlayerColor();
+        chessClient.getGameplayUI().redrawGame(this.currentGame, playerColor);
+    }
+
+    static {
+        LOGGER.setLevel(Level.WARNING);
     }
 
     public void displayMenu() {
         if (isInGame) {
-            displayInGameMenu();
             return;
         }
 
@@ -48,29 +62,18 @@ public class PostloginUI {
         processUserChoice(choice);
     }
 
-    private void displayInGameMenu() {
-        System.out.println("In-Game Menu:");
-        System.out.println("1. Make Move");
-        System.out.println("2. Resign Game");
-        System.out.println("3. Leave Game");
-        System.out.println("4. Return to Main Menu");
-
-        Scanner scanner = new Scanner(System.in);
-        int choice = getInput(scanner, 1, 4);
-        processInGameChoice(choice);
-    }
-
     private int getInput(Scanner scanner, int min, int max) {
         int choice = -1;
         while (choice < min || choice > max) {
             System.out.print("Enter choice: ");
-            try {
+            if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
-            } catch (Exception e) {
+            } else {
                 LOGGER.warning("Invalid input. Please enter a valid number.");
-                scanner.nextLine();
+                scanner.next(); // Clear the invalid input
             }
         }
+        scanner.nextLine(); // Consume the newline left after nextInt()
         return choice;
     }
 
@@ -168,28 +171,46 @@ public class PostloginUI {
 
     private void joinGame(boolean asObserver) {
         Scanner scanner = new Scanner(System.in);
+        if (gameMap.isEmpty()) {
+            LOGGER.warning("Please list games first.");
+            return;
+        }
+
         System.out.print("Enter game number to join: ");
         int gameNumber = scanner.nextInt();
-        Integer gameId = gameMap.get(gameNumber);
+        Integer gameID = gameMap.get(gameNumber);
 
-        if (gameId == null) {
+        if (gameID == null) {
             LOGGER.warning("Invalid game number.");
             return;
         }
 
         try {
             if (asObserver) {
-                webSocketClient.joinObserver(gameId);
+                webSocketClient.joinObserver(gameID);
                 LOGGER.info("Joined game as observer successfully.");
             } else {
                 System.out.print("Enter color (WHITE/BLACK): ");
                 String colorStr = scanner.next().toUpperCase();
-                webSocketClient.joinPlayer(colorStr, gameId);
 
+                boolean joinSuccess = joinGameHttp(gameID, colorStr);
+                if (!joinSuccess) {
+                    LOGGER.warning("Failed to join the game.");
+                    return;
+                }
+
+                webSocketClient.joinPlayer(colorStr, gameID);
                 LOGGER.info("Joined game successfully.");
 
-                // Draw the board
-                chessClient.getGameplayUI().drawChessboard();
+                // Initialize currentGame and reset its board
+                this.currentGame = new ChessGameImpl();
+                this.currentGame.getBoard().resetBoard();
+
+                // Set isInGame to true
+                isInGame = true;
+
+                // Display the board
+                chessClient.getGameplayUI().displayBoard(currentGame.getBoard(), colorStr.toLowerCase(), null, null);
 
                 // Prompt user for a move if they're joining as a player
                 promptForMove();
@@ -199,28 +220,28 @@ public class PostloginUI {
         }
     }
 
-    private void processInGameChoice(int choice) {
-        switch (choice) {
-            case 1 -> promptForMove();
-            case 2 -> resignGame();
-            case 3 -> leaveGame();
-            case 4 -> {
-                isInGame = false;
-                displayMenu();
-            }
-            default -> LOGGER.warning("Invalid in-game choice selected: " + choice);
+    private boolean joinGameHttp(Integer gameID, String colorStr) {
+        try {
+            JoinGameRequest joinRequest = new JoinGameRequest(chessClient.getAuthToken(), gameID, colorStr);
+            String response = serverFacade.sendPutRequest("/game", new Gson().toJson(joinRequest), chessClient.getAuthToken());
+            JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
+            return responseObject.get("success").getAsBoolean();
+        } catch (ServerFacadeException | IOException | URISyntaxException e) {
+            LOGGER.severe("Error joining game: " + e.getMessage());
+            return false;
         }
     }
 
     private void promptForMove() {
-        Scanner scanner = new Scanner(System.in);
+        String playerColor = webSocketClient.getPlayerColor();
+        chessClient.getGameplayUI().redrawGame(this.currentGame, playerColor);
 
+        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("Options:");
             System.out.println("1. Make Move");
             System.out.println("2. Resign Game");
             System.out.println("3. Leave Game");
-            System.out.println("Enter your choice:");
 
             int choice = getInput(scanner, 1, 3);
 
@@ -241,6 +262,11 @@ public class PostloginUI {
     }
 
     private void makeMove(Scanner scanner) {
+        if (webSocketClient.getPlayerTeamColor() == null || currentGame.getTeamTurn() != webSocketClient.getPlayerTeamColor()) {
+            LOGGER.warning("It's not your turn.");
+            return;
+        }
+
         System.out.println("Enter your move (e.g., e2 e4, or e7 e8 Q for pawn promotion): ");
         String moveInput = scanner.nextLine();
         String[] moveParts = moveInput.split(" ");
@@ -326,7 +352,7 @@ public class PostloginUI {
         try {
             webSocketClient.resignGame();
             LOGGER.info("Resigned from game successfully.");
-            isInGame = false;
+            isInGame = false; // Reset isInGame
         } catch (Exception e) {
             LOGGER.severe("Error resigning from game: " + e.getMessage());
         }
@@ -336,7 +362,7 @@ public class PostloginUI {
         try {
             webSocketClient.leaveGame();
             LOGGER.info("Left game successfully.");
-            isInGame = false;
+            isInGame = false; // Reset isInGame
         } catch (Exception e) {
             LOGGER.severe("Error leaving game: " + e.getMessage());
         }
