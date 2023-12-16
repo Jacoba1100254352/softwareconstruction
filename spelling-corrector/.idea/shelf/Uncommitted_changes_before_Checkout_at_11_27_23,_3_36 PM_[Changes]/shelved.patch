@@ -1,0 +1,15 @@
+Index: ../.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>**/.DS_Store\n**/.idea\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../.gitignore b/../.gitignore
+--- a/../.gitignore	(revision 559d0de0185d0d2cfbb4a58c0440b8b8c3f351b1)
++++ b/../.gitignore	(date 1701124462111)
+@@ -1,2 +1,3 @@
+ **/.DS_Store
+ **/.idea
++**/**/out/*
+\ No newline at end of file

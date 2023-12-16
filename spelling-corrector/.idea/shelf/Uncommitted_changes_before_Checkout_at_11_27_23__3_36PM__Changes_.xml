@@ -1,0 +1,49 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]" date="1701124638228" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 11/27/23, 3:36 PM [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/passoff/TrieTest.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/passoff/TrieTest.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/TrieTest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/Main.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/Main.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/Main.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/Node.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/Node.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/Node.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/ITrie.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/ITrie.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/ITrie.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/passoff/SpellTest.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/passoff/SpellTest.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/SpellTest.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/INode.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/INode.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/INode.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/ISpellCorrector.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/ISpellCorrector.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/ISpellCorrector.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/Trie.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/Trie.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/Trie.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="out/production/spelling-corrector/spell/SpellCorrector.class" />
+    <option name="AFTER_PATH" value="out/production/spelling-corrector/spell/SpellCorrector.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_11_27_23,_3_36 PM_[Changes]/SpellCorrector.class" />
+  </binary>
+</changelist>

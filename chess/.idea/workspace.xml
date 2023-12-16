@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a98ce036-0d87-4234-9fb3-a51604ac8f0d" name="Changes" comment="Setup for passing off" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="fe08e80089d0e58ea7dca0f846911d132b1cfb9a" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2XUFzBej8mtKACtUe0M1ZtPwTFN" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.ChessClient.executor": "Run",
+    "Application.Server (1).executor": "Run",
+    "Application.Server.executor": "Run",
+    "Application.server.Server.executor": "Run",
+    "Downloaded.Files.Path": "/Users/jacobanderson/Documents/BYU Classes/Current BYU Classes/CS 240/softwareconstruction/chess/client/lib",
+    "Downloaded.Files.Path.Enabled": "true",
+    "JUnit.All in client.executor": "Run",
+    "JUnit.All in server.executor": "Run",
+    "JUnit.All in shared.executor": "Run",
+    "JUnit.ServerFacadeTests.executor": "Run",
+    "JUnit.ServerTests and 2 more.executor": "Run",
+    "JUnit.ServerTests and 4 more.executor": "Run",
+    "JUnit.ServerTests.executor": "Run",
+    "JUnit.StandardAPITests.executor": "Run",
+    "JUnit.WebSocketTests,invalidMoveGameOver and 6 more.executor": "Run",
+    "JUnit.WebSocketTests,validResign and 3 more.executor": "Run",
+    "JUnit.WebSocketTests,validResign and 4 more.executor": "Run",
+    "JUnit.WebSocketTests.executor": "Run",
+    "JUnit.WebSocketTests.invalidResignGameOver.executor": "Run",
+    "JUnit.WebSocketTests.joinObserverGood.executor": "Run",
+    "JUnit.WebSocketTests.joinPlayerGood.executor": "Run",
+    "JUnit.WebSocketTests.leaveGame.executor": "Run",
+    "JUnit.WebSocketTests.multipleJoinObserver.executor": "Run",
+    "JUnit.WebSocketTests.validMove.executor": "Run",
+    "JUnit.WebSocketTests.validResign.executor": "Run",
+    "JUnit.passoffTests in server.executor": "Run",
+    "JUnit.passoffTests.clientTests in server.executor": "Run",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "true",
+    "Repository.Attach.Sources": "true",
+    "RunOnceActivity.OpenDatabaseViewOnStart": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "extract.method.default.visibility": "private",
+    "git-widget-placeholder": "main",
+    "java.suggest.annotation.dependency": "false",
+    "jdk.selected.JAVA_MODULE": "openjdk-21",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/jacobanderson/Documents/BYU Classes/Current BYU Classes/CS 240/softwareconstruction/chess/shared/src/main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "settings.sync",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JAVA"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shared/src/main" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shared/src/main/webSocketMessages/userCommands" />
+      <recent name="$PROJECT_DIR$/shared/src/main/webSocketMessages/serverMessages" />
+      <recent name="$PROJECT_DIR$/Info Files/Phase 6" />
+      <recent name="$PROJECT_DIR$/shared/src/main" />
+      <recent name="$PROJECT_DIR$/server/src/test" />
+    </key>
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="responses" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="testFactory" />
+      <recent name="" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="WebSocketFacade" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JUnit.WebSocketTests">
+    <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Server" />
+      <module name="server" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value=".*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Server" />
+      <module name="server" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in server" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ServerFacadeTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="client" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ServerFacadeTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ServerTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="ServerTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebSocketTests" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="server" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="WebSocketTests" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.WebSocketTests" />
+        <item itemvalue="Application.Server" />
+        <item itemvalue="JUnit.ServerTests" />
+        <item itemvalue="JUnit.All in server" />
+        <item itemvalue="JUnit.ServerFacadeTests" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-21.0.1-openjdk-21.0.1-3183f394aec4-abbd5a8d" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a98ce036-0d87-4234-9fb3-a51604ac8f0d" name="Changes" comment="" />
+      <created>1698676012205</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1698676012205</updated>
+      <workItem from="1698676013217" duration="1339000" />
+      <workItem from="1698677359543" duration="25000" />
+      <workItem from="1698677410754" duration="8508000" />
+      <workItem from="1699295449414" duration="694000" />
+      <workItem from="1699296825486" duration="220000" />
+      <workItem from="1699297096102" duration="191000" />
+      <workItem from="1699297546041" duration="61000" />
+      <workItem from="1699297637874" duration="17000" />
+      <workItem from="1699297668810" duration="87000" />
+      <workItem from="1699297761398" duration="55000" />
+      <workItem from="1699297819344" duration="293000" />
+      <workItem from="1699298128822" duration="615000" />
+      <workItem from="1699307023239" duration="6084000" />
+      <workItem from="1699320435822" duration="20144000" />
+      <workItem from="1699397389897" duration="955000" />
+      <workItem from="1699403993742" duration="3846000" />
+      <workItem from="1699410594537" duration="37027000" />
+      <workItem from="1699482543004" duration="770000" />
+      <workItem from="1699638911915" duration="2739000" />
+      <workItem from="1699817054224" duration="229000" />
+      <workItem from="1699817300154" duration="4455000" />
+      <workItem from="1699822957806" duration="95000" />
+      <workItem from="1699823058148" duration="1873000" />
+      <workItem from="1699853967799" duration="3673000" />
+      <workItem from="1699903869558" duration="485000" />
+      <workItem from="1699904370923" duration="188000" />
+      <workItem from="1699904624249" duration="180000" />
+      <workItem from="1699992816256" duration="633000" />
+      <workItem from="1699996570681" duration="966000" />
+      <workItem from="1700284208895" duration="1105000" />
+      <workItem from="1700377362238" duration="25164000" />
+      <workItem from="1700683818699" duration="16131000" />
+      <workItem from="1700796076114" duration="14096000" />
+      <workItem from="1700812528441" duration="13144000" />
+      <workItem from="1701029368160" duration="264000" />
+      <workItem from="1701064591665" duration="1772000" />
+      <workItem from="1701109457651" duration="989000" />
+      <workItem from="1701113111439" duration="1080000" />
+      <workItem from="1701114651824" duration="147000" />
+      <workItem from="1701115337164" duration="4382000" />
+      <workItem from="1701120439639" duration="3858000" />
+      <workItem from="1701124477109" duration="45000" />
+      <workItem from="1701124855222" duration="3594000" />
+      <workItem from="1701129782500" duration="5453000" />
+      <workItem from="1701145149612" duration="544000" />
+      <workItem from="1701190162133" duration="30816000" />
+      <workItem from="1701359073001" duration="5735000" />
+      <workItem from="1701532995420" duration="6292000" />
+      <workItem from="1701542554545" duration="4098000" />
+      <workItem from="1701668093196" duration="2143000" />
+      <workItem from="1701886570980" duration="11219000" />
+      <workItem from="1702081241770" duration="707000" />
+      <workItem from="1702081988711" duration="40000" />
+      <workItem from="1702082089801" duration="391000" />
+      <workItem from="1702082863356" duration="24473000" />
+      <workItem from="1702169863115" duration="1911000" />
+      <workItem from="1702187780304" duration="485000" />
+      <workItem from="1702252537880" duration="139000" />
+      <workItem from="1702318237113" duration="18433000" />
+      <workItem from="1702355022555" duration="17405000" />
+      <workItem from="1702405839697" duration="5382000" />
+      <workItem from="1702416749797" duration="14635000" />
+      <workItem from="1702432968795" duration="4776000" />
+      <workItem from="1702490532462" duration="14084000" />
+      <workItem from="1702507637954" duration="14180000" />
+      <workItem from="1702543227790" duration="2780000" />
+      <workItem from="1702575600550" duration="29840000" />
+    </task>
+    <task id="LOCAL-00001" summary="Updating downloaded jar files (lib)">
+      <option name="closed" value="true" />
+      <created>1698677215630</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1698677215630</updated>
+    </task>
+    <task id="LOCAL-00002" summary="General format updates">
+      <option name="closed" value="true" />
+      <created>1698685651399</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1698685651399</updated>
+    </task>
+    <task id="LOCAL-00003" summary="General format updates">
+      <option name="closed" value="true" />
+      <created>1698686610596</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1698686610596</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Basic Database setup">
+      <option name="closed" value="true" />
+      <created>1699371723107</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1699371723107</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Final Database setup">
+      <option name="closed" value="true" />
+      <created>1699409400966</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1699409400967</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Final Database setup">
+      <option name="closed" value="true" />
+      <created>1699409470235</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1699409470235</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Final fixes and formatting">
+      <option name="closed" value="true" />
+      <created>1699471708603</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1699471708603</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Final fixes and formatting">
+      <option name="closed" value="true" />
+      <created>1699471820880</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1699471820880</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Final fixes and formatting">
+      <option name="closed" value="true" />
+      <created>1699480724724</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1699480724724</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Prelogin working">
+      <option name="closed" value="true" />
+      <created>1700597889181</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1700597889181</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Fixed project">
+      <option name="closed" value="true" />
+      <created>1700692798728</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1700692798728</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Adjusted tests to be more robust/individual">
+      <option name="closed" value="true" />
+      <created>1700693542630</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1700693542630</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Adjusted tests to be more robust/individual">
+      <option name="closed" value="true" />
+      <created>1700693612349</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1700693612349</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Implementing admin user">
+      <option name="closed" value="true" />
+      <created>1700709105309</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1700709105309</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Working on AuthDAO edits">
+      <option name="closed" value="true" />
+      <created>1701105394474</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1701105394475</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Adjustments to accommodate admin flag in sql database to accommodate future changes">
+      <option name="closed" value="true" />
+      <created>1701110056369</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1701110056370</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Cleaning up, and finishing client">
+      <option name="closed" value="true" />
+      <created>1701124340693</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1701124340693</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Phase 6 starting setup">
+      <option name="closed" value="true" />
+      <created>1701192645493</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1701192645493</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Adding more classes">
+      <option name="closed" value="true" />
+      <created>1701221506963</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1701221506963</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Basic Websocket Setup">
+      <option name="closed" value="true" />
+      <created>1701279187502</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1701279187502</updated>
+    </task>
+    <task id="LOCAL-00021" summary="More configurations, server additions">
+      <option name="closed" value="true" />
+      <created>1701410097454</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1701410097455</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Fixing Server setup">
+      <option name="closed" value="true" />
+      <created>1701538209363</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1701538209363</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Main modifications for websocket functionality. Additions for possible separate services, handlers, responses, and requests">
+      <option name="closed" value="true" />
+      <created>1702154960614</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1702154960615</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Removing some possibly unnecessary previous modifications">
+      <option name="closed" value="true" />
+      <created>1702155184425</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1702155184425</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Some tests passed">
+      <option name="closed" value="true" />
+      <created>1702344196129</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1702344196129</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Removing updateGame function">
+      <option name="closed" value="true" />
+      <created>1702344811213</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1702344811213</updated>
+    </task>
+    <task id="LOCAL-00027" summary="CreateGame edits">
+      <option name="closed" value="true" />
+      <created>1702366896292</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1702366896292</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Adding type adapters">
+      <option name="closed" value="true" />
+      <created>1702366924336</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1702366924336</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Attempting fixes for messages">
+      <option name="closed" value="true" />
+      <created>1702367013880</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1702367013880</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Reorganization of message management">
+      <option name="closed" value="true" />
+      <created>1702403788841</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1702403788841</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Organizing and passes two more tests">
+      <option name="closed" value="true" />
+      <created>1702432594200</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1702432594201</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Passing 10/20">
+      <option name="closed" value="true" />
+      <created>1702438636687</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1702438636687</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Passing all tests and cleaning up code">
+      <option name="closed" value="true" />
+      <created>1702521356389</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1702521356389</updated>
+    </task>
+    <task id="LOCAL-00034" summary="More cleanup">
+      <option name="closed" value="true" />
+      <created>1702575490954</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1702575490954</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Round 1 for client adjustments">
+      <option name="closed" value="true" />
+      <created>1702582103418</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1702582103419</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Setup for passing off">
+      <option name="closed" value="true" />
+      <created>1702608355511</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1702608355511</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Setup for passing off">
+      <option name="closed" value="true" />
+      <created>1702609854052</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1702609854052</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Adjusted tests to be more robust/individual" />
+    <MESSAGE value="Implementing admin user" />
+    <MESSAGE value="Working on AuthDAO edits" />
+    <MESSAGE value="Adjustments to accommodate admin flag in sql database to accommodate future changes" />
+    <MESSAGE value="Cleaning up, and finishing client" />
+    <MESSAGE value="Phase 6 starting setup" />
+    <MESSAGE value="Adding more classes" />
+    <MESSAGE value="Basic Websocket Setup" />
+    <MESSAGE value="More configurations, server additions" />
+    <MESSAGE value="Fixing Server setup" />
+    <MESSAGE value="Main modifications for websocket functionality. Additions for possible separate services, handlers, responses, and requests" />
+    <MESSAGE value="Removing some possibly unnecessary previous modifications" />
+    <MESSAGE value="Some tests passed" />
+    <MESSAGE value="Removing updateGame function" />
+    <MESSAGE value="CreateGame edits" />
+    <MESSAGE value="Adding type adapters" />
+    <MESSAGE value="Attempting fixes for messages" />
+    <MESSAGE value="Reorganization of message management" />
+    <MESSAGE value="Organizing and passes two more tests" />
+    <MESSAGE value="Passing 10/20" />
+    <MESSAGE value="Passing all tests" />
+    <MESSAGE value="Passing all tests and cleaning up code" />
+    <MESSAGE value="More cleanup" />
+    <MESSAGE value="Round 1 for client adjustments" />
+    <MESSAGE value="Setup for passing off" />
+    <option name="LAST_COMMIT_MESSAGE" value="Setup for passing off" />
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="models.Game" memberName="gameName" />
+      </pinned-members>
+    </pin-to-top-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/chess$WebSocketTests.ic" NAME="WebSocketTests Coverage Results" MODIFIED="1702494676101" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+</project>
