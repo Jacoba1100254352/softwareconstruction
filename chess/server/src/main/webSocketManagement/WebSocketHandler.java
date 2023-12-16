@@ -13,9 +13,7 @@ import models.AuthToken;
 import models.Game;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
-import webSocketMessages.serverMessages.ErrorMessage;
-import webSocketMessages.serverMessages.LoadGameMessage;
-import webSocketMessages.serverMessages.NotificationMessage;
+import webSocketMessages.serverMessages.*;
 import webSocketMessages.userCommands.*;
 
 @WebSocket

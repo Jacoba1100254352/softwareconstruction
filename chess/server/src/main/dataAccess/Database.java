@@ -11,6 +11,8 @@ import java.sql.Statement;
  */
 public class Database {
 
+    // mysql -u root -pnyvceB-gysvuq-gozne5
+
     private static final String DB_NAME = "chessServerDB";
     private static final String DB_USERNAME = "root"; // System.getProperty("dbUsername", "root"); // Fallback to 'root' if not set
     private static final String DB_PASSWORD = "nyvceB-gysvuq-gozne5"; // System.getProperty("dbPassword", ""); // Fallback to empty if not set
