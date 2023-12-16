@@ -1,25 +1,43 @@
-import dataAccess.DataAccessException;
 import handlers.*;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
+import testFactory.TestFactory;
+import webSocketManagement.WebSocketHandler;
 
 import java.util.HashMap;
-
-import dataAccess.UserDAO;
-import models.User;
 
 public class Server {
     /**
      * Handlers for service requests and responses.
      */
     private final HashMap<String, BaseHandler> handlers;
+    /**
+     * Handler for WebSocket connections.
+     */
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         // Initialize handlers
         handlers = new HashMap<>();
+        webSocketHandler = new WebSocketHandler();
 
         // Set up the handlers
+        setupHandlers();
+    }
+
+    public static void main(String[] args) {
+        // Setup server instance
+        Server server = new Server();
+
+        // Start the server
+        server.start();
+
+        // Register a shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(server::stopServer));
+    }
+
+    private void setupHandlers() {
         handlers.put("/db:DELETE", new ClearHandler());
         handlers.put("/user:POST", new RegisterHandler());
         handlers.put("/session:POST", new LoginHandler());
@@ -28,14 +46,6 @@ public class Server {
         handlers.put("/game:POST", new CreateGameHandler());
         handlers.put("/game:PUT", new JoinGameHandler());
         handlers.put("/user/:username:DELETE", new DeleteUserHandler()); // Admin: Delete specific user
-    }
-
-    public static void main(String[] args) {
-        Server server = new Server();
-        server.start();
-
-        // Register a shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(server::stopServer));
     }
 
     public String handleRequest(Request req, Response res) {
@@ -51,21 +61,29 @@ public class Server {
             } catch (Exception e) {
                 res.status(500);
                 res.type("application/json");
-                return "{\"error\":\"Internal server.Server Error: " + e.getMessage() + "\"}";
+                return "{\"error\":\"Internal server error: " + e.getMessage() + "\"}";
             }
         } else {
             res.status(404);
             res.type("application/json");
-            return "{\"error\":\"Not Found\"}";
+            return "{\"error\":\"Endpoint " + req.pathInfo() + " not found\"}";
         }
     }
 
     public void start() {
         // Set the Spark port
-        Spark.port(8080);
+        Spark.port(Integer.parseInt(TestFactory.getServerPort()));
 
-        // Set the location for static files
-        Spark.externalStaticFileLocation("src/web");
+        // Set the WebSocket handler
+        Spark.webSocket("/connect", WebSocketHandler.class);
+
+        // Set security headers
+        Spark.before((request, response) -> {
+            response.header("Content-Security-Policy", "default-src 'self'");
+            response.header("X-Content-Type-Options", "nosniff");
+            response.header("X-Frame-Options", "SAMEORIGIN");
+            response.header("X-XSS-Protection", "1; mode=block");
+        });
 
         // Set the Spark routes
         Spark.delete("/db", this::handleRequest);
@@ -77,33 +95,21 @@ public class Server {
         Spark.put("/game", this::handleRequest);
         Spark.delete("/user/:username", this::handleRequest); // Admin: Delete specific user
 
-        createAdminAccount(); // Ensure admin account exists
-
         // Initialize the Spark server
         Spark.init();
     }
 
     public void stopServer() {
-        // Stop the Spark server
-        Spark.stop();
-
-        // Stop the Spark server
-        System.out.println("server.Server stopped successfully.");
-    }
-
-    private void createAdminAccount() {
-        UserDAO userDAO = new UserDAO();
         try {
-            String adminUsername = "admin"; // Admin username
-            String adminPassword = "adminPassword"; // Admin password
-            String adminEmail = "admin@example.com"; // Admin email
+            // Gracefully close WebSocket connections
+            webSocketHandler.clearSessions();
 
-            // Check if admin already exists
-            if (userDAO.getUser(adminUsername) == null)
-                userDAO.insertUser(new User(adminUsername, adminPassword, adminEmail, true));
+            // Stop the Spark server
+            Spark.stop();
 
-        } catch (DataAccessException e) {
-            System.err.println("Error creating admin account: " + e.getMessage());
+            System.out.println("Server stopped successfully.");
+        } catch (Exception e) {
+            System.err.println("Error during server shutdown: " + e.getMessage());
         }
     }
 }

@@ -25,24 +25,24 @@ public class RegisterService {
      */
     public RegisterResponse register(RegisterRequest request) {
         try {
-            if (request.getUsername() == null || request.getUsername().isEmpty() ||
-                    request.getPassword() == null || request.getPassword().isEmpty() ||
-                    request.getEmail() == null || request.getEmail().isEmpty()) {
-                return new RegisterResponse("Error: bad request");
+            if (request.username() == null || request.username().isEmpty() ||
+                    request.password() == null || request.password().isEmpty() ||
+                    request.email() == null || request.email().isEmpty()) {
+                return new RegisterResponse(null, null, "Error: bad request", false);
             }
 
-            if (userDAO.getUser(request.getUsername()) == null) {
-                userDAO.insertUser(new User(request.getUsername(), request.getPassword(), request.getEmail()));
+            if (userDAO.getUser(request.username()) == null) {
+                userDAO.insertUser(new User(request.username(), request.password(), request.email()));
 
                 String uniqueToken = UUID.randomUUID().toString();
-                authDAO.insertAuth(new AuthToken(uniqueToken, request.getUsername()));
+                authDAO.insertAuth(new AuthToken(uniqueToken, request.username()));
 
-                return new RegisterResponse(uniqueToken, request.getUsername());
+                return new RegisterResponse(uniqueToken, request.username(), null, true);
             } else {
-                return new RegisterResponse("Error: already taken");
+                return new RegisterResponse(null, null, "Error: already taken", false);
             }
         } catch (DataAccessException e) {
-            return new RegisterResponse("Error: " + e.getMessage());
+            return new RegisterResponse(null, null, "Error: " + e.getMessage(), false);
         }
     }
 }

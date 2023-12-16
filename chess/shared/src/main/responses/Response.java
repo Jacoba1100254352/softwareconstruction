@@ -1,11 +1,7 @@
 package responses;
 
 public interface Response {
-    String getMessage();
+    String message();
 
-    void setMessage(String message);
-
-    boolean isSuccess();
-
-    void setSuccess(boolean success);
+    boolean success();
 }

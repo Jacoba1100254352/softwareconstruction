@@ -13,10 +13,10 @@ public class LoginHandler extends BaseHandler {
         LoginService loginService = new LoginService();
         LoginResponse result = loginService.login(loginRequest);
 
-        if (result.isSuccess())
+        if (result.success())
             response.status(200);
         else
-            response.status(result.getMessage().equals("Error: unauthorized") ? 401 : 500);
+            response.status(result.message().equals("Error: unauthorized") ? 401 : 500);
 
         return result;
     }

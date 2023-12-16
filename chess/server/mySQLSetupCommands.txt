@@ -7,7 +7,6 @@ CREATE TABLE Users (
     Username VARCHAR(50) NOT NULL PRIMARY KEY,
     Password VARCHAR(255) NOT NULL, -- Storing a hashed password
     Email VARCHAR(100) NOT NULL UNIQUE,
-    IsAdmin BOOLEAN DEFAULT FALSE, -- New field indicating if the user is an admin
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -26,7 +25,7 @@ CREATE TABLE Games (
     WhiteUsername VARCHAR(50), -- Username of the user playing white
     BlackUsername VARCHAR(50), -- Username of the user playing black
     GameName VARCHAR(255) NOT NULL,
-    GameState TEXT NOT NULL, -- Store the serialized game state
+    ChessGame TEXT NOT NULL, -- Store the serialized game state
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     LastMoveAt TIMESTAMP,
     FOREIGN KEY (WhiteUsername) REFERENCES Users(Username),

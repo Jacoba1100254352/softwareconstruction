@@ -4,7 +4,6 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import models.AuthToken;
-import models.User;
 import requests.LoginRequest;
 import responses.LoginResponse;
 
@@ -25,21 +24,15 @@ public class LoginService {
      */
     public LoginResponse login(LoginRequest request) {
         try {
-            if (userDAO.validatePassword(request.getUsername(), request.getPassword())) {
-                User user = userDAO.getUser(request.getUsername());
-                AuthToken newToken = new AuthToken(UUID.randomUUID().toString(), request.getUsername());
+            if (userDAO.validatePassword(request.username(), request.password())) {
+                AuthToken newToken = new AuthToken(UUID.randomUUID().toString(), request.username());
                 authDAO.insertAuth(newToken);
-
-                System.out.println("user: " + user.toString());
-                System.out.println("isAdmin: " + user.getIsAdmin());
-
-                // Include isAdmin in the response
-                return new LoginResponse(newToken.getToken(), user.getUsername(), user.getIsAdmin());
+                return new LoginResponse(newToken.getToken(), request.username(), null, true);
             } else {
-                return new LoginResponse("Error: unauthorized");
+                return new LoginResponse(null, null, "Error: unauthorized", false);
             }
         } catch (DataAccessException e) {
-            return new LoginResponse("Error: " + e.getMessage());
+            return new LoginResponse(null, null, "Error: " + e.getMessage(), false);
         }
     }
 }

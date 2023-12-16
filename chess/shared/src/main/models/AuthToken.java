@@ -7,11 +7,11 @@ public class AuthToken {
     /**
      * The token string.
      */
-    private String authToken;
+    private final String authToken;
     /**
      * The associated username.
      */
-    private String username;
+    private final String username;
 
 
     ///   Constructor   ///
@@ -40,29 +40,11 @@ public class AuthToken {
     }
 
     /**
-     * Sets the authentication token.
-     *
-     * @param authToken A string representing the token to be set.
-     */
-    public void setToken(String authToken) {
-        this.authToken = authToken;
-    }
-
-    /**
      * Gets the username associated with the token.
      *
      * @return A string representing the username.
      */
     public String getUsername() {
         return this.username;
-    }
-
-    /**
-     * Sets the username associated with the token.
-     *
-     * @param username A string representing the username to be set.
-     */
-    public void setUsername(String username) {
-        this.username = username;
     }
 }

@@ -180,7 +180,9 @@ In addition to returning `Future` objects from the execution of a `Callable`, th
 
 In our example above we created a pool using the ExecutorService's factory `newSingleThreadExecutor` method. This creates a single thread and gives each Callable an equal chance to execute. You can also create a thread pool that allocates a fixed number of threads using the `newFixedThreadPool` method. This executor will block newly submitted tasks if there are no available threads in the pool. The `newCachedThreadPool` will grow the pool of threads when a new task is submitted if all of the current threads are in use.
 
-With all of the executors defined above, the threads in the pool are reused for each of the submitted tasks. This helps to decrease the overhead involved with creating and deleting threads.
+![Executor](executor.png)
+
+With all of the executors defined above, the threads in the pool are reused for each of the submitted tasks. This helps to decrease the overhead involved with creating and deleting threads. The following is a list of executors that are provided in the JDK concurrency package.
 
 | Pool Type               | Description                                                                                                       |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -340,14 +342,13 @@ It is important to recognize that if you create an HTTP server, you have created
 
 ```java
 public class MultithreadedServerExample {
-    static boolean value = true;
+    static int sum = 0;
 
-     public static void main(String[] args) {
+    public static void main(String[] args) {
         Spark.port(8080);
-        Spark.get("/toggle", (req, res) -> {
-            value = !value;
-            value = !value;
-            return " " + value;
+        Spark.get("/add/:value", (req, res) -> {
+            sum += Integer.parseInt(req.params(":value"));
+            return " " + sum;
         });
     }
 }
@@ -366,17 +367,17 @@ However, because we read and write `value` as two different statements, we have 
 We can solve this by synchronizing the access to the critical section of code.
 
 ```java
-public class MultithreadedServerExample {
-    static boolean value = true;
+public class SynchronizedMultithreadedServerExample {
+    static int sum = 0;
     static Object lock = new Object();
 
     public static void main(String[] args) {
         Spark.port(8080);
-        Spark.get("/toggle", (req, res) -> {
+        Spark.get("/add/:value", (req, res) -> {
             synchronized (lock) {
-                value = !value;
-                value = !value;
-                return " " + value;
+                var value = Integer.parseInt(req.params(":value"));
+                sum += value;
+                return " " + sum;
             }
         });
     }
@@ -385,18 +386,18 @@ public class MultithreadedServerExample {
 
 ## Atomic Concurrency
 
-The Java concurrency package also includes several classes that make it so that you don't create critical sections that have to be protected with a synchronization object. One of these classes is `AtomicBoolean`. Remember that you only need to protect resources that take several steps to modify (e.g. read/modify/write). By modifying a resource over multiple statements, you allow another thread to slip in between and change the resource you are working with. If you can read/modify/write a resource in on statement, or atomically, then there is no need to synchronize the object across threads. We can rewrite our server example to use an `AtomicBoolean` instead of the simple `boolean` type. Then instead of reading the value, modifying toggling it, and then writing it, we simply call the `AtomicBoolean.compareAndExchange` method to do all three in one atomic step. This makes things completely thread safe.
+The Java concurrency package also includes several classes that make it so that you don't create critical sections that have to be protected with a synchronization object. One of these classes is `AtomicInteger`. Remember that you only need to protect resources that take several steps to modify (e.g. read/modify/write). By modifying a resource over multiple statements, you allow another thread to slip in between and change the resource you are working with. If you can read/modify/write a resource in on statement, or atomically, then there is no need to synchronize the object across threads. We can rewrite our server example to use an `AtomicInteger` instead of the simple `int` type. Then instead of reading the value and modifying it, we simply call the `AtomicInteger.addAndGet` method to do do both in one atomic step. This makes things completely thread safe.
 
 ```java
 public class AtomicServerExample {
-    static AtomicBoolean value = new AtomicBoolean(true);
+    static AtomicInteger sum = new AtomicInteger(0);
 
     public static void main(String[] args) {
         Spark.port(8080);
-        Spark.get("/toggle", (req, res) -> {
-            value.compareAndExchange(true, false);
-            var v = value.compareAndExchange(false, true);
-            return " " + (v == false);
+        Spark.get("/add/:value", (req, res) -> {
+            var value = Integer.parseInt(req.params(":value"));
+            value = sum.addAndGet(value);
+            return " " + value;
         });
     }
 }
@@ -407,6 +408,7 @@ There are other atomic classes in the JDK that you might find useful in order to
 | Class                | Description                                                                                                                                                                          |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | AtomicInteger        | Atomically add to the value of an integer.                                                                                                                                           |
+| AtomicBoolean        | Atomically change a boolean value if it is the given value.                                                                                                                          |
 | BlockingQueue        | A thread-safe queue that allows threads to add and remove elements without worrying about synchronization. It is useful for implementing producer-consumer patterns.                 |
 | LinkedBlockingQueue  | An implementation of the BlockingQueue interface that uses a linked list to store its elements. It is a good choice for applications that require high throughput and low latency.   |
 | ArrayBlockingQueue   | An implementation of the BlockingQueue interface that uses an array to store its elements. It is a good choice for applications that require bounded capacity and fast access times. |

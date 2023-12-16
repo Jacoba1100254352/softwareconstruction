@@ -1,5 +1,7 @@
 package services;
 
+import chess.ChessGame;
+import chess.ChessGameImpl;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
@@ -22,22 +24,24 @@ public class CreateGameService {
      */
     public CreateGameResponse createGame(CreateGameRequest request) {
         try {
-            if (request.getGameName() == null || request.getGameName().isEmpty())
-                return new CreateGameResponse("Error: bad request");
+            if (request.gameName() == null || request.gameName().isEmpty())
+                return new CreateGameResponse(null, "Error: bad request", false);
 
-            if (authDAO.findAuth(request.getAuthToken()) == null)
-                return new CreateGameResponse("Error: unauthorized");
+            if (authDAO.findAuth(request.authToken()) == null)
+                return new CreateGameResponse(null, "Error: unauthorized", false);
 
             // Create a new Game object
+            ChessGame game = new ChessGameImpl();
+            game.getBoard().resetBoard();
             Integer gameID = (!gameDAO.findAllGames().isEmpty()) ? gameDAO.getCurrentGameId() : 0;
-            Game newGame = new Game(gameID, request.getGameName());
+            Game newGame = new Game(gameID, request.gameName(), game);
 
             // Insert the new Game object into the data store
             gameDAO.insertGame(newGame);
 
-            return new CreateGameResponse(newGame.getGameID());
+            return new CreateGameResponse(newGame.getGameID(), null, true);
         } catch (DataAccessException e) {
-            return new CreateGameResponse("Error: " + e.getMessage());
+            return new CreateGameResponse(null, "Error: " + e.getMessage(), false);
         }
     }
 }

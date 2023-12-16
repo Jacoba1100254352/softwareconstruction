@@ -1,32 +1,54 @@
 package ui;
 
-import client.ChessClient;
+import chess.*;
+import clients.ChessClient;
+import clients.WebSocketClient;
 import com.google.gson.*;
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
+import requests.JoinGameRequest;
 import serverFacade.ServerFacade;
 import serverFacade.ServerFacadeException;
+import GameStateUpdateListener.GameStateUpdateListener;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
-public class PostloginUI {
-    private final ChessClient client;
-    private final ServerFacade serverFacade;
+public class PostloginUI implements GameStateUpdateListener {
     private static final Logger LOGGER = Logger.getLogger(PostloginUI.class.getName());
+    private final ChessClient chessClient;
+    private ChessGame currentGame;
+    private final WebSocketClient webSocketClient;
+    private final ServerFacade serverFacade;
     private final Map<Integer, Integer> gameMap = new HashMap<>();
 
-    public PostloginUI(ChessClient client, ServerFacade serverFacade) {
-        this.client = client;
+    private boolean isInGame = false;
+
+    public PostloginUI(ChessClient chessClient, ServerFacade serverFacade) {
+        this.chessClient = chessClient;
+        this.webSocketClient = new WebSocketClient(chessClient);
         this.serverFacade = serverFacade;
+        this.webSocketClient.getWebSocketFacade().setGameStateUpdateListener(this);
+    }
+
+    @Override
+    public void onGameStateUpdate(ChessGame updatedGame) {
+        this.currentGame = updatedGame;
+        String playerColor = webSocketClient.getPlayerColor();
+        chessClient.getGameplayUI().redrawGame(this.currentGame, playerColor);
+    }
+
+    static {
+        LOGGER.setLevel(Level.WARNING);
     }
 
     public void displayMenu() {
+        if (isInGame) {
+            return;
+        }
+
         System.out.println("Post-login Menu:");
         System.out.println("0. Help");
         System.out.println("1. Create Game");
@@ -35,32 +57,27 @@ public class PostloginUI {
         System.out.println("4. Join as Observer");
         System.out.println("5. Logout");
 
-        if (client.isAdmin())
-            displayAdminOptions();
-
         Scanner scanner = new Scanner(System.in);
-        int choice = -1;
-        int maxChoice = client.isAdmin() ? 8 : 5;
+        int choice = getInput(scanner, 0, 5);
+        processUserChoice(choice);
+    }
 
-        // Validate user input
-        while (choice < 0 || choice > maxChoice) {
+    private int getInput(Scanner scanner, int min, int max) {
+        int choice = -1;
+        while (choice < min || choice > max) {
             System.out.print("Enter choice: ");
-            try {
+            if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
-                processUserChoice(choice);
-            } catch (InputMismatchException | DataAccessException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-                scanner.nextLine();
+            } else {
+                LOGGER.warning("Invalid input. Please enter a valid number.");
+                scanner.next(); // Clear the invalid input
             }
         }
+        scanner.nextLine(); // Consume the newline left after nextInt()
+        return choice;
     }
 
-    private void displayAdminOptions() {
-        System.out.println("6. Remove User");
-        System.out.println("7. Reset Database");
-    }
-
-    private void processUserChoice(int choice) throws DataAccessException {
+    private void processUserChoice(int choice) {
         switch (choice) {
             case 0 -> displayHelp();
             case 1 -> createGame();
@@ -68,18 +85,17 @@ public class PostloginUI {
             case 3 -> joinGame();
             case 4 -> joinAsObserver();
             case 5 -> logout();
-            case 6 -> { if (client.isAdmin()) removeUser(); else printInvalidChoice(); }
-            case 7 -> { if (client.isAdmin()) resetDatabase(); else printInvalidChoice(); }
-            default -> printInvalidChoice();
+            case 6 -> resignGame();
+            case 7 -> leaveGame();
+            default -> LOGGER.warning("Invalid choice selected: " + choice);
         }
     }
 
-    private void printInvalidChoice() {
-        System.out.println("Invalid choice.");
-    }
-
-
     private void displayHelp() {
+        if (chessClient.isDebugMode()) {
+            LOGGER.info("Displaying Help Menu");
+        }
+
         System.out.println("Help Menu:");
         System.out.println("0. Help - Displays this help menu.");
         System.out.println("1. Create Game - Create a new game on the server.");
@@ -87,8 +103,7 @@ public class PostloginUI {
         System.out.println("3. Join Game - Join an existing game as a player.");
         System.out.println("4. Join as Observer - Observe an existing game.");
         System.out.println("5. Logout - Log out of the application.");
-        if (client.isAdmin())
-            displayAdminOptions();
+        System.out.println();
     }
 
     private void createGame() {
@@ -100,23 +115,22 @@ public class PostloginUI {
         jsonRequest.addProperty("gameName", gameName);
 
         try {
-            String response = serverFacade.sendPostRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
+            String response = serverFacade.sendPostRequest("/game", new Gson().toJson(jsonRequest), chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 System.out.println("Game created successfully. Game ID: " + responseObject.get("gameID").getAsInt());
             } else {
-                System.out.println("Failed to create game: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Failed to create game: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("Create game error: " + e.getMessage());
-            System.out.println("Failed to create game: " + e.getMessage());
         }
     }
 
     private void listGames() {
-        gameMap.clear(); // Clear the previous mapping
+        gameMap.clear(); // Clear the previous game list mapping
         try {
-            String response = serverFacade.sendGetRequest("/game", client.getAuthToken());
+            String response = serverFacade.sendGetRequest("/game", chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
                 JsonArray games = responseObject.get("games").getAsJsonArray();
@@ -128,17 +142,22 @@ public class PostloginUI {
 
                 int number = 1;
                 for (JsonElement game : games) {
+                    // Get game info
                     Integer gameId = game.getAsJsonObject().get("gameID").getAsInt();
                     String gameName = game.getAsJsonObject().get("gameName").getAsString();
-                    System.out.println(number + ". " + gameName);
+
+                    // Get Players
+                    String whitePlayer = game.getAsJsonObject().get("whiteUsername").isJsonNull() ? "None" : game.getAsJsonObject().get("whiteUsername").getAsString();
+                    String blackPlayer = game.getAsJsonObject().get("blackUsername").isJsonNull() ? "None" : game.getAsJsonObject().get("blackUsername").getAsString();
+
+                    System.out.println(number + ". " + gameName + "\tWHITE: " + whitePlayer + " BLACK: " + blackPlayer);
                     gameMap.put(number++, gameId); // Map list number to game ID
                 }
             } else {
-                System.out.println("Failed to list games: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Failed to list games: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("List games error: " + e.getMessage());
-            System.out.println("Failed to list games: " + e.getMessage());
         }
     }
 
@@ -152,92 +171,200 @@ public class PostloginUI {
 
     private void joinGame(boolean asObserver) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter game number to join: ");
-        int gameNumber = scanner.nextInt();
-        Integer gameId = gameMap.get(gameNumber);
-
-        if (gameId == null) {
-            System.out.println("Invalid game number.");
+        if (gameMap.isEmpty()) {
+            LOGGER.warning("Please list games first.");
             return;
         }
 
-        JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("gameID", gameId);
+        System.out.print("Enter game number to join: ");
+        int gameNumber = scanner.nextInt();
+        Integer gameID = gameMap.get(gameNumber);
 
-        if (!asObserver) {
-            System.out.print("Enter color (WHITE/BLACK): ");
-            String color = scanner.next().toUpperCase();
-            jsonRequest.addProperty("playerColor", color);
+        if (gameID == null) {
+            LOGGER.warning("Invalid game number.");
+            return;
         }
 
         try {
-            String response = serverFacade.sendPutRequest("/game", new Gson().toJson(jsonRequest), client.getAuthToken());
-            JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
-            if (responseObject.get("success").getAsBoolean()) {
-                System.out.println(asObserver ? "Joined game as observer successfully." : "Joined game successfully.");
+            if (asObserver) {
+                webSocketClient.joinObserver(gameID);
+                LOGGER.info("Joined game as observer successfully.");
             } else {
-                System.out.println("Failed to join game: " + responseObject.get("message").getAsString());
+                System.out.print("Enter color (WHITE/BLACK): ");
+                String colorStr = scanner.next().toUpperCase();
+
+                boolean joinSuccess = joinGameHttp(gameID, colorStr);
+                if (!joinSuccess) {
+                    LOGGER.warning("Failed to join the game.");
+                    return;
+                }
+
+                webSocketClient.joinPlayer(colorStr, gameID);
+                LOGGER.info("Joined game successfully.");
+
+                // Initialize currentGame and reset its board
+                this.currentGame = new ChessGameImpl();
+                this.currentGame.getBoard().resetBoard();
+
+                // Set isInGame to true
+                isInGame = true;
+
+                // Display the board
+                chessClient.getGameplayUI().displayBoard(currentGame.getBoard(), colorStr.toLowerCase(), null, null);
+
+                // Prompt user for a move if they're joining as a player
+                promptForMove();
             }
-        } catch (ServerFacadeException | IOException | URISyntaxException e) {
+        } catch (Exception e) {
             LOGGER.severe("Join game error: " + e.getMessage());
-            System.out.println("Failed to join game: " + e.getMessage());
+        }
+    }
+
+    private boolean joinGameHttp(Integer gameID, String colorStr) {
+        try {
+            JoinGameRequest joinRequest = new JoinGameRequest(chessClient.getAuthToken(), gameID, colorStr);
+            String response = serverFacade.sendPutRequest("/game", new Gson().toJson(joinRequest), chessClient.getAuthToken());
+            JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
+            return responseObject.get("success").getAsBoolean();
+        } catch (ServerFacadeException | IOException | URISyntaxException e) {
+            LOGGER.severe("Error joining game: " + e.getMessage());
+            return false;
+        }
+    }
+
+    private void promptForMove() {
+        String playerColor = webSocketClient.getPlayerColor();
+        chessClient.getGameplayUI().redrawGame(this.currentGame, playerColor);
+
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Options:");
+            System.out.println("1. Make Move");
+            System.out.println("2. Resign Game");
+            System.out.println("3. Leave Game");
+
+            int choice = getInput(scanner, 1, 3);
+
+            switch (choice) {
+                case 1:
+                    makeMove(scanner);
+                    return; // Return after move is made
+                case 2:
+                    resignGame();
+                    return; // Return after resigning
+                case 3:
+                    leaveGame();
+                    return; // Return after leaving
+                default:
+                    LOGGER.warning("Invalid choice. Please select a valid option.");
+            }
+        }
+    }
+
+    private void makeMove(Scanner scanner) {
+        if (webSocketClient.getPlayerTeamColor() == null || currentGame.getTeamTurn() != webSocketClient.getPlayerTeamColor()) {
+            LOGGER.warning("It's not your turn.");
+            return;
+        }
+
+        System.out.println("Enter your move (e.g., e2 e4, or e7 e8 Q for pawn promotion): ");
+        String moveInput = scanner.nextLine();
+        String[] moveParts = moveInput.split(" ");
+
+        // Check for standard move format or move with promotion
+        if (moveParts.length != 2 && moveParts.length != 3) {
+            LOGGER.warning("Invalid move format. Please enter a valid move.");
+            return;
+        }
+
+        try {
+            // Use the third part of the input as the promotion piece if provided
+            String promotionPiece = (moveParts.length == 3) ? moveParts[2] : null;
+            ChessMove move = parseMoveInput(moveParts[0], moveParts[1], promotionPiece);
+            webSocketClient.makeMove(move);
+
+            LOGGER.info("Move made successfully.");
+        } catch (Exception e) {
+            LOGGER.severe("Make move error: " + e.getMessage());
+        }
+    }
+
+
+    // Convert user input into a ChessMove object
+    private ChessMove parseMoveInput(String from, String to, String promotion) throws IllegalArgumentException {
+        // Parse the 'from' and 'to' strings into ChessPositionImpl objects
+        ChessPositionImpl startPos = parsePosition(from);
+        ChessPositionImpl endPos = parsePosition(to);
+
+        // Parse the promotion piece, if provided
+        ChessPiece.PieceType promotionPiece = parsePromotionPiece(promotion);
+
+        // Return a new ChessMove object
+        return new ChessMoveImpl(startPos, endPos, promotionPiece);
+    }
+
+    private ChessPositionImpl parsePosition(String position) throws IllegalArgumentException {
+        if (position.length() != 2)
+            throw new IllegalArgumentException("Invalid position format.");
+
+        char colChar = position.toLowerCase().charAt(0);
+        int row = Integer.parseInt(position.substring(1));
+        int col = colChar - 'a' + 1;
+
+        return new ChessPositionImpl(row, col);
+    }
+
+    private ChessPiece.PieceType parsePromotionPiece(String promotion) {
+        if (promotion == null || promotion.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return ChessPiece.PieceType.valueOf(promotion.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid promotion piece type.");
         }
     }
 
     private void logout() {
         JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("authToken", client.getAuthToken());
+        jsonRequest.addProperty("authToken", chessClient.getAuthToken());
 
         try {
-            String response = serverFacade.sendDeleteRequest("/session", new Gson().toJson(jsonRequest), client.getAuthToken());
+            String response = serverFacade.sendDeleteRequest("/session", new Gson().toJson(jsonRequest), chessClient.getAuthToken());
             JsonObject responseObject = JsonParser.parseString(response).getAsJsonObject();
             if (responseObject.get("success").getAsBoolean()) {
-                client.setAuthToken(null);
-                client.transitionToPreloginUI();
-                System.out.println("Logged out successfully.");
+                chessClient.setAuthToken(null);
+                chessClient.transitionToPreloginUI();
+
+                if (chessClient.isDebugMode()) {
+                    LOGGER.info("Logged out successfully.");
+                }
             } else {
-                System.out.println("Failed to logout: " + responseObject.get("message").getAsString());
+                LOGGER.warning("Logout error: " + responseObject.get("message").getAsString());
             }
         } catch (ServerFacadeException | IOException | URISyntaxException e) {
             LOGGER.severe("Logout error: " + e.getMessage());
-            System.out.println("Failed to logout: " + e.getMessage());
         }
     }
 
-    private void removeUser() {
-        System.out.print("Enter username to remove: ");
-        String username = (new Scanner(System.in)).nextLine();
-
+    private void resignGame() {
         try {
-            if (!client.isAdmin()) {
-                System.out.println("You are not authorized to perform this action.");
-                return;
-            }
-
-            serverFacade.sendDeleteRequest("/user/" + username, null, client.getAuthToken());
-            System.out.println("User removed successfully.");
+            webSocketClient.resignGame();
+            LOGGER.info("Resigned from game successfully.");
+            isInGame = false; // Reset isInGame
         } catch (Exception e) {
-            LOGGER.severe("Error removing user: " + e.getMessage());
-            System.out.println("Failed to remove user.");
+            LOGGER.severe("Error resigning from game: " + e.getMessage());
         }
     }
 
-    private void resetDatabase() {
+    private void leaveGame() {
         try {
-            if (!client.isAdmin()) {
-                System.out.println("You are not authorized to perform this action.");
-                return;
-            }
-
-            String authToken = client.getAuthToken();
-            System.out.println("Logging out admin...");
-            logout(); // Log out the admin
-            System.out.println("Resetting database...");
-            serverFacade.sendDeleteRequest("/db", null, authToken);
-            System.out.println("Database reset.");
+            webSocketClient.leaveGame();
+            LOGGER.info("Left game successfully.");
+            isInGame = false; // Reset isInGame
         } catch (Exception e) {
-            LOGGER.severe("Error resetting database: " + e.getMessage());
-            System.out.println("Failed to reset database.");
+            LOGGER.severe("Error leaving game: " + e.getMessage());
         }
     }
 }

@@ -161,7 +161,6 @@ public class ChessGameImpl implements ChessGame {
     private boolean doesMoveResultInCheck(ChessMove move, ChessPiece piece) {
         // Temporarily apply the move to see if it results in check
         ChessPiece originalEndPiece = board.getPiece(move.getEndPosition());
-        ChessPiece capturedPawn = null;
 
         board.addPiece(move.getEndPosition(), piece);
         board.removePiece(move.getStartPosition());
