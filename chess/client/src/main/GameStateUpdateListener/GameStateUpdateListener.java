@@ -1,7 +1,10 @@
 package GameStateUpdateListener;
 
-import chess.ChessGame;
 
-public interface GameStateUpdateListener {
-    void onGameStateUpdate(ChessGame updatedGame);
+import chess.gameplay.ChessGame;
+
+
+public interface GameStateUpdateListener
+{
+	void onGameStateUpdate(ChessGame updatedGame);
 }

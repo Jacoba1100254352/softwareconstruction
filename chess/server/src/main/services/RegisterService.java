@@ -1,5 +1,6 @@
 package services;
 
+
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
@@ -10,39 +11,42 @@ import responses.RegisterResponse;
 
 import java.util.UUID;
 
+
 /**
  * Provides services for registering a user.
  */
-public class RegisterService {
-    private final UserDAO userDAO = new UserDAO();
-    private final AuthDAO authDAO = new AuthDAO();
-
-    /**
-     * Registers a new user.
-     *
-     * @param request The registration request containing user details.
-     * @return RegisterResponse indicating success or failure.
-     */
-    public RegisterResponse register(RegisterRequest request) {
-        try {
-            if (request.username() == null || request.username().isEmpty() ||
-                    request.password() == null || request.password().isEmpty() ||
-                    request.email() == null || request.email().isEmpty()) {
-                return new RegisterResponse(null, null, "Error: bad request", false);
-            }
-
-            if (userDAO.getUser(request.username()) == null) {
-                userDAO.insertUser(new User(request.username(), request.password(), request.email()));
-
-                String uniqueToken = UUID.randomUUID().toString();
-                authDAO.insertAuth(new AuthToken(uniqueToken, request.username()));
-
-                return new RegisterResponse(uniqueToken, request.username(), null, true);
-            } else {
-                return new RegisterResponse(null, null, "Error: already taken", false);
-            }
-        } catch (DataAccessException e) {
-            return new RegisterResponse(null, null, "Error: " + e.getMessage(), false);
-        }
-    }
+public class RegisterService
+{
+	private final UserDAO userDAO = new UserDAO();
+	private final AuthDAO authDAO = new AuthDAO();
+	
+	/**
+	 * Registers a new user.
+	 *
+	 * @param request The registration request containing user details.
+	 *
+	 * @return RegisterResponse indicating success or failure.
+	 */
+	public RegisterResponse register(RegisterRequest request) {
+		try {
+			if (request.username() == null || request.username().isEmpty() ||
+					request.password() == null || request.password().isEmpty() ||
+					request.email() == null || request.email().isEmpty()) {
+				return new RegisterResponse(null, null, "Error: bad request", false);
+			}
+			
+			if (userDAO.getUser(request.username()) == null) {
+				userDAO.insertUser(new User(request.username(), request.password(), request.email()));
+				
+				String uniqueToken = UUID.randomUUID().toString();
+				authDAO.insertAuth(new AuthToken(uniqueToken, request.username()));
+				
+				return new RegisterResponse(uniqueToken, request.username(), null, true);
+			} else {
+				return new RegisterResponse(null, null, "Error: already taken", false);
+			}
+		} catch (DataAccessException e) {
+			return new RegisterResponse(null, null, "Error: " + e.getMessage(), false);
+		}
+	}
 }

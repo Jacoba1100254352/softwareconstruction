@@ -1,5 +1,6 @@
 package requests;
 
+
 /**
  * Represents the request data required for a user to join a game.
  *
@@ -7,5 +8,6 @@ package requests;
  * @param gameID      The unique ID of the game.
  * @param playerColor The color the player wishes to play as.
  */
-public record JoinGameRequest(String authToken, Integer gameID, String playerColor) {
+public record JoinGameRequest(String authToken, Integer gameID, String playerColor)
+{
 }

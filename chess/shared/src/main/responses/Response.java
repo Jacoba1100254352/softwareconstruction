@@ -1,7 +1,9 @@
 package responses;
 
-public interface Response {
-    String message();
 
-    boolean success();
+public interface Response
+{
+	String message();
+	
+	boolean success();
 }

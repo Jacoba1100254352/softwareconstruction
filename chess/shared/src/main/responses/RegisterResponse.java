@@ -1,5 +1,6 @@
 package responses;
 
+
 /**
  * Represents the result of a registration request.
  *
@@ -8,5 +9,6 @@ package responses;
  * @param message   The error message.
  * @param success   Indicates the success of the register operation.
  */
-public record RegisterResponse(String authToken, String username, String message, boolean success) implements Response {
+public record RegisterResponse(String authToken, String username, String message, boolean success) implements Response
+{
 }

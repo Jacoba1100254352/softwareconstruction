@@ -1,8 +1,10 @@
 package responses;
 
+
 import models.Game;
 
 import java.util.Collection;
+
 
 /**
  * Represents the response containing a list of all games.
@@ -11,5 +13,6 @@ import java.util.Collection;
  * @param message A message providing details or an error description.
  * @param success The game listing was successful
  */
-public record ListGamesResponse(Collection<Game> games, String message, boolean success) implements Response {
+public record ListGamesResponse(Collection<Game> games, String message, boolean success) implements Response
+{
 }

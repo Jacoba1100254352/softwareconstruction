@@ -1,5 +1,6 @@
 package responses;
 
+
 /**
  * Represents the result of a login request.
  *
@@ -8,5 +9,6 @@ package responses;
  * @param message   The error message.
  * @param success   Indicates if the login operation was successful.
  */
-public record LoginResponse(String authToken, String username, String message, boolean success) implements Response {
+public record LoginResponse(String authToken, String username, String message, boolean success) implements Response
+{
 }
