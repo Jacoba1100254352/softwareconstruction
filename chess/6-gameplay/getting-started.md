@@ -1,15 +1,36 @@
 # Getting Started
 
-📁 [Starter code](starter-code)
+The Starter Code has 2 folders, `server` and `websocket`. Complete the following steps to move the starter code into your project for this phase.
 
-The Starter Code should have 2 folders, `serverTests` and `webSocketMessages`. Do the following:
+1. Open your chess project directory.
+1. Copy the contents of the `starter-code/6-gameplay/passoff/server` folder into your project’s `server/src/test/java/passoff/server` folder. The `WebSocketTests.java` file contains the pass off test cases that verify your server’s websocket interactions with clients. The `TestFactory.java` file contains necessary helper methods for you run and debug the web socket tests effectively.
+1. Copy the `starter-code/6-gameplay/websocket` folder into your project’s `shared/src/main/java` folder. This folder contains the `UserGameCommand` and `ServerMessage` superclasses for the websocket message classes you will create.
 
-1. Copy the `serverTests` folder into your project’s `src/test/passoffTests` folder. The `serverTests` folder already exists in your project, but this will add a new class named WebSocketTests to it. This class contains the pass off test cases that verify your server’s web socket interactions with clients.
-1. Copy the `webSocketMessages` folder into your project’s `shared/src/starter` folder. Note that this folder is in your `shared` module. This folder contains the `UserGameCommand` and `ServerMessage` superclasses for the web socket message classes you will create.
+This should result in the following additions to your project.
+
+```txt
+├── server
+│   └── src
+│       └── test
+│           └── java
+│               └── passoff
+│                   └── server
+│                       ├── WebSocketTests.java
+│                       └── TestFactory.java
+└── shared
+    └── src
+        └── main
+            └── java
+                └── websocket
+                    ├── messages
+                    │   └── ServerMessage.java
+                    └── commands
+                        └── UserGameCommand.java
+```
 
 ## Dependencies
 
-Add the following dependencies to the `client` module:
+Install the following library from Maven and add a dependency to the `client` and `server` modules.
 
-- **org.glassfish.tyrus.bundles:tyrus-standalone-client:1.15**
+- **org.glassfish.tyrus.bundles:tyrus-standalone-client:2.1.4**
   - Scope: Compile

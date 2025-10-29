@@ -10,10 +10,18 @@ Advanced Software Construction provides you with the experience and skills neces
 
 The content for this course is represented by the following parts.
 
-- [Instruction](instruction/modules.md#readme)
-- [Chess](chess/chess.md#readme)
-- [Pet Shop](petshop/petshop.md)
-- Assignments, quizzes, and tests submitted through Canvas
+- [Syllabus](instruction/syllabus/syllabus.md) - Course policies
+- [Instruction](instruction/modules.md) - Course topics
+- [Chess](chess/chess.md) - Instructions for building your application
+- [Pet Shop](petshop/petshop.md) - Demonstration application
+- **Canvas** - Submit assignments and tests
+
+## Course Schedule
+
+Although assignment due dates are the same for all sections, the lecture schedule may vary by instructor.
+
+- [Schedule for Dr. Rodham's Sections](./schedule/fall2025-rodham.md)
+- [Schedule for Professor Jensen's Sections](./schedule/fall2025.md)
 
 ## Outcomes
 
@@ -40,4 +48,4 @@ The course covers a full software stack of technologies and topics.
 - Testing
 - Application design
 
-_Image Source: [Christina Morillo](https://www.pexels.com/photo/close-up-photo-of-person-typing-on-laptop-1181675/)_
+_Image Source: Dall-E_

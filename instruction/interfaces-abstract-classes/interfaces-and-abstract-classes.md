@@ -1,6 +1,6 @@
 # Interfaces and Abstract Classes
 
-🖥️ [Slides](https://docs.google.com/presentation/d/17S-Y7Og08S9kRWHZfnH8k2wTBht39aCd/edit?usp=sharing&ouid=114081115660452804792&rtpof=true&sd=true)
+🖥️ [Slides](https://docs.google.com/presentation/d/1eaSGnq2FCGd7jNWve1W-LSNrERGUj7nT)
 
 📖 **Required Reading**: Core Java for the Impatient
 
@@ -13,6 +13,8 @@
   - Section 2 - Object: The Cosmic Superclass
   - Section 3 - Enumerations
 
+🖥️ [Lecture Videos](#videos)
+
 ## Polymorphism
 
 Polymorphism is the blanket term used in computer science to represent the idea of morphing an object to fit into many (i.e. poly) different contexts. In Java, the use of inheritance and abstract classes are the primary ways to provide polymorphism. You use the `extends` keyword to inherit another class's functionality, and you use the `implements` keyword to inherit an interface definition. Polymorphism allows you to decouple, or abstract, a class's internals, from how it is used. That makes it so you can significantly alter the class without having to change how the class is used.
@@ -20,6 +22,16 @@ Polymorphism is the blanket term used in computer science to represent the idea 
 ## Interfaces
 
 Interfaces allow you to define what something does, without specifying how it does it. It also allows you to create and supply alternative implementations for the interface. For example, you can have an interface that defines what a `List` can do, and then create classes that provide different implementations of the `List`. Perhaps one implementation uses less memory, and a different one is faster. You can then write code that uses the `List` interface and not have to think about if it is using the fast version or the memory efficient version.
+
+```java
+public interface List<E> extends SequencedCollection<E> {
+    void add(int index, E element);
+    E remove(int index);
+    int size();
+    void clear();
+    ListIterator<E> listIterator();
+}
+```
 
 The following example shows two implementations of a `List`. One that uses an array, and one that uses a linked list. The two lists can be passed to a function, `addAndPrint` in this case, that doesn't know anything about the implementation of the list, it just knows that it can call the interface's `add` method.
 
@@ -84,11 +96,39 @@ public class AlphabetIterator implements CharIterator {
 }
 ```
 
+## Extending Classes
+
+In the discussion for classes and objects we showed how you can inherit code from another class and treat it as if the code was included in a derived class. By default, all classes in Java derive from the Object class. That means they `inherit` the Object classes fields and methods. You can also explicitly state what class you derive from by using the `extends` keyword. In the following example, the `SubClass` extends the `SuperClass` and uses the SuperClass's toString method to implement its toString method. SubClass can do this because everything in the derived class literally becomes part of the subclass just as if the code had been written in the subclass.
+
+```java
+public static class SuperClass extends Object {
+    String name = "super";
+
+    public String toString() {
+        return name;
+    }
+}
+
+public static class SubClass extends SuperClass {
+    public String toString() {
+        return "Sub-class of " + super.toString();
+    }
+}
+```
+
 ## Abstract Classes
 
 Abstract classes provide another type of polymorphism. However, unlike interfaces, where the subclass implements all of the functionality of the interface, a base class that is an abstract class provides some of the implementation and leaves other methods to be implemented by the subclass.
 
-Here is an example of an abstract class that implements the JDK's `Iterator` interface, but also defines a new abstract method for iterating with a string prefix. This is done by specifying the `abstract` keyword on the `nextWithPrefix` method, without providing an implementation of the method.
+The JDK's `Iterator` interface allows you to walk through, or iterate, through a collection of objects.
+
+```java
+public interface Iterator<E> {
+    boolean hasNext();
+    E next();
+```
+
+We can create a class that implements the iterator interface by returning the characters of a string, but also defines a new abstract method for iterating that allows for a string to be prefixed to each iteration result. This is done by specifying the `abstract` keyword on the `nextWithPrefix` method, without providing an implementation of the method.
 
 You can think of abstract classes as a class/interface hybrid.
 
@@ -177,6 +217,25 @@ public static void main(String[] args) {
 }
 ```
 
+Starting in Java version 17 the pattern matching version of instanceof that automatically casts the object if it is of the specified type. This makes it very convenient to both test and cast in the one statement.
+
+```java
+public class PatternMatchInstanceOfExample {
+    public static void main(String[] args) {
+        List<Object> list = List.of('a', "b", 3);
+        for (var item : list) {
+            if (item instanceof String stringItem) {
+                System.out.println(stringItem.toUpperCase());
+            } else if (item instanceof Integer intItem) {
+                System.out.println(intItem + 100);
+            } else if (item instanceof Character charItem) {
+                System.out.println(charItem.compareTo('a'));
+            }
+        }
+    }
+}
+```
+
 ## final
 
 If you don't want a subclass to override a method in a base class then you can prefix the method with the keyword `final`. You can also use the final keyword to make a class's field value immutable. (You can still call methods on final fields, however, so it's not the same as the C++ `const`.)
@@ -193,6 +252,120 @@ public class FinalExample {
 }
 ```
 
+## Thinking about Chess
+
+WIth what you have learned here, consider the Chess program. How should chess pieces be abstracted? Should the piece type be represented as a data field?
+
+```mermaid
+classDiagram
+
+    class ChessPiece {
+        TeamColor
+        PieceType
+        pieceMoves()
+    }
+```
+
+Or would it be more appropriate to represent it using abstract class inheritance?
+
+```mermaid
+classDiagram
+
+    class ChessPiece {
+        TeamColor
+        pieceMoves()
+    }
+
+    ChessPiece <|-- King
+    ChessPiece <|-- Queen
+    ChessPiece <|-- Pawn
+
+    class King {
+        pieceMoves()
+    }
+    class Queen {
+        pieceMoves()
+    }
+
+    class Pawn {
+        pieceMoves()
+    }
+
+```
+
+Or should the rules be abstracted out of the chess so that the chess piece only represents the properties of the piece and not the rules of a game?
+
+```mermaid
+classDiagram
+
+    class ChessPiece {
+        TeamColor
+        pieceMoves()
+    }
+
+
+    class Rule {
+        <<interface>>
+        pieceMoves()
+    }
+
+    KingRule  --|> Rule
+    QueenRule --|>  Rule
+    PawnRule  --|> Rule
+
+    class KingRule {
+        pieceMoves()
+    }
+    class QueenRule {
+        pieceMoves()
+    }
+
+    class PawnRule {
+        pieceMoves()
+    }
+```
+
+Can I also use abstract classes, interfaces, and inheritances to build something that turns the dial even more? Or is this taking things too far? All of these questions are part of learning how to design software.
+
+Here is a possible design to incorporates all of the abstraction concepts into an architecture for representing rules.
+
+```mermaid
+classDiagram
+
+    class Rules {
+        getRule()
+    }
+
+    Rules --> MovementRule
+
+    class MovementRule {
+        <<interface>>
+        pieceMoves()
+    }
+
+    class BaseMovementRule {
+        <<abstract>>
+        private calculateMoves()
+        pieceMoves()
+    }
+    BaseMovementRule --|> MovementRule
+
+    KingRule  --|> BaseMovementRule
+    QueenRule --|>  BaseMovementRule
+    PawnRule  --|> BaseMovementRule
+
+    class KingRule {
+        pieceMoves()
+    }
+    class QueenRule {
+        pieceMoves()
+    }
+
+    class PawnRule {
+        pieceMoves()
+    }
+```
+
 ## Things to Understand
 
 - What polymorphism is
@@ -205,11 +378,9 @@ public class FinalExample {
 
 ## Videos
 
-- 🎥 [Polymorphism](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=23d2e58e-9628-43a4-9aaa-ad640141e7dc&start=0)
-- 🎥 [Polymorphism Example Part 1](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=88adc709-e900-47d6-9e9a-ad64014400ad&start=0)
-- 🎥 [Polymorphism Example Part 2](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ebfcd403-53e4-4b68-8a3d-ad6401453df4&start=0)
-- 🎥 [Polymorphism Example Part 3](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f451dd38-e32d-445f-be0d-ad6401470c45&start=0)
-- 🎥 [Creating an Interface](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=2da0fb3a-7aca-4344-a42b-ad640149f9e2&start=0)
-- 🎥 [Implementing an Interface](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f7ec17c1-c815-429b-8ffd-ad64014b0921&start=0)
-- 🎥 [Inheritance](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=74faf0ca-9a24-4800-8ded-ad5d014f9493&start=0)
-- 🎥 [The Final Keyword](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c8298a1a-b65c-43bd-8928-ad64013a3b89&start=0)
+- 🎥 [Polymorphism (5:53)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=23d2e58e-9628-43a4-9aaa-ad640141e7dc&start=0) - [[transcript]](https://github.com/user-attachments/files/17804824/CS_240_Polymorphism.pdf)
+- 🎥 [Polymorphism Example Part 1 (3:33)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=88adc709-e900-47d6-9e9a-ad64014400ad&start=0) - [[transcript]](https://github.com/user-attachments/files/17804825/CS_240_Polymorphism_Example_Part1.pdf)
+- 🎥 [Polymorphism Example Part 2 (5:55)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ebfcd403-53e4-4b68-8a3d-ad6401453df4&start=0) - [[transcript]](https://github.com/user-attachments/files/17738597/CS_240_Polymorphism_Example_Part_2_Transcript.pdf)
+- 🎥 [Polymorphism Example Part 3 (9:33)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f451dd38-e32d-445f-be0d-ad6401470c45&start=0) - [[transcript]](https://github.com/user-attachments/files/17804827/CS_240_Polymorphism_Example_Part3.pdf)
+- 🎥 [Creating an Interface (3:03)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=2da0fb3a-7aca-4344-a42b-ad640149f9e2&start=0) - [[transcript]](https://github.com/user-attachments/files/17804828/CS_240_Creating_an_Interface.pdf)
+- 🎥 [Implementing an Interface (2:27)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f7ec17c1-c815-429b-8ffd-ad64014b0921&start=0) - [[transcript]](https://github.com/user-attachments/files/17804829/CS_240_Implementing_an_Interface.pdf)

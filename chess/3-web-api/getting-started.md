@@ -1,41 +1,68 @@
 # Getting Started
 
-📁 [Starter code](starter-code)
+The Starter Code has four folders: `dataAccess`, `passoff`, `resources`, and `server`. Complete the following steps to move the starter code into your project for this phase.
 
-The Starter Code should have three folders: `libs`, `serverTests`, and `web`. Do the following:
+1. Open your chess project directory.
+1. Copy the `starter-code/3-web-api/server` folder into the `server/src/main/java` folder. This contains a basic implementation of an HTTP server that allows the pass off tests to programmatically start and stop your server, as well as the code to host a web browser interface for experimenting with your endpoints.
+1. Copy the `starter-code/3-web-api/dataaccess` folder into the `server/src/main/java` folder. This contains an exception class that you will throw whenever there is a data access error.
+1. Create the folder `server/src/test/java`. Right click on the folder and select the option to mark the directory as `Test sources root`. This tells IntelliJ where to look for code to run as tests.
 
-1. Copy the `libs` folder into your project’s root folder. The `libs` folder contains some Java libraries (i.e., JAR files) that the pass off test cases depend on.
-1. Copy the `serverTests` folder into your project’s `src/test/passoffTests` folder so it’s a sibling of `chessTests` and `TestFactory`. The `serverTests` folder contains the server test cases.
-1. Copy the `web` folder into your project’s root folder. The `web` folder contains the files that implement the server’s test web page. When you create your server class, you will need to specify the `web` folder’s path for static files, as shown below.
+   ![mark test root](mark-test-root.png)
 
-   ```java
-   Spark.externalStaticFileLocation("path/to/web/folder");
-   ```
+1. Copy the `starter-code/3-web-api/passoff` folder into the `server/src/test/java` folder. The `passoff/server` folder contains the server test cases.
+1. Create the folder `server/src/main/resources`. Right click on the folder and select the option to mark the directory as `Resources root`. This tells IntelliJ that it should include the directory when compiling the code to your `out` directory.
+1. Copy the `starter-code/3-web-api/resources/web` folder to the `server/src/main/resources` folder. The `web` folder contains the files that implement the web browser interface for experimenting with your endpoints.
 
-## Dependencies
+This should result in the following additions to your project.
 
-Add the following dependencies to your project. HINT: Use the File->Project Structure menu option.
+```txt
+└── server
+    └── src
+        ├── main
+        │   ├── java
+        │   │   ├── Main.java
+        │   │   ├── server
+        │   │   │   └── Server.java
+        │   │   └── dataaccess
+        │   │       └── DataAccessException.java
+        │   └── resources
+        │       └── web
+        │           ├── favicon.ico
+        │           ├── index.css
+        │           ├── index.html
+        │           └── index.js
+        └── test
+            └── java
+                └── passoff
+                    └── server
+                        └── StandardAPITests.java
+```
 
-- `org.slf4j:slf4j-simple:1.7.36`
+## Getting the Webpage for Testing Setup
 
-  - Scope: Compile
+Once you have completed **all** of the previous steps you should be able to launch your server and access a testing HTML page. This is a simple frontend that was made to help with basic testing of your server endpoints.
 
-    Logger for the server. The server needs a logger to work. This is a simple one that tells you about things like when an API is accessed.
+Inside of `server/src/main/java/Main.java` in the main method, replace the code that is there with the creation of the Server object. Then call the server's run method. The run method needs the port you will run your server on, which typically for testing is 8080.
 
-- `com.sparkjava:spark-core:2.9.3`
+```java
+import server.Server;
 
-  - Scope: Compile
+public class Main {
+    public static void main(String[] args) {
+        Server server = new Server();
+        server.run(8080);
 
-    This library gives us the framework for our server.
+        System.out.println("♕ 240 Chess Server");
+    }
+}
+```
 
-- `com.google.code.gson:gson:2.10.1`
+When you run the main method it will start the server. Intelij will display several informational lines of red text in the **Run** window , but if no errors are reported you should be fine.
 
-  - Scope: Compile
+Open a browser and go to `localhost:8080` (If you picked another port replace 8080 with that instead). If everything is setup correctly you should be able to see this webpage.
 
-    Library for serializing and deserializing objects to/from JSON
+![Webpage](chess-server-webpage.png)
 
-- The `libs` folder in the root folder of your project.
+You can use this to test your endpoints as you are coding the project.
 
-  - Scope: Compile
-
-    This dependency is a `directory` dependency instead of a `library` dependency. When you add a `directory` dependency to a project, it creates a dependency on all the JAR files in the selected directory. When creating this dependency, instead of selecting `Library`, select `JARs or Directories` and select your project’s `libs` folder.
+If you want to see how this works in greater depth or need help troubleshooting, take a look at [this page](../../instruction/web-api/web-api.md).

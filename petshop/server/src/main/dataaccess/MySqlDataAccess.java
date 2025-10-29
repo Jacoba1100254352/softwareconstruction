@@ -2,12 +2,8 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.ArrayFriendList;
-import model.Pet;
-import model.PetType;
+import model.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.sql.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -16,87 +12,73 @@ import static java.sql.Types.NULL;
 
 public class MySqlDataAccess implements DataAccess {
 
-    private final MySqlDataAccessConfig config;
-
-    public MySqlDataAccess(MySqlDataAccessConfig config) throws ResponseException {
-        this.config = config;
+    public MySqlDataAccess() throws ResponseException {
         configureDatabase();
     }
 
     public Pet addPet(Pet pet) throws ResponseException {
-        var friendJson = new Gson().toJson(pet.friends());
-        var statement = setDb("INSERT INTO %DB_NAME%.pet (name, type, friends) VALUES (?, ?, ?)");
-        var id = executeUpdate(statement, pet.name(), pet.type(), friendJson);
-        return new Pet(id, pet.name(), pet.type(), pet.friends());
+        var statement = "INSERT INTO pet (name, type, json) VALUES (?, ?, ?)";
+        String json = new Gson().toJson(pet);
+        int id = executeUpdate(statement, pet.name(), pet.type(), json);
+        return new Pet(id, pet.name(), pet.type());
     }
 
     public Pet getPet(int id) throws ResponseException {
-        try (var conn = getConnection()) {
-            var statement = setDb("SELECT id, name, type, friends FROM %DB_NAME%.pet WHERE id=?");
-            try (var ps = conn.prepareStatement(statement)) {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT id, json FROM pet WHERE id=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, id);
-                try (var rs = ps.executeQuery()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         return readPet(rs);
                     }
                 }
             }
         } catch (Exception e) {
-            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
 
-    public Collection<Pet> listPets() throws ResponseException {
-        var result = new ArrayList<Pet>();
-        try (var conn = getConnection()) {
-            var statement = setDb("SELECT id, name, type, friends FROM %DB_NAME%.pet");
-            try (var ps = conn.prepareStatement(statement)) {
-                try (var rs = ps.executeQuery()) {
+    public PetList listPets() throws ResponseException {
+        var result = new PetList();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT id, json FROM pet";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         result.add(readPet(rs));
                     }
                 }
             }
         } catch (Exception e) {
-            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
         }
         return result;
     }
 
     public void deletePet(Integer id) throws ResponseException {
-        var statement = setDb("DELETE FROM %DB_NAME%.pet WHERE id=?");
+        var statement = "DELETE FROM pet WHERE id=?";
         executeUpdate(statement, id);
     }
 
     public void deleteAllPets() throws ResponseException {
-        var statement = setDb("TRUNCATE %DB_NAME%.pet");
+        var statement = "TRUNCATE pet";
         executeUpdate(statement);
     }
 
     private Pet readPet(ResultSet rs) throws SQLException {
         var id = rs.getInt("id");
-        var name = rs.getString("name");
-        var type = PetType.valueOf(rs.getString("type"));
-        var friendsJson = rs.getString("friends");
-        var friends = new Gson().fromJson(friendsJson, ArrayFriendList.class);
-
-        return new Pet(id, name, type, friends);
-    }
-
-    private Connection getConnection() throws ResponseException {
-        try {
-            return DriverManager.getConnection(config.serverUrl(), config.username(), config.password());
-        } catch (SQLException ex) {
-            throw new ResponseException(500, String.format("Unable to create database connection: %s", ex.getMessage()));
-        }
+        var json = rs.getString("json");
+        Pet pet = new Gson().fromJson(json, Pet.class);
+        return pet.setId(id);
     }
 
     private int executeUpdate(String statement, Object... params) throws ResponseException {
-        try (var conn = getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
                     if (param instanceof String p) ps.setString(i + 1, p);
                     else if (param instanceof Integer p) ps.setInt(i + 1, p);
                     else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
@@ -104,7 +86,7 @@ public class MySqlDataAccess implements DataAccess {
                 }
                 ps.executeUpdate();
 
-                var rs = ps.getGeneratedKeys();
+                ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
@@ -112,20 +94,17 @@ public class MySqlDataAccess implements DataAccess {
                 return 0;
             }
         } catch (SQLException e) {
-            throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
 
     private final String[] createStatements = {
             """
-            CREATE DATABASE IF NOT EXISTS %DB_NAME%
-            """,
-            """
-            CREATE TABLE IF NOT EXISTS  %DB_NAME%.pet (
+            CREATE TABLE IF NOT EXISTS  pet (
               `id` int NOT NULL AUTO_INCREMENT,
               `name` varchar(256) NOT NULL,
               `type` ENUM('CAT', 'DOG', 'FISH', 'FROG', 'ROCK') DEFAULT 'CAT',
-              `friends` TEXT DEFAULT NULL,
+              `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`id`),
               INDEX(type),
               INDEX(name)
@@ -135,19 +114,15 @@ public class MySqlDataAccess implements DataAccess {
 
 
     private void configureDatabase() throws ResponseException {
-        try (var conn = getConnection()) {
-            for (var statement : createStatements) {
-                statement = setDb(statement);
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
         } catch (SQLException ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to configure database: %s", ex.getMessage()));
         }
-    }
-
-    private String setDb(String statement) {
-        return statement.replace("%DB_NAME%", config.dbName());
     }
 }

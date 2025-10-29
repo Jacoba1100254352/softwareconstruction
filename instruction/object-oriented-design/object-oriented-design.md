@@ -2,6 +2,8 @@
 
 🖥️ [Slides](https://docs.google.com/presentation/d/17S-Y7Og08S9kRWHZfnH8k2wTBht39aCd/edit?usp=sharing&ouid=114081115660452804792&rtpof=true&sd=true)
 
+🖥️ [Lecture Videos](#videos)
+
 `Object Oriented` design focuses on describing objects in the application domain as literal programming constructs. That means if your application contains people who eat fruit. Then you model the application by creating a `Person` and `Fruit` object. Those objects will have properties such as name, ripeness, and color. The objects will also have operations such as eat, plant, grow, or purchase. You then write your code as real world interactions between the core application domain objects. To continue our example, you would have interactions where a `Person` will either `plant`, or `purchase`, a `Fruit` object and then `eat` the fruit.
 
 ![Person Fruit Model](personFruitModel.jpg)
@@ -24,9 +26,9 @@ In order to fully model the real world with your objects, you need to describe t
 
 | Relationship | Description                                                             | Example                            |
 | ------------ | ----------------------------------------------------------------------- | ---------------------------------- |
-| Is-A         | Polymorphic inheritance. This defines what something is, or appears as. | A `Programmer` is a `Person`.      |
-| Has-A        | Ownership.                                                              | A `Programmer` has a `Computer`    |
-| Uses-A       | Transient association. This is often associated with an operation.      | A `Person` uses a `Car` to travel. |
+| Is-A         | Polymorphic inheritance.  Often defined by a extending a class. | A `Programmer` is a `Person`.      |
+| Has-A        | Ownership.  Often defined by a class field.                                                             | A `Programmer` has a `Computer`.    |
+| Uses-A       | Transient association. Often defined by a method parameter.      | A `Person` uses a `Taxi` to travel. |
 
 The following is an example of the relationships between a number of objects. Note that there are many ways that you can represent the real world with object oriented design.
 
@@ -46,7 +48,7 @@ A good object oriented design will be easy to enhance or improve as time goes by
 
 We can always add functionality later that exposes that a `Programmer` has a computer, or pass the computer as part of the `writeCode` call, but if we keep that hidden then we are free to change the relationship with the computer and the programmer until it is necessary to expose it.
 
-In many ways encapsulation is preferable to inheriting functionality primarily because to is more extensible. This is primarily due to the fact that there is no immediate external exposure of the encapsulation. With inheritance (using `extends` for your object) you are explicitly, publicly, exposing both the methods and the implementation that the extended class provides.
+In many ways encapsulation is preferable to inheriting functionality primarily because it is more extensible. This is primarily due to the fact that there is no immediate external exposure of the encapsulation. With inheritance (using `extends` for your object) you are explicitly, publicly, exposing both the methods and the implementation that the extended class provides.
 
 ## Simplicity
 
@@ -76,4 +78,4 @@ Of course you can simplify too far and end up with thousands of classes that eac
 
 ## Videos
 
-- 🎥 [Object-Oriented Design Overview](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=77c184e5-8afd-4c56-84c8-ad64013f7a4b&start=0)
+- 🎥 [Object-Oriented Design Overview](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=77c184e5-8afd-4c56-84c8-ad64013f7a4b&start=0) - [[transcript]](https://github.com/user-attachments/files/17805111/CS_240_Object_Oriented_Design_Overview.pdf)
