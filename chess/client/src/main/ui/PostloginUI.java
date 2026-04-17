@@ -45,6 +45,7 @@ public class PostloginUI implements GameStateUpdateListener
 	@Override
 	public void onGameStateUpdate(ChessGame updatedGame) {
 		this.currentGame = updatedGame;
+		webSocketClient.syncGameState(updatedGame);
 		String playerColor = webSocketClient.getPlayerColor();
 		chessClient.getGameplayUI().redrawGame(this.currentGame, playerColor);
 	}

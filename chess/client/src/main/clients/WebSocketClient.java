@@ -16,6 +16,7 @@ public class WebSocketClient
 	private Integer gameID;
 	
 	private boolean isPlayer;
+	private ChessGame.TeamColor playerColor;
 	private boolean canMove;
 	
 	public WebSocketClient(ChessClient chessClient) {
@@ -23,6 +24,7 @@ public class WebSocketClient
 		this.gameID = null;
 		
 		this.isPlayer = false;
+		this.playerColor = null;
 		this.canMove = false;
 		
 		// Initialize WebSocketFacade with this instance
@@ -43,6 +45,7 @@ public class WebSocketClient
 			
 			// Update client state
 			isPlayer = false;
+			playerColor = null;
 			canMove = false;
 		} catch (Exception e) {
 			System.err.println("Error in resignGame: " + e.getMessage());
@@ -63,6 +66,7 @@ public class WebSocketClient
 			
 			// Update the client's state
 			isPlayer = false;
+			playerColor = null;
 			canMove = false;
 		} catch (Exception e) {
 			System.err.println("Error in leaveGame: " + e.getMessage());
@@ -95,10 +99,8 @@ public class WebSocketClient
 		ChessGame.TeamColor teamColor;
 		if (colorStr.equals("WHITE")) {
 			teamColor = ChessGame.TeamColor.WHITE;
-			this.canMove = true;
 		} else {
 			teamColor = ChessGame.TeamColor.BLACK;
-			this.canMove = false;
 		}
 		
 		try {
@@ -110,6 +112,8 @@ public class WebSocketClient
 			
 			// Update the client state
 			this.isPlayer = true;
+			this.playerColor = teamColor;
+			this.canMove = teamColor == ChessGame.TeamColor.WHITE;
 			this.gameID = gameID;
 		} catch (Exception e) {
 			System.err.println("Error in joinPlayer: " + e.getMessage());
@@ -127,6 +131,7 @@ public class WebSocketClient
 			
 			// Update the client state
 			this.isPlayer = false;
+			this.playerColor = null;
 			this.canMove = false;
 			this.gameID = gameID;
 		} catch (Exception e) {
@@ -134,18 +139,26 @@ public class WebSocketClient
 		}
 	}
 	
+	public void syncGameState(ChessGame game) {
+		if (game == null || !isPlayer || playerColor == null) {
+			canMove = false;
+			return;
+		}
+		canMove = playerColor == game.getTeamTurn();
+	}
+	
 	public String getPlayerColor() {
-		if (!isPlayer) {
+		if (!isPlayer || playerColor == null) {
 			return null;
 		}
-		return canMove ? "WHITE" : "BLACK";
+		return playerColor.name();
 	}
 	
 	public ChessGame.TeamColor getPlayerTeamColor() {
 		if (!isPlayer) {
 			return null;
 		}
-		return canMove ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+		return playerColor;
 	}
 	
 	public WebSocketFacade getWebSocketFacade() {
