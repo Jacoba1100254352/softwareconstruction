@@ -20,19 +20,21 @@ Start the server in one terminal:
 
 ```bash
 cd blind-chess-bot
-mvn -q -DskipTests exec:java -Dexec.mainClass=blindchess.BlindChessServer
+./mvnw -q -DskipTests exec:java -Dexec.mainClass=blindchess.BlindChessServer
 ```
 
 Start the client in another terminal:
 
 ```bash
 cd blind-chess-bot
-mvn -q -DskipTests exec:java -Dexec.mainClass=blindchess.BlindChessClient
+./mvnw -q -DskipTests exec:java -Dexec.mainClass=blindchess.BlindChessClient
 ```
 
 ## Test
 
 ```bash
 cd blind-chess-bot
-mvn test
+./mvnw test
 ```
+
+The first wrapper run downloads a local Maven distribution automatically, so a separate `mvn` install is not required.
