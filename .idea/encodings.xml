@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/client/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/shared/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/shared/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/instruction/command-line-builds/example-code/chess/src/main/resources" charset="UTF-8" />
+  </component>
+</project>

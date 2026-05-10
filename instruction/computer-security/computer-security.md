@@ -2,6 +2,8 @@
 
 🖥️ [Slides](https://docs.google.com/presentation/d/1pUU4DDACUndgj_ij7bbKOUY8cxmGinZq/edit#slide=id.p1)
 
+🖥️ [Lecture Videos](#videos)
+
 📖 **Required Reading**: None
 
 Software systems conduct trillions of dollars in daily transactions, and manage access to billions of personal records. This makes these systems a valuable target for attack. Bad actors try to compromise systems in a variety of ways. They may try to gain unauthorized access to data and computers for the purposes of stealing, monitoring, damaging, or otherwise misusing these assets. In order to mitigate their efforts you must include security as a primary design criteria, understand historical and current attack vectors, vigilantly monitor for intrusion, and continually enhance your systems as new threats evolve.
@@ -140,7 +142,7 @@ The following diagram demonstrates the flow necessary to use salted passwords.
 
 ![Salting](salting.png)
 
-Note that the salt is not encrypted. It can be simply stored in your database along with the hashed password. The idea is to simply make it difficult for the attacker to precompute the hashed value. With the salt you are making each hash unique. To do a brute for attack against that representation an attacker would have to compute a rainbow table against each salted password.
+Note that the salt is not encrypted. It can be simply stored in your database along with the hashed password. The idea is to simply make it difficult for the attacker to precompute the hashed value. With the salt you are making each hash unique. To do a brute force attack against that representation an attacker would have to compute a rainbow table against each salted password.
 
 | Representation    | Benefit                                                                           |
 | ----------------- | --------------------------------------------------------------------------------- |
@@ -150,29 +152,28 @@ Note that the salt is not encrypted. It can be simply stored in your database al
 
 ### Bcrypt
 
-As an additional protection for our user's passwords we want to use a hash algorithm that is expensive to calculate. That way it is difficult to create a table of precomputed passwords. With modern hardware that utilizes graphical processing units (GPUs), it is possible to try millions of possible hashes per second with the `SHA-256` algorithm. For this reason, algorithms such as `Bcrypt` were created to make it computationally expensive to generate a hash, while still maintaining all of the other desirable characteristics of a password hashing algorithm. That means that while `SHA-256` can create millions of hashes per second, `Bcrypt` will only generate a few thousand when running on the same hardware. The cost of generation it very difficult for an attacker to create a large rainbow table, and extremely difficult to do so with salted data.
+As an additional protection for our user's passwords we want to use a hash algorithm that is expensive to calculate. That way it is difficult to create a table of precomputed passwords. With modern hardware that utilizes graphical processing units (GPUs), it is possible to try millions of possible hashes per second with the `SHA-256` algorithm. For this reason, algorithms such as `Bcrypt` were created to make it computationally expensive to generate a hash, while still maintaining all of the other desirable characteristics of a password hashing algorithm. That means that while `SHA-256` can create millions of hashes per second, `Bcrypt` will only generate a few thousand when running on the same hardware. The cost of generation makes it very difficult for an attacker to create a large rainbow table, and extremely difficult to do so with salted data.
 
 You can experiment with `Bcrypt` using the following library.
 
 ```
-org.springframework.security:spring-security-core:5.7.1
+org.mindrot:jbcrypt:0.4
 ```
 
 This implementation of Bcrypt makes it so you can hash and salt a password with one line of code, and then later compare the hash to a candidate password with another line of code. The following example first hashes the password `toomanysecrets` and then compares it to three possible candidates.
 
 ```java
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordExample {
 
     public static void main(String[] args) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String secret = "toomanysecrets";
-        String hash = encoder.encode(secret);
+        String hash = BCrypt.hashpw(secret, BCrypt.gensalt());
 
         String[] passwords = {"cow", "toomanysecrets", "password"};
         for (var pw : passwords) {
-            var match = encoder.matches(pw, hash) ? "==" : "!=";
+            var match = BCrypt.checkpw(pw, hash) ? "==" : "!=";
 
             System.out.printf("%s %s %s%n", pw, match, secret);
         }
@@ -194,7 +195,7 @@ In Cryptography, `encryption` is the process of encoding data so that it is unre
 
 Unlike hashing passwords, many applications need to both encrypt and decrypt information. For example, when you have to save confidential information such as a user's medical or financial records, you want to encrypt that data so that it is difficult to compromise, but you also need to be able to decrypt it so that it can be returned to the user on request.
 
-In the world of cryptography, the unencrypted test is called plain text. The encrypted text is called a cipher. Algorithms that both encrypt and decrypt data utilize a sequence of bytes, called a key, that enable conversion. Typically, the longer the key size, the more difficult it will be to defeat the encryption.
+In the world of cryptography, the unencrypted text is called plain text. The encrypted text is called a cipher. Algorithms that both encrypt and decrypt data utilize a sequence of bytes, called a key, that enable conversion. Typically, the longer the key size, the more difficult it will be to defeat the encryption.
 
 | Term        | Purpose                                | Example             |
 | ----------- | -------------------------------------- | ------------------- |
@@ -219,17 +220,18 @@ You could implement this algorithm for both encryption and decryption with the f
 ```java
 public class SimpleExample {
   public static void main(String[] args) {
+      var key = 1;
       var plainText = "toomanysecrets".toCharArray();
 
       // encrypt
       var cipherText = new char[plainText.length];
       for (var i = 0; i < plainText.length; i++) {
-          cipherText[i] = (char) (plainText[i] + 1);
+          cipherText[i] = (char) (plainText[i] + key);
       }
 
       // decrypt
       for (var i = 0; i < cipherText.length; i++) {
-          plainText[i] = (char) (cipherText[i] - 1);
+          plainText[i] = (char) (cipherText[i] - key);
       }
 
       System.out.println(plainText);
@@ -250,8 +252,7 @@ This number is significantly larger than the number of atoms in the observable u
 
 The `SimpleExample` encryption code that was demonstrated above is an example of a symmetric key encryption algorithm. Symmetric algorithms use the same key to both encryption and decryption. Symmetric encryption algorithms are attractive because they are very quick to compute and difficult to attack assuming that you have an appropriately sized key.
 
-As we mentioned above, a good encryption algorithm will use complex mathematics to make it difficult to encrypt or decrypt without the proper key. One commonly used symmetric key algorithm is Advanced Encryption Standard (`AES`). This algorithm shifts blocks of characters around, across multiple rounds of manipulation, while applying a key size of 128, 192, or 256 bits. It also applies
-an `initialization vector` to create a unique cipher value for each `plain text`/`initialization vector` combination. The use of the initialization vector makes it so that the same plain text does not result in the same cipher representation. Without that, you would be able to determine the encrypted data by brute forcing an attack that guessed what the plain text was.
+As we mentioned above, a good encryption algorithm will use complex mathematics to make it difficult to encrypt or decrypt without the proper key. One commonly used symmetric key algorithm is Advanced Encryption Standard (`AES`). This algorithm shifts blocks of characters around, across multiple rounds of manipulation, while applying a key size of 128, 192, or 256 bits. It also applies an `initialization vector` to create a unique cipher value for each `plain text`/`initialization vector` combination. The use of the initialization vector makes it so that the same plain text does not result in the same cipher representation. Without that, you would be able to determine the encrypted data by brute forcing an attack that guessed what the plain text was.
 
 ![symmetric encryption](symmetric.png)
 
@@ -320,7 +321,7 @@ An alternative to symmetric key encryption is `asymmetric key encryption`. With 
 
 ![asymmetric encryption](asymmetric.png)
 
-In order for this exchange to work it is very important that you keep the private key secret. If the private key is every publicly released then the pair becomes worthless.
+In order for this exchange to work it is very important that you keep the private key secret. If the private key is ever publicly released then the pair becomes worthless.
 
 There are several implementations of asymmetric key encryption. Here are the two most popular ones.
 
@@ -461,6 +462,20 @@ This demonstrates how modern cryptography forms the foundation of web security b
   - Public key certificates
 - Secure password storage and verification
 - Secure network communication using HTTPS
+
+## Videos
+
+- 🎥 [Computer Security Overview (7:49)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f60bd2e6-9aec-44ba-8e48-b1a8014a2efe) - [[transcript]](https://github.com/user-attachments/files/17736619/CS_240_Computer_Security_Overview_Transcript.pdf)
+- 🎥 [Cryptographic Hash Functions (10:05)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e54b188b-89a4-4f51-be13-b1a8014d0a7b) - [[transcript]](https://github.com/user-attachments/files/17736652/CS_240_Cryptographic_Hash_Functions_Transcript.pdf)
+- 🎥 [Cryptographic Hashing Applications (5:29)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=44f59163-ab0a-410b-a8bb-b1a8015012bf) - [[transcript]](https://github.com/user-attachments/files/17736656/CS_240_Cryptographic_Hashing_Applications_Transcript.pdf)
+- 🎥 [Secure Password Storage (15:06)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f977577d-6fec-45a9-8e80-b1a80151efc1) - [[transcript]](https://github.com/user-attachments/files/17736661/CS_240_Secure_Password_Storage_Transcript.pdf)
+- 🎥 [Data Encryption (4:27)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=bd28a2d9-adec-4c2b-b78f-b1a8015667b9) - [[transcript]](https://github.com/user-attachments/files/17736672/CS_240_Data_Encryption_Transcript.pdf)
+- 🎥 [Symmetric Key Encryption (11:37)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=0537f4f0-5ef2-4534-9564-b1a80157e780) - [[transcript]](https://github.com/user-attachments/files/17736680/CS_240_Symmetric_Key_Encryption_Transcript.pdf)
+- 🎥 [Asymmetric Key Encryption (15:01)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=aad832e9-0621-4a6d-b389-b1a8015b6ffc) - [[transcript]](https://github.com/user-attachments/files/17736687/CS_240_Asymmetric_Key_Encryption_Transcript.pdf)
+- 🎥 [Encryption Applications (6:28)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cb8ef70e-52fd-4390-9ae9-b1a8015fcac1) - [[transcript]](https://github.com/user-attachments/files/17736710/CS_240_Encryption_Applications_Transcript.pdf)
+- 🎥 [Secure Key Exchange (4:51)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=a466805a-7a15-4859-b84e-b1af0148e79d) - [[transcript]](https://github.com/user-attachments/files/17736726/CS_240_Secure_Key_Exchange_Transcript.pdf)
+- 🎥 [Secure Communication with HTTPS (14:17)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=f02e79ed-fcca-4549-a8b7-b1af014aa782) - [[transcript]](https://github.com/user-attachments/files/17736732/CS_240_Secure_Communication_using_HTTPS_Transcript.pdf)
+- 🎥 [Digital Signatures (8:10)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=93205b28-04ef-4e11-b939-b1af014ef686) - [[transcript]](https://github.com/user-attachments/files/17736735/CS_240_Digital_Signatures_Transcript.pdf)
 
 ## Demonstration code
 

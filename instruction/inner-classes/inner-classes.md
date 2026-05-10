@@ -5,6 +5,8 @@
 - Chapter 2 section 2.7 Nested Classes
 - Chapter 3 section 3.9 Local and Anonymous Classes
 
+🖥️ [Lecture Videos](#videos)
+
 Normally in Java, a class must be defined at the top level of a file that has the same name as the class. However, there are times when a class is only used within the context of another class, method, or scope. This is where inner, or nested, classes come into play.
 
 There are four types of Inner (Nested) Classes in Java.
@@ -196,11 +198,11 @@ public class AnonymousExample {
 
 ## Videos
 
-- 🎥 [Introduction](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1a6ec347-24b8-41db-9dd8-ad72014f1ec1&start=0)
-- 🎥 [Static Inner-Classes](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c02cdeb8-5929-4b80-b83a-ad72015107bc&start=0)
-- 🎥 [Inner-Classes](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=201871e8-f294-40d4-944c-ad720152d070&start=0)
-- 🎥 [Local Inner-Classes](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=817e3e88-8d19-4ffa-85b4-ad7201539033&start=0)
-- 🎥 [Anonymous Inner-Classes](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=7faf22b0-00df-4429-818f-ad720155ad20&start=0)
+- 🎥 [Introduction (6:23)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1a6ec347-24b8-41db-9dd8-ad72014f1ec1&start=0) - [[transcript]](https://github.com/user-attachments/files/17780969/CS_240_Inner_Class_Introduction.pdf)
+- 🎥 [Static Inner Classes (5:55)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c02cdeb8-5929-4b80-b83a-ad72015107bc&start=0) - [[transcript]](https://github.com/user-attachments/files/17780972/CS_240_Static_Inner_Classes.pdf)
+- 🎥 [Inner Classes (2:06)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=201871e8-f294-40d4-944c-ad720152d070&start=0) - [[transcript]](https://github.com/user-attachments/files/17804795/CS_240_Inner_Classes.pdf)
+- 🎥 [Local Inner Classes (7:09)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=817e3e88-8d19-4ffa-85b4-ad7201539033&start=0) - [[transcript]](https://github.com/user-attachments/files/17804799/CS_240_Local_Inner_Classes.pdf)
+- 🎥 [Anonymous Inner Classes (5:16)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=7faf22b0-00df-4429-818f-ad720155ad20&start=0) - [[transcript]](https://github.com/user-attachments/files/17804804/CS_240_Anonymous_Inner_Classes.pdf)
 
 ## Demonstration code
 

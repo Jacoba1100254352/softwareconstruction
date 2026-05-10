@@ -1,6 +1,8 @@
 # Relational Databases - JDBC
 
-🖥️ [Slides - JDBC](https://docs.google.com/presentation/d/19nC7v6SDqoEeK75Mb-f6L3QhnbuP6Xfo)
+🖥️ [Slides - JDBC](https://docs.google.com/presentation/d/12XS7en64-oQYivKayGyNGueWphiL6mm5)
+
+🖥️ [Lecture Videos](#videos)
 
 Now that we have covered what relational databases are and how to use SQL to interact with them, it is time to discuss how to use SQL from a Java program. Java uses a standard interface library called Java Database Connector (JDBC). This library provides you with classes to connect to a database, execute SQL queries, and process the results.
 
@@ -68,7 +70,7 @@ Once you have a connection you can use it to create databases and tables. It is 
 We can fully configure a theoretical pet store application by doing the following.
 
 1. Get a connection to the RDBMS.
-1. Create the the pet store database if it doesn't exist.
+1. Create the pet store database if it doesn't exist.
 1. Create the pet table if it doesn't exist.
 
 ```java
@@ -268,13 +270,13 @@ void queryPets(Connection conn, String findType) throws SQLException {
 }
 ```
 
-When you call the result set `next` method it will advance the result to the next row. If it ever returns `false` then it means you have read all the matching rows. You can read the fields of the row with the result set `get` methods. There are methods for all of the basic SQL types. Make sure that the fields you get are represented in the fields that your `SELECT` statement requested.
+When you call the result set `next` method it will advance the result to the next row. If it ever returns `false` then it means you have read all the matching rows. You can read the fields of the row with the result set `get` methods. There are methods for all of the basic SQL types. Make sure that the fields you getting are represented in the fields that your `SELECT` statement requested.
 
 Make sure that your wrap the result set returned from the query with a `try-with-resource` block so that you release the resources associated with the result once you are done with them.
 
 ## Text and Blob Types
 
-Sometimes you want to store large text or binary data in the database. In MySQL the `text` type can represent large textual sequences, and the `blob` type represents large binary sequences. These can be as large as 4 gigabytes. Blob and text data is not searchable, but it is convenient to associate it with some other indexed fields. For example, a commonly used pattern called a `key-value` store, associates a single key field with a blob field. This basically uses the database as a big persisted map.
+Sometimes you want to store large text or binary data in the database. In MySQL the `text` type can represent large textual sequences, and the `blob` type represents large binary sequences. These can be as large as 4 gigabytes. Blob and text data is not searchable, but it is convenient to associate it with some other indexed fields. For example, a commonly used pattern called a `key-value` store, associates a single key field with a blob field. This basically uses the database as a big persistent map.
 
 Another example of storing large text data comes from the chess application. With chess, you need to store your game board and make it searchable using the game ID. One way to do this is to serialize your board to JSON and then place the JSON data in a `text` field.
 
@@ -334,51 +336,6 @@ Collection<Pet> listPets(Connection conn) throws SQLException {
 }
 ```
 
-### Type Adapters
-
-Sometimes you need to deserialize JSON data into a field that is defined as, or contains, an Interface. When that happens, you must register an adapter to tell Gson what concrete class it should use when deserializing the JSON.
-
-We can demonstrate that my changing our Pet record to contain a `FriendList` instead of a `String[]`.
-
-```java
-interface FriendList {
-    FriendList add(String friend);
-}
-
-record Pet(String name, String type, List friends) {}
-```
-
-Now that we have an interface in our record, Gson no longer knows what class to create in order to represent the `FriendList` interface. That means we must register an adapter that explicitly handles the conversion. Gson supports this with the `JsonDeserializer` interface. This interface defines a method named `deserialize` that takes a JSON element and converts it into the expected object. In the example below we take the element and use the `fromJson` method to do the explicit conversion for us.
-
-```java
-class ListAdapter implements JsonDeserializer<FriendList> {
-    public FriendList deserialize(JsonElement el, Type type, JsonDeserializationContext ctx) throws JsonParseException {
-        return ctx.deserialize(el, ArrayFriendList.class);
-    }
-}
-```
-
-We then use the adapter when we deserialize the friends field from the database. We replace the simple deserialization code,
-
-```java
-var json = rs.getString("friends");
-var friends = new Gson().fromJson(json, String[].class);
-```
-
-with code that creates a builder and registers the adapter to be used whenever the `FriendList` interface is observed.
-
-```java
-var json = rs.getString("friends");
-var builder = new GsonBuilder();
-    builder.registerTypeAdapter(FriendList.class, new ListAdapter());
-
-var friends = builder.create().fromJson(json, FriendList.class);
-```
-
-Now Gson knows that whenever it sees a `FriendList` it creates a `ArrayFriendList` to back it.
-
-With the Chess application you may have a similar situation with the game interfaces. If so, then you will have to tell Gson to map the `ChessGame`, `ChessBoard`, and `ChessPiece` interfaces to your concrete implementations.
-
 ## Things to Understand
 
 - How to execute each of the SQL statements from Java using JDBC
@@ -389,5 +346,12 @@ With the Chess application you may have a similar situation with the game interf
 
 ## Videos
 
-- 🎥 [Java Database Access with JDBC](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cabe9971-3ff7-4579-be2e-ad660156090a&start=0)
-- 🎥 [JDBC - Putting it All Together](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e5d62c40-3494-4ff9-9558-ad6b013cdfb6&start=0)
+- 🎥 [JDBC Overview (3:20)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cabe9971-3ff7-4579-be2e-ad660156090a&start=0) - [[transcript]](https://github.com/user-attachments/files/17737257/CS_240_Java_Database_Access_with_JDBC_Transcript.pdf)
+- 🎥 [JDBC Drivers and Connections (7:44)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1e05e1c6-727a-49b4-81cf-b1a00121b187&start=0) - [[transcript]](https://github.com/user-attachments/files/17737267/CS_240_JDBC_Drivers_and_Connections_Transcript.pdf)
+- 🎥 [Executing Queries with JDBC (5:09)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=79ca902c-b6f2-457a-b1ba-b1a0012499a4&start=0) - [[transcript]](https://github.com/user-attachments/files/17737275/CS_240_Executing_Queries_with_JDBC_Transcript.pdf)
+- 🎥 [Executing Insert, Update, and Delete Statements (8:37)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=9033fa48-8260-4701-84ee-b1a001262b8c&start=0) - [[transcript]](https://github.com/user-attachments/files/17737292/CS_240_Executing_Insert_Update_and_Delete_Statements_Transcript.pdf)
+- 🎥 [Retrieving Auto-Increment Primary Keys and Ending Transactions (4:33)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=78e3086c-c6de-43d0-bba5-b1a0012a17fa&start=0) - [[transcript]](https://github.com/user-attachments/files/17737303/CS_240_Retrieving_Auto_Increment_Primary_Keys_and_Ending_Transactions_Transcript.pdf)
+- 🎥 [Usernames, Passwords, and User Permissions (3:25)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=636f5721-1e35-413e-a1fe-b1a0012d43d7&start=0) - [[transcript]](https://github.com/user-attachments/files/17737306/CS_240_Usernames_Passwords_and_User_Permissions_Transcript.pdf)
+- 🎥 [JDBC - Putting It All Together (9:48)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=a882dded-56a9-43ff-b4fe-b1a0012e6341&start=0) - [[transcript]](https://github.com/user-attachments/files/17737311/CS_240_JDBC_Putting_It_All_Together_Transcript.pdf)
+- 🎥 [Unit Testing Database Code (5:12)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=6d8bf3b3-3ddd-4f3d-b90d-ad6b014f2bb7&start=0) - [[transcript]](https://github.com/user-attachments/files/17780620/CS_240_Unit_Testing_Database_Code.pdf)
+- 🎥 [Correction - Unit Testing Database Code (3:52)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=9178d92a-e41b-48f4-8e68-adf8015d7a91&start=0) - [[transcript]](https://github.com/user-attachments/files/17780623/CS_240_Unit_Testing_Database_Code_Correction.pdf)

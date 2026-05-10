@@ -6,6 +6,8 @@
 
 - Chapter 3: Interfaces and Lambda Expressions. _Only_: section 3.4
 
+🖥️ [Lecture Videos](#videos)
+
 The Java programming language originally required everything to be defined within the scope of a class. That meant that defining a simple utility, or one off function, outside of a class was not allowed. This becomes problematic when you wanted to write small one line functions that do things like handle a mouse click event, or run a simple concurrent task. By forcing all functions to be defined in a class, Java effectively forced developers to new class, in a new file, for each single line function they wanted to implement. You can image hundreds or even thousands of these little files cluttering up a large sized application.
 
 Consider the following `Speaker` interface,
@@ -150,16 +152,16 @@ Just like anonymous classes, lambda functions also support closure. That means y
     }
 ```
 
-## Videos (34:42)
+## Videos
 
-- 🎥 [Lambda Expressions Overview (6:47)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=6cfff192-6903-40b0-bacb-b053010e7658)
-- 🎥 [How Java Lambdas Work (7:14)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=30d50a0f-b462-4d41-b7c6-b05301107ef8)
-- 🎥 [Lambda Syntax (2:56)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=66a7b726-985e-4f7e-be87-b0530112a93e)
-- 🎥 [Function / Lambda Variables (2:47)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=3c58fb2e-dc04-4dc4-b040-b0530113a8f6)
-- 🎥 [Creating APIs with Lambdas (5:10)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4f332bfb-9836-41d8-acc0-b0530114dcb2)
-- 🎥 [Using Generic Interfaces Example Revisited (2:10)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ceee1a53-7ff3-4a71-8b26-b0530116817b)
-- 🎥 [Use of Lambdas in Existing Classes (3:22)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=19b04002-8028-4e50-bd68-b0530117654d)
-- 🎥 [Method References (4:16)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=465b91d6-210d-4838-b266-b0530119161e)
+- 🎥 [Lambda Expressions Overview (6:47)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=6cfff192-6903-40b0-bacb-b053010e7658) - [[transcript]](https://github.com/user-attachments/files/18563796/CS_240_Lambda_Expressions_Overview_Transcript.pdf)
+- 🎥 [How Java Lambdas Work (7:14)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=30d50a0f-b462-4d41-b7c6-b05301107ef8) - [[transcript]](https://github.com/user-attachments/files/18563807/CS_240_How_Java_Lambdas_Work_Transcript.pdf)
+- 🎥 [Lambda Syntax (2:56)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=66a7b726-985e-4f7e-be87-b0530112a93e) - [[transcript]](https://github.com/user-attachments/files/18563809/CS_240_Lambda_Syntax_Transcript.pdf)
+- 🎥 [Function / Lambda Variables (2:47)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=3c58fb2e-dc04-4dc4-b040-b0530113a8f6) - [[transcript]](https://github.com/user-attachments/files/18563817/CS_240_Function_Lambda_Variables_Transcript.pdf)
+- 🎥 [Creating APIs with Lambdas (5:10)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=4f332bfb-9836-41d8-acc0-b0530114dcb2) - [[transcript]](https://github.com/user-attachments/files/18563835/CS_240_Creating_APIs_with_Lambdas_Transcript.pdf)
+- 🎥 [Using Generic Interfaces Example Revisited (2:10)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=ceee1a53-7ff3-4a71-8b26-b0530116817b) - [[transcript]](https://github.com/user-attachments/files/18563838/CS_240_Using_Generic_Interfaces_Example_Revisited_Transcript.pdf)
+- 🎥 [Use of Lambdas in Existing Classes (3:22)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=19b04002-8028-4e50-bd68-b0530117654d) - [[transcript]](https://github.com/user-attachments/files/18563840/CS_240_Use_of_Lambdas_in_Existing_Java_ClassesTranscript.pdf)
+- 🎥 [Method References (4:16)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=465b91d6-210d-4838-b266-b0530119161e) - [[transcript]](https://github.com/user-attachments/files/18563848/CS_240_Method_References_Transcript.pdf)
 
 ## Demonstration code
 

@@ -8,6 +8,8 @@
 - Sections 2 through 2.2
 - Section 2.4
 
+🖥️ [Lecture Videos](#videos)
+
 Test driven development ([TDD](https://en.wikipedia.org/wiki/Test-driven_development)) was popularized in the 1990s as part of the [extreme programming](https://en.wikipedia.org/wiki/Extreme_programming) wave. The idea is that you begin writing software by creating tests that represent the consumer of your software. You then use the tests to drive the development of your code. When the tests pass you know that your code is complete.
 
 TDD has been proven to decrease development time, provide documentation and examples for your code, result in less bugs, and prevent against the introduction of future bugs. Additionally, by writing your tests by focusing on the consumer of your code, you tend to design better interfaces and accurate domain models.
@@ -27,14 +29,14 @@ This process is then repeated for each additional feature or bug.
 
 There are several characteristics that you want to strive for when creating tests.
 
-| Characteristic        | Description                                                                                                                                                                                                                                                                                                           |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Single responsibility | The test only tests one thing. That doesn't mean it doesn't require other code to execute before the test asserts are made, but the test should not be making unrelated assertions. Instead create an additional test.                                                                                                |
-| Quick                 | You want your tests to run as quickly as possible. Ideally, you would write a little bit of production code and then run all the tests so that you can quickly discover if you broke something. When tests take a long time to run you will be discouraged from executing them.                                       |
-| Do not repeat         | You are not exercising the same code over and over again with different tests.                                                                                                                                                                                                                                        |
-| Stable                | If the test passes once, and the production code does not change, then the test should always pass. Unstable tests suggest a problem with the production or testing code. Unstable tests decrease the value of your tests because you no longer trust them, or have to rerun them multiple times to get them to pass. |
-| Automated             | No human should be involved in the execution process of the tests. Automation allows you to run the tests as part of your continuous delivery pipeline or check in process.                                                                                                                                           |
-| Easy                  | It should be easy to introduce new tests. If the process requires significant effort then it discourages people from writing them.                                                                                                                                                                                    |
+| Characteristic | Description                                                                                                                                                                                                                                                                                                           |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cohesive       | The test only tests one thing. That doesn't mean it doesn't require other code to execute before the test asserts are made, but the test should not be making unrelated assertions. Instead create an additional test.                                                                                                |
+| Quick          | You want your tests to run as quickly as possible. Ideally, you would write a little bit of production code and then run all the tests so that you can quickly discover if you broke something. When tests take a long time to run you will be discouraged from executing them.                                       |
+| Do not repeat  | You are not exercising the same code over and over again with different tests.                                                                                                                                                                                                                                        |
+| Stable         | If the test passes once, and the production code does not change, then the test should always pass. Unstable tests suggest a problem with the production or testing code. Unstable tests decrease the value of your tests because you no longer trust them, or have to rerun them multiple times to get them to pass. |
+| Automated      | No human should be involved in the execution process of the tests. Automation allows you to run the tests as part of your continuous delivery pipeline or check in process.                                                                                                                                           |
+| Easy           | It should be easy to introduce new tests. If the process requires significant effort then it discourages people from writing them.                                                                                                                                                                                    |
 
 ## JUnit
 
@@ -54,6 +56,9 @@ public class ExampleTests {
         assertEquals(200, 100 + 100);
         assertTrue(100 == 2 * 50);
         assertNotNull(new Object(), "Response did not return authentication String");
+        assertThrows(InvalidArgumentException.class, () -> {
+            throw new InvalidArgumentException();
+        });
     }
 }
 ```
@@ -108,11 +113,9 @@ With IntelliJ, you can autogenerate your unit tests. To use this tool open up an
 
 ## Videos
 
-- 🎥 [Why We Need Unit Testing](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c5707c4c-77d9-43d7-b96b-ad6b014612ca&start=0)
-- 🎥 [Unit Testing Overview](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=bb1884b3-55ab-4a8b-be05-ad6b01477df8&start=0)
-- 🎥 [The JUnit Testing Framework](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=071e47be-a746-4e74-afd5-ad6b0149b2b8&start=0)
-- 🎥 [Unit Testing Database Code](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=6d8bf3b3-3ddd-4f3d-b90d-ad6b014f2bb7&start=0)
-- 🎥 [Correction - Unit Testing Database Code](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=9178d92a-e41b-48f4-8e68-adf8015d7a91&start=0)
+- 🎥 [Why We Need Unit Testing (4:30)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=c5707c4c-77d9-43d7-b96b-ad6b014612ca&start=0) - [[transcript]](https://github.com/user-attachments/files/17805242/CS_240_Why_We_Need_Unit_Testing.pdf)
+- 🎥 [Unit Testing Overview (5:10)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=bb1884b3-55ab-4a8b-be05-ad6b01477df8&start=0) - [[transcript]](https://github.com/user-attachments/files/17805243/CS_240_Unit_Testing_Overview.pdf)
+- 🎥 [The JUnit Testing Framework (15:25)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=071e47be-a746-4e74-afd5-ad6b0149b2b8&start=0) - [[transcript]](https://github.com/user-attachments/files/17805245/CS_240_The_JUnit_Testing_Framework.pdf)
 
 ## Demonstration code
 

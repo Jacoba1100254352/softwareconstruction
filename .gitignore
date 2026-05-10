@@ -1,2 +1,9 @@
+.DS_Store
 **/.DS_Store
+.idea/
 **/.idea
+chess/out/
+
+# Used to store files while they're modified for Wiki.
+docs
+**pycache**

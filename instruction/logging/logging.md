@@ -6,6 +6,8 @@
 
 - Chapter 5: Exceptions, Assertions, and Logging. _Only Section 5.3 Logging - Section 5.3.7 Filters and Formatters_
 
+🖥️ [Lecture Videos](#videos)
+
 Logging is a critical piece of advanced software construction. Without logging your application is a black box where only your users know if it is working or not. By recording, or logging, what is happening within your application you create a persistent record of what users are doing and how the application is responding to their requests. Logging works by recording entries in a log that describes what is happening at key points in your application. Typically this includes the request and response of HTTP endpoints, authentication and authorization requests, and exceptional errors. You can then query your logs to view events, graphs, and reports that give you insight into what the system is doing. You can also set up your logging system to automatically alert you when things seem exceptional.
 
 ![logging flow](logging-flow.png)
@@ -36,9 +38,9 @@ logger.addHandler(fileHandler);
 
 ### Log Levels
 
-Each log record specifying a `Level` that defines how important the record is. This can be anything from `SEVERE`, `WARNING`, or `INFO` down to the `FINEST` detail. You can then use the log levels to filter out details when you are looking for problems in your logs, or when you are generating alters. For example, you might want to automatically send an alert for anything that is `SEVERE`.
+Each log record specifies a `Level` that defines how important the record is. This can be anything from `SEVERE`, `WARNING`, or `INFO` down to the `FINEST` detail. You can then use the log levels to filter out details when you are looking for problems in your logs, or when you are generating alerts. For example, you might want to automatically send an alert for anything that is `SEVERE`.
 
-The level that you assign to your log records is dependent on what each log level means in the context of your application. With the chess program you might never publish a `SEVERE` log record. That is because the application could always fall back to some reasonable level of functionality. However, with an application that is protecting human safety, you might want to publish `SERVER` log records for anything that might conceivably endanger life.
+The level that you assign to your log records is dependent on what each log level means in the context of your application. With the chess program you might never publish a `SEVERE` log record. That is because the application could always fall back to some reasonable level of functionality. However, with an application that is protecting human safety, you might want to publish `SEVERE` log records for anything that might conceivably endanger life.
 
 You can also control how much logging your application is publishing by specifying a level on your logger. For example, when you are debugging you want to log the `FINEST` detail, but when you are running in production you only want to log `SEVERE`, `WARNING`, or `INFO`. When you restrict the handler to a certain level it will ignore any log requests that are below that level. This allows you to control how much logging is happening based upon an application configuration parameter. To set the level on a logger you use the `setLevel` method.
 
@@ -179,17 +181,17 @@ public class ServerLoggingExample {
     static Logger logger = Logger.getLogger("myLogger");
 
     private void run() throws Exception {
-        Spark.port(8080);
-
         var config = new DatabaseConfig("jdbc:mysql://localhost:3306", "pet_store", "root", "monkeypie");
         logger.addHandler(new DatabaseHandler(config));
 
-        Spark.get("/*", (req, res) -> "<p>OK</p>");
-        Spark.after(this::log);
+        var javalin = Javalin.create()
+            .get("/*", (ctx) -> ctx.result("<p>OK</p>")
+            .after(this::log)
+            .start(8080);
     }
 
-    private void log(Request req, Response res) {
-        logger.info(String.format("[%s]%s - %d", req.requestMethod(), req.pathInfo(), res.status()));
+    private void log(Context ctx) {
+        logger.info(String.format("[%s]%s - %d", ctx.method(), ctx.path(), ctx.status()));
     }
 }
 ```
@@ -225,9 +227,9 @@ Java's direct support for logging, with the `java.util.logging` package, was not
 
 ## Videos
 
-- 🎥 [Logging](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=014ade75-f4ad-4119-95c1-ad6d0147c217&start=0)
-- 🎥 [Logging: Configuration](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5c08583a-579d-452e-88d6-ad6d0149e2cc&start=0)
-- 🎥 [Logging: Messages](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e1afdb4c-bb5f-42cc-ad6c-ad6d014dd97d&start=0)
+- 🎥 [Logging (6:47)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=014ade75-f4ad-4119-95c1-ad6d0147c217&start=0) - [[transcript]](https://github.com/user-attachments/files/17805093/CS_240_Java_Logging.pdf)
+- 🎥 [Logging: Configuration (13:44)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=5c08583a-579d-452e-88d6-ad6d0149e2cc&start=0) - [[transcript]](https://github.com/user-attachments/files/17805094/CS_240_Logging_Configuration.pdf)
+- 🎥 [Logging: Messages (9:04)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=e1afdb4c-bb5f-42cc-ad6c-ad6d014dd97d&start=0) - [[transcript]](https://github.com/user-attachments/files/17805096/CS_240_Logging_Messages.pdf)
 
 ## Demonstration code
 
