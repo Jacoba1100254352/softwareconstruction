@@ -1,4 +1,3 @@
-import chess.gameplay.ChessGame;
 import chess.gameplay.ChessMove;
 import chess.gameplay.ChessPosition;
 import com.google.gson.Gson;
@@ -130,9 +129,9 @@ public class WebSocketTests
 		fullGame = createResult.gameID;
 		
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		serverFacade.verifyJoinPlayer(joinRequest, bobAuth);
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		serverFacade.verifyJoinPlayer(joinRequest, jamesAuth);
 	}
 	
@@ -154,7 +153,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//make sure got load board message
@@ -181,7 +180,7 @@ public class WebSocketTests
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = jamesAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.gameID = fullGame;
 		
 		
@@ -225,7 +224,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK; //bob is playing white, but james is playing black
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK; //bob is playing white, but james is playing black
 		joinCommand.gameID = fullGame;
 		
 		//make sure got load board message
@@ -261,7 +260,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = alfredAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.gameID = emptyGame;
 		
 		//make sure got load board message
@@ -295,7 +294,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = jamesAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.gameID = fullGame + emptyGame; //invalid ID
 		
 		//make sure got load board message
@@ -328,7 +327,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = "badBobAuth";
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//make sure got load board message
@@ -460,7 +459,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -620,7 +619,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -633,7 +632,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -680,7 +679,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = bobAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -754,7 +753,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -767,7 +766,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -813,7 +812,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = bobAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -864,7 +863,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -877,7 +876,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -923,7 +922,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = jamesAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -974,7 +973,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -987,7 +986,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1033,7 +1032,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = jamesAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -1084,7 +1083,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1097,7 +1096,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1143,7 +1142,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = alfredAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -1193,7 +1192,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1206,7 +1205,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1268,7 +1267,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = bobAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -1318,7 +1317,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1331,7 +1330,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1423,7 +1422,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1436,7 +1435,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1511,7 +1510,7 @@ public class WebSocketTests
 		moveCommand.commandType = TestModels.TestCommandType.MAKE_MOVE;
 		moveCommand.authToken = bobAuth;
 		moveCommand.gameID = fullGame;
-		moveCommand.move = move;
+		moveCommand.move = PassoffChessAdapter.move(move);
 		
 		//ready message
 		readyLatch = new CountDownLatch(3);
@@ -1562,7 +1561,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1575,7 +1574,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1662,7 +1661,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1675,7 +1674,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		
@@ -1778,7 +1777,7 @@ public class WebSocketTests
 		TestModels.TestCommand joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
 		joinCommand.authToken = bobAuth;
-		joinCommand.playerColor = ChessGame.TeamColor.WHITE;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinCommand.gameID = fullGame;
 		
 		//wait for bob joining as a player to go through
@@ -1791,7 +1790,7 @@ public class WebSocketTests
 		//have james join as a player
 		joinCommand = new TestModels.TestCommand();
 		joinCommand.commandType = TestModels.TestCommandType.JOIN_PLAYER;
-		joinCommand.playerColor = ChessGame.TeamColor.BLACK;
+		joinCommand.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinCommand.authToken = jamesAuth;
 		joinCommand.gameID = fullGame;
 		

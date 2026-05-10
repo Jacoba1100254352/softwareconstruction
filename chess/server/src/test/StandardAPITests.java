@@ -1,4 +1,3 @@
-import chess.gameplay.ChessGame;
 import org.junit.jupiter.api.*;
 import passoffTests.obfuscatedTestClasses.TestServerFacade;
 import passoffTests.testClasses.TestModels;
@@ -444,7 +443,7 @@ public class StandardAPITests
 		//join as white
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		
 		//try join
 		TestModels.TestResult joinResult = serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
@@ -474,7 +473,7 @@ public class StandardAPITests
 		//join as white
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		
 		//try join
 		TestModels.TestResult joinResult = serverFacade.verifyJoinPlayer(joinRequest, existingAuth + "bad stuff");
@@ -499,7 +498,7 @@ public class StandardAPITests
 		//add existing user as black
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
 		
 		//register second user
@@ -512,7 +511,7 @@ public class StandardAPITests
 		//join request trying to also join  as black
 		joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		TestModels.TestResult joinResult = serverFacade.verifyJoinPlayer(joinRequest, registerResult.authToken);
 		
 		//check failed
@@ -536,7 +535,7 @@ public class StandardAPITests
 		//join as white
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = 0;
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		
 		//try join
 		TestModels.TestResult joinResult = serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
@@ -605,30 +604,30 @@ public class StandardAPITests
 		
 		//A join game 1 as black
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinRequest.gameID = game1.gameID;
 		serverFacade.verifyJoinPlayer(joinRequest, userA.authToken);
 		
 		//B join game 2 as white
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinRequest.gameID = game2.gameID;
 		serverFacade.verifyJoinPlayer(joinRequest, userB.authToken);
 		
 		//C join game 3 as white
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinRequest.gameID = game3.gameID;
 		serverFacade.verifyJoinPlayer(joinRequest, userC.authToken);
 		
 		//A join game3 as black
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinRequest.gameID = game3.gameID;
 		serverFacade.verifyJoinPlayer(joinRequest, userA.authToken);
 		
 		//C play self in game 4
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		joinRequest.gameID = game4.gameID;
 		serverFacade.verifyJoinPlayer(joinRequest, userC.authToken);
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		joinRequest.gameID = game4.gameID;
 		serverFacade.verifyJoinPlayer(joinRequest, userC.authToken);
 		
@@ -702,7 +701,7 @@ public class StandardAPITests
 		
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		serverFacade.verifyJoinPlayer(joinRequest, registerResult.authToken);
 		
 		//do clear

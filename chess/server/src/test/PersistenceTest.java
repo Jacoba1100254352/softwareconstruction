@@ -1,4 +1,3 @@
-import chess.gameplay.ChessGame;
 import org.junit.jupiter.api.*;
 import passoffTests.obfuscatedTestClasses.TestServerFacade;
 import passoffTests.testClasses.TestModels;
@@ -78,11 +77,11 @@ public class PersistenceTest
 		//have first user join
 		TestModels.TestJoinRequest joinRequest = new TestModels.TestJoinRequest();
 		joinRequest.gameID = createResult.gameID;
-		joinRequest.playerColor = ChessGame.TeamColor.WHITE;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.WHITE;
 		serverFacade.verifyJoinPlayer(joinRequest, existingAuth);
 		
 		//have second user join
-		joinRequest.playerColor = ChessGame.TeamColor.BLACK;
+		joinRequest.playerColor = chess.ChessGame.TeamColor.BLACK;
 		serverFacade.verifyJoinPlayer(joinRequest, newAuth);
 		
 		//second empty game
