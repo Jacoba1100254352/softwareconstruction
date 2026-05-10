@@ -116,7 +116,7 @@ public class GameplayUI
 		}
 		
 		// Determine orientation based on player color
-		boolean reverse = !color.equals("white");
+		boolean reverse = color != null && color.equalsIgnoreCase("black");
 		printBoard(boardArr, reverse);
 	}
 	

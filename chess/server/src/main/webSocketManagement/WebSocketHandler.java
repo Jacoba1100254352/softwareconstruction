@@ -358,11 +358,10 @@ public class WebSocketHandler
 		// Set the game's turn to null to indicate a game end
 		game.getChessGame().setTeamTurn(null);
 		gameDao.updateGame(game);
-		connectionManager.clearGameSessions(gameCmd.getGameID());
 		
 		// Send a notification to all users about the resignation
 		NotificationMessage notification = new NotificationMessage(userName + " resigned");
-		messageDispatcher.broadcastToAll(notification);
+		messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification);
 	}
 	
 	/**
@@ -387,7 +386,7 @@ public class WebSocketHandler
 		connectionManager.remove(userName, gameCmd.getGameID()); // Remove from connection manager
 		// Send a notification about the player leaving the game
 		NotificationMessage notification = new NotificationMessage(userName + " left the game");
-		messageDispatcher.broadcastToAll(notification);
+		messageDispatcher.broadcastToGame(gameCmd.getGameID(), notification);
 	}
 	
 	/**
