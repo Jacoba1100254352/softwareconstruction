@@ -5,7 +5,6 @@ import dataAccess.DataAccessException;
 import dataAccess.Database;
 import requests.ClearRequest;
 import responses.ClearResponse;
-import responses.Response;
 
 
 /**
@@ -20,7 +19,7 @@ public class ClearService
 	 *
 	 * @return ClearResponse indicating success or failure.
 	 */
-	public Response clearDatabase(ClearRequest request) {
+	public ClearResponse clearDatabase(ClearRequest request) {
 		try {
 			// Call resetDatabase method to clear all data
 			Database.getInstance().resetDatabase();
@@ -29,5 +28,4 @@ public class ClearService
 			return new ClearResponse("Error: " + e.getMessage(), false);
 		}
 	}
-	
 }
