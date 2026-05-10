@@ -35,8 +35,6 @@ The goal of CS 240 is to help students learn a variety of computer programming c
 
 ##  Course Materials
 
-###   Suggested Textbook
-
 ![Core Java For The Impatient 4th Edition](coreJava4th.png)
 
 |                        |                                                                                                                                                                                                                        |
@@ -44,8 +42,8 @@ The goal of CS 240 is to help students learn a variety of computer programming c
 | **Title:**             | Core Java for the Impatient (4th Edition)                                                                                                                                                                              |
 | **Author(s):**         | Cay S. Hostmann                                                                                                                                                                                                        |
 | **Publisher:**         | Addison-Wesley                                                                                                                                                                                                         |
-| **Approved Editions:** | 3rd Edition                                                                                                                                                                                                            |
-| **Print ISBN:**        | 978-0135404522                                                                                                                                                                                                         |
+| **Approved Editions:** | 4th Edition                                                                                                                                                                                                            |
+| **Print ISBN:**        | 9780135404522                                                                                                                                                                                                         |
 | **Online Option:**     | Access through the [BYU library](https://lib.byu.edu/remoteauth/?url=https://go.oreilly.com/byu-edu/library/view/-/9780135404522/?ar). If for some reason the link does not work, come speak with a professor or a TA. |
 
 ##  Technology Needs
@@ -90,7 +88,7 @@ Also, please understand that even though the TAs have taken the class and passed
 
 In summary, TAs are here to help but not to hold your hand and take away the learning experience of programming and debugging. But when you are stuck, do not hesitate to come in and ask for help.
 
-When you need help, please join our [help queue](https://students.cs.byu.edu/~cs240ta/helpqueueDelta/?login=). To see when TAs are working, check [here](https://docs.google.com/document/d/12ZrcsQAfVirCuCwzI0TKX_tSPyBOjqB9vDE-sx1n_S0/edit?tab=t.0#heading=h.cp6dfptbk5p3).
+When you need help, please join our [help queue](https://help.cs240.click). To see when TAs are working, check [here](https://docs.google.com/document/d/12ZrcsQAfVirCuCwzI0TKX_tSPyBOjqB9vDE-sx1n_S0/edit?tab=t.0#heading=h.cp6dfptbk5p3).
 
 Please go over the TA Help Policies before you come in to ask for help.
 
@@ -158,11 +156,13 @@ If appealing a grade, start by discussing the item(s) in question with a TA duri
 
 ### **Doing Your Own Work**
 
-This class is about individual competence, not team work. Therefore, all assignments you turn in must be your own work. You are encouraged to study with other students, and you may discuss concepts, ideas, and general approaches with others (e.g. at a whiteboard), but when it comes time to create your actual design documentation or source code, you must work alone. You may not share electronic files or hard-copy printouts containing designs or source code with other students, either as giver or receiver. You may not work in close synchronization with other students in a side-by-side fashion. **Violations of this policy will result in all involved students failing the course and the possibility of further action at the university level.**
+This class is about individual competence, not teamwork. Therefore, all assignments you turn in must be your own work. You are encouraged to study with other students, and you may discuss concepts, ideas, and general approaches with others (e.g. at a whiteboard), but when it comes time to create your actual design documentation or source code, you must work alone. You may not share electronic files or hard-copy printouts containing designs or source code with other students, either as giver or receiver. You may not work in close synchronization with other students in a side-by-side fashion. **Violations of this policy will result in all involved students failing the course and the possibility of further action at the university level.**
 
 Be aware that we use plagiarism detection software to ensure that the source code you submit was not derived from code written by other current or past CS 240 students. Specifically, it is not appropriate to search the Web for solutions published by other students, or to otherwise obtain source code from other students. If you do this, you are likely to get caught, which will result in (at least) failing the class. Of course, we know that most of you would not do this, but sometimes people make mistakes when the pressure is high.
 
 You may not use AI systems such as ChatGPT to write your code. Such systems merely repeat content they found on the Web, and, in effect, are just an indirect way of copying other students' solutions from the Web. This is not acceptable. **If you use AI to write your code, it is highly likely that your code will be flagged by our plagiarism detection system**. The code it writes for you will be very similar to code it writes for other students, and that code will be similar to student solutions found on the Web.
+
+However, you may use AI chat systems (such as ChatGPT) as a personal tutor. You may use it to ask questions and review responses, but you may not use it to analyze or write your code. You may not use any AI system that has access to your code. Copying code into or out of any AI system (including looking at code in an AI system while typing it into your project) is a violation of this policy and will be treated as plagiarism.
 
 ### **Children in the Classroom**
 

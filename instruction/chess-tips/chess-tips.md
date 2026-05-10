@@ -1,11 +1,13 @@
 # Chess Tips
 
 This is a collection of tips that the TAs have compiled for solving common problems.
+
 # General - all phases
 
 ## I don't have enough GitHub commits to pass the autograder
 
 Try to avoid this by following these rules of thumb:
+
 1. **Work in small chunks.** One common mistake is only committing when you hit a big milestone, like passing an entire test file - this is a sign that you could break the problem into smaller pieces. Commit when you hit small milestones, like finishing a function or passing a test.
 2. **Always set a clear goal for your next commit.** Something like "pass this test" or "create this piece of logic." Let the flow of regular commits drive your development process.
 3. Commits should **represent your changes in one short sentence.** If your commits are feeling hard to articulate because you don't remember all the things you changed, that's a good indicator that you should be committing more often.
@@ -17,7 +19,7 @@ If you turn in your code without enough commits, the autograder will let you kno
 
 ## These collections look identical to each other, but Java says they aren’t
 
-Look at the [specification](https://github.com/softwareconstruction240/softwareconstruction/blob/main/chess/0-chess-moves/chess-moves.md#object-overrides) for mentions of the `equals()` and `hashCode()` methods. It might also be worthwhile to implement a `toString()` method. Additionally, check the promotion piece (null in 99% of cases). Also, review the getters and setters for each class if that doesn’t work.
+Look at the [specification](../../chess/0-chess-moves/chess-moves.md#object-overrides) for mentions of the `equals()` and `hashCode()` methods. It might also be worthwhile to implement a `toString()` method. Additionally, check the promotion piece (null in 99% of cases). Also, review the getters and setters for each class if that doesn’t work.
 
 ## JUnit - No test events received
 
@@ -37,19 +39,19 @@ See [previous](/instruction/chess-tips/chess-tips.md#General---all-phases)
 
 ## toString
 
-If you are struggling to understand how the board is looking during your code, and especially when comparing it with the expected test cases, what you can do is override a toString to your code. This means that instead of printing ChessGame@12345, it will print out the variables, and you can have it print out a mock chess board so you can visually see and understand what the current layout of the chessBoard. 
+If you are struggling to understand how the board is looking during your code, and especially when comparing it with the expected test cases, what you can do is override a toString to your code. This means that instead of printing ChessGame@12345, it will print out the variables, and you can have it print out a mock chess board so you can visually see and understand what the current layout of the chessBoard.
 
 ## `static` keyword
 
-If your IDE is telling you to use static, you probably should change your code to not use it. Static classes and variables mean that there will only be one single instance, making it like a global variable, and there will not be any different variations of it. ChessGame nor most of the main classes you work on should be cosidered static, because you should have multiple different ChessGames, or ChessBoards, or even ChessPieces. If you know what you are doing, you can use static, but only use it if you can know what you are using it for. If your IDE is telling you to use static, you should see why it is thinking it should be static, and fix it because 90-100% of your code shouldn't be static.
+In most cases you should not be using the `static` keyword for your classes and methods. Static classes and variables mean that there will only be one single instance, making it into a global variable. If you know what you are doing, you can use static, but only use it if you can know what you are using it for. If your IDE is telling you to use static, you should see why it is thinking it should be static, and fix it because 90-100% of your code shouldn't be static.
 
 ## Clone and Copy
 
-When in your `ChessGame.validMoves`, you may want to create a copy/clone of the ChessBoard so that you can make a piece move and see if you are still in check to know if that is a valid move or not. If you create a shallow copy, the ChessBoard will be the exact same, and will keep any changes you make. This needs to be a DeepCopy or clone so that it can be unique and different, so that if a chance happens on one instance, the other will stay the same. If you would like some explanations on how to incorporate clone and copy, look here for [copying objects](https://github.com/softwareconstruction240/softwareconstruction/wiki/Copying-Objects). One such method is to have ChessBoard implement Cloneable, then in the override clone method, you loop through the 2d ChessPiece array, and do `Arrays.copyOf` to copy the chess board row by row, then finally putting the 2d array into the cloned ChessBoard. 
+When in your `ChessGame.validMoves`, you may want to create a copy/clone of the ChessBoard so that you can make a piece move and see if you are still in check to know if that is a valid move or not. If you create a shallow copy, the ChessBoard will be the exact same, and will keep any changes you make. This needs to be a DeepCopy or clone so that it can be unique and different, so that if a chance happens on one instance, the other will stay the same. If you would like some explanations on how to incorporate clone and copy, look here for [copying objects](../copying-objects/copying-objects.md). One such method is to have ChessBoard implement Cloneable, then in the override clone method, you loop through the 2d ChessPiece array, and do `Arrays.copyOf` to copy the chess board row by row, then finally putting the 2d array into the cloned ChessBoard.
 
 ## `==` vs `.equals()` comparison
 
-If you are trying to see if a king is in check by doing `endPosition == kingPosition`, the answer will always return false. Instead, you should use `endPosition.equals(kingPosition)`. To understand why Objects require `.equals()` instead, please refer to [Java Object Class](https://github.com/softwareconstruction240/softwareconstruction/wiki/Java-Object-Class#equals).
+If you are trying to see if a king is in check by doing `endPosition == kingPosition`, the answer will always return false. Instead, you should use `endPosition.equals(kingPosition)`. To understand why Objects require `.equals()` instead, please refer to [Java Object Class](../java-object-class/java-object-class.md).
 
 ## I don't have enough GitHub commits to pass the autograder
 
@@ -65,7 +67,7 @@ See [previous](/instruction/chess-tips/chess-tips.md#General---all-phases)
 
 1. **Read the error messages.** The computer doesn’t lie, and it even tells you exactly which line caused the problem!
 2. **Read the specs.** The document is long, but it’s not redundant— it’s helpful. All the information has been carefully placed in there to help YOU as a student.
-3. **Search Slack.** It’s really to ask a new question, but first try to use the search feature to find a pre-existing answer.
+3. **Search Discord.** It’s really to ask a new question, but first try to use the search feature to find a pre-existing answer.
 4. **Write your own tests.** Yes, it was convenient in the first phases when we had done that for you, but now we’re expecting you to do this yourself. The Phase 3 tests are intentionally less helpful than before. Rely on manual testing, or write your own tests from the beginning.
 5. **Appreciate the learning opportunity.** We (the instructors) designed this course to teach you new things. You are supposed to wrestle with new concepts and challenges, but it is possible. Think through the problems; you can do it!
 
@@ -182,7 +184,7 @@ You probably made the move calculator a class variable inside ChessPiece. Remove
 
 ## Access denied to database chess or Access denied for user ‘dbUser173910573’@’%’ to database ‘chess’
 
-This means they hardcoded the database to chess. Or they need to call createDatabase. Look here for more debugging tips: https://github.com/softwareconstruction240/softwareconstruction/blob/main/chess/4-database/database.md#pass-off-submission-and-grading
+This means they hardcoded the database to chess. Or they need to call createDatabase. Look here for more information: [Ititializing Your Database and Tables](../../chess/4-database/database.md#initializing-your-database-and-tables)
 
 ## No driver provided error
 
@@ -233,6 +235,25 @@ If it says “Error: Unauthorized” with a 401 error, that probably means that 
 
 Your ServerFacade is probably not in a package. Put it in a package (probably not your UI package, is it a UI class?) and you should be able to import it
 
+## Passoff Frequently Encountered Problems
+
+Here are a couple of things that students commonly forget to include as part of their code which causes them to fail their passoff. This is not a complete list of everything that your code needs to do in order to pass, just some of the common problems.
+
+- After registering, you will automatically enter the signed-in state, you don't need to login afterwards. [Prelogin UI Command Descriptions](../../chess/5-pregame/pregame.md#prelogin-ui)
+- Make your ListGames numbering be independent of the game IDs. [Postlogin UI Command Descriptions](../../chess/5-pregame/pregame.md#postlogin-ui)
+- Make sure your board is printed correctly! [Gameplay UI Description](../../chess/5-pregame/pregame.md#gameplay-ui)
+- Print readable errors and make sure your code doesn't crash. For example, make sure you handle trying to join or observe a game with an invalid game number input (`1000`, `-10`, `two`). [UI Requirements](../../chess/5-pregame/pregame.md#ui-requirements)
+
+## Chess Board UI
+
+If you want to use the Chess Pieces, but are having some issues with making the board a square, here are some tips
+
+- Make sure that your spaces are including the unicode for the width of a chess piece "\u2003" and are following the same space configuration
+  - " ♛ " would have the same width as "\u2003a " because they each have a space on the right, the first example has a space which is the same width as the 'a' in the second example, and they both have the width of a chess piece as well, meaning that each of these square examples would be the same width
+- If you are sure that each square should be printing the same as stated above, then you might need to change your font. Go to IntelliJ Settings -> Editor -> Font
+  - This is because different laptop systems and processors can print the unicode "\u2003" and the actual chess pieces as different widths. Using the correct font will ensure that they are printed as the same width
+  - Make sure you still use a monospaced font, because monospaced means that a space is the same width as the letter 'a', but if you use a non monospaced font, they will no longer be the same width
+
 ## I don't have enough GitHub commits to pass the autograder
 
 See [previous](/instruction/chess-tips/chess-tips.md#General---all-phases)
@@ -253,7 +274,7 @@ A variable in a ServerMessage/UserCommand object is named incorrectly (casing ma
 
 ## message.toString
 
-Note, make sure that students aren’t copying Pet Shop code, but specifically the message.toString method, as Pet Shop will override that and turn it into a Gson.toJson of the class, while student’s code will just make it a string message of the whole Message class, which isn’t json. They need to make sure that
+Note, make sure that you just aren’t copying Pet Shop code, but specifically the message.toString method, as Pet Shop will override that and turn it into a Gson.toJson of the class, while your code will just make it a string message of the whole Message class, which isn’t json.
 
 ## Message is sent from Server but doesn’t look like it’s being received in the client
 
@@ -266,6 +287,15 @@ This could be from a race condition, if you send a notification that a move was 
 ## Running into a ClosedChannelException
 
 This exception is thrown when you are trying to send a message to a closed channel. Have the student make sure they are checking that the session is open (session.isOpen()) before sending it a message.
+
+## Passoff Frequently Encountered Problems
+
+Here are a couple of things that students commonly forget to include as part of their code which causes them to fail their passoff. This is not a complete list of everything that your code needs to do in order to pass, just some of the common problems.
+
+- Resigning should require a confirmation, and does **not** kick players from the game. [Gameplay Functionality](../../chess/6-gameplay/gameplay.md#gameplay-functionality)
+- Anyone can highlight any piece, independent of whose turn it is. In addition, a user trying to highlight a position with no piece shouldn't break your code. [Gameplay Functionality](../../chess/6-gameplay/gameplay.md#gameplay-functionality)
+- Make sure you implement pawn promotion. [Pawn Functionality](../../chess/0-chess-moves/the-game-of-chess.md#pawn)
+- All messages should contain player usernames. Move messages should have a description of the move such as a2 to a4. [Notifications](../../chess/6-gameplay/gameplay.md#notifications)
 
 ## I don't have enough GitHub commits to pass the autograder
 

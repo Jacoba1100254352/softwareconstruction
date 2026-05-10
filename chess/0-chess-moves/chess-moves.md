@@ -11,6 +11,7 @@ In this part of the Chess Project, you will implement a basic representation of 
 > Review the [Game of Chess](the-game-of-chess.md) instruction to learn how to set up the board and how each of the pieces move.
 
 ## Getting Started
+
 Complete the [Getting Started](getting-started.md) instructions before working on this phase.
 
 ## Starter Code
@@ -164,7 +165,7 @@ A good process for this is to:
 - Commit your changes to GitHub. Smaller changes will be much easier to follow and verify for this project.
 - Repeat the above process for each of the tests until they all pass.
 
-If you are confused at what a test is doing reread the specs to understand what functionality it is looking for, and you can ask for clarification on Slack or to a TA.
+If you are confused at what a test is doing reread the specs to understand what functionality it is looking for, and you can ask for clarification on Discord or to a TA.
 
 ## Code Quality
 
@@ -193,6 +194,10 @@ To pass off this assignment use the course [auto-grading](https://cs240.click/) 
 |                | **Total**                                                                                         |      **125** |
 
 ## Videos
+
+> [!WARNING]
+>
+> Do not use videos during the programming exam.
 
 - 🎥 [Phase 0 Overview (21.17)](https://youtu.be/mTtK8iRXsZo) - transcript
 - 🎥 [Phase 0 Design Tips (5:31)](https://byu.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=88653eac-78a8-4f59-a12a-b170014f61f1) - [[transcript]](https://github.com/user-attachments/files/17706812/CS_240_Phase_0_Design_Tips_Transcript.pdf)

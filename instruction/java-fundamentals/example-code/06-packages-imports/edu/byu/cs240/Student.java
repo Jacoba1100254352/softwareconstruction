@@ -1,4 +1,4 @@
-package edu.byu.cs;
+package edu.byu.cs240;
 
 public class Student {
 }
