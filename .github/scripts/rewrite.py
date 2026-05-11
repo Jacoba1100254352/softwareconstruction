@@ -57,7 +57,7 @@ def main(root: str, code_base: str):
 
         match get_ext(basename):
             case embed if embed in EMBED_EXTS:
-                return embed_map.get(dirname, info.parent, basename)
+                return embed_map.get(dirname, info.parent, basename) or link_to_codebase()
             case edit if edit in EDIT_FILE_EXTS:
                 new_base = edited_map.get(dirname, info.parent, basename)
                 if new_base:
@@ -75,7 +75,7 @@ def main(root: str, code_base: str):
             path_part = target.partition('#')[0]
             new_link = extract_new_link(info, path_part)
 
-            return re.sub(re.escape(path_part), new_link, m.group(0), 1)
+            return re.sub(re.escape(path_part), lambda _: new_link, m.group(0), count=1)
 
         return link_re.sub(repl, line)
 
