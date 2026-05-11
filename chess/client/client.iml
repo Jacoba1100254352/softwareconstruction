@@ -10,6 +10,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="shared" exported="" />
+    <orderEntry type="module" module-name="server" scope="TEST" />
     <orderEntry type="library" exported="" name="client lib" level="project" />
   </component>
 </module>

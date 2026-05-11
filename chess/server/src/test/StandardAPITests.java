@@ -27,6 +27,8 @@ public class StandardAPITests
 	
 	@BeforeAll
 	public static void init() {
+		TestServerSupport.startServer();
+
 		existingUser = new TestModels.TestUser();
 		existingUser.username = "Joseph";
 		existingUser.password = "Smith";
@@ -41,6 +43,11 @@ public class StandardAPITests
 		createRequest.gameName = "testGame";
 		
 		serverFacade = new TestServerFacade("localhost", TestFactory.getServerPort());
+	}
+
+	@AfterAll
+	public static void cleanup() {
+		TestServerSupport.stopServer();
 	}
 	
 	
@@ -767,4 +774,3 @@ public class StandardAPITests
 	}
 	
 }
-

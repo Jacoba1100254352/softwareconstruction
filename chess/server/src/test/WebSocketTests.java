@@ -36,6 +36,8 @@ public class WebSocketTests
 	
 	@BeforeAll
 	public static void init() {
+		TestServerSupport.startServer();
+
 		serverFacade = new TestServerFacade("localhost", TestFactory.getServerPort());
 		serverFacade.clear();
 		
@@ -75,10 +77,17 @@ public class WebSocketTests
 		
 		waitTime = TestFactory.getMessageTime();
 	}
+
+	@AfterAll
+	public static void cleanup() {
+		TestServerSupport.stopServer();
+	}
 	
 	
 	@BeforeEach
 	public void setup() {
+		TestServerSupport.restartServer();
+
 		bobExecutor = Executors.newSingleThreadExecutor();
 		jamesExecutor = Executors.newSingleThreadExecutor();
 		alfredExecutor = Executors.newSingleThreadExecutor();

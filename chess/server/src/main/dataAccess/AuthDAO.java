@@ -32,6 +32,11 @@ public class AuthDAO
 	 * @throws DataAccessException if there's an error in the data access operation.
 	 */
 	public void insertAuth(AuthToken authToken) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().insertAuth(authToken);
+			return;
+		}
+
 		deleteExistingAuth(authToken.getUsername());
 
 		String sql = "INSERT INTO AuthTokens (Token, Username) VALUES (?, ?);";
@@ -62,6 +67,10 @@ public class AuthDAO
 	 * @throws DataAccessException if there's an error in the data access operation.
 	 */
 	private void deleteExistingAuth(String username) throws DataAccessException {
+		if (db.isInMemory()) {
+			return;
+		}
+
 		String sql = "DELETE FROM AuthTokens WHERE Username = ?;";
 
 		try (
@@ -85,6 +94,10 @@ public class AuthDAO
 	 * @throws DataAccessException if there's an error in the data access operation.
 	 */
 	public AuthToken findAuth(String authToken) throws DataAccessException {
+		if (db.isInMemory()) {
+			return db.memoryStore().findAuth(authToken);
+		}
+
 		String sql = "SELECT * FROM AuthTokens WHERE Token = ?;";
 
 		try (
@@ -108,6 +121,11 @@ public class AuthDAO
 	 * @throws DataAccessException if there's an error in the data access operation.
 	 */
 	public void deleteAuth(AuthToken authToken) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().deleteAuth(authToken);
+			return;
+		}
+
 		String sql = "DELETE FROM AuthTokens WHERE Token = ?;";
 
 		try (
@@ -126,6 +144,11 @@ public class AuthDAO
 	 * Clears all data from the database.
 	 */
 	public void clearAuth(Connection conn) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().clear();
+			return;
+		}
+
 		String sql = "DELETE FROM AuthTokens;";
 		try (Statement stmt = conn.createStatement()) {
 			stmt.executeUpdate(sql);

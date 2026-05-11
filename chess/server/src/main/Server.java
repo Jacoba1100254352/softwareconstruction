@@ -104,6 +104,7 @@ public class Server
 
 		// Initialize the Spark server
 		Spark.init();
+		Spark.awaitInitialization();
 	}
 
 	public void stopServer() {
@@ -113,6 +114,7 @@ public class Server
 
 			// Stop the Spark server
 			Spark.stop();
+			Spark.awaitStop();
 
 			System.out.println("Server stopped successfully.");
 		} catch (Exception e) {

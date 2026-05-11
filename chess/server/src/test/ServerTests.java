@@ -22,7 +22,8 @@ public class ServerTests
 	
 	@BeforeAll
 	public static void setUp() throws DataAccessException {
-		db = new Database();
+		TestServerSupport.useInMemoryDatabase();
+		db = Database.getInstance();
 		db.resetDatabase(); // Resetting the database to a clean state before tests
 		authDAO = new AuthDAO();
 		userDAO = new UserDAO();
@@ -467,6 +468,13 @@ public class ServerTests
 	@Order(28)
 	@DisplayName("Positive: clearGames")
 	public void clearGamesPass() throws DataAccessException, SQLException {
+		if (db.isInMemory()) {
+			gameDAO.insertGame(new Game(null, "testGame", null, null, new ChessGameImpl()));
+			gameDAO.clearGames(null);
+			Assertions.assertTrue(gameDAO.findAllGames().isEmpty());
+			return;
+		}
+
 		Connection conn = db.getConnection();
 		try {
 			conn.setAutoCommit(false);

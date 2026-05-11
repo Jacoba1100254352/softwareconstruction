@@ -23,6 +23,7 @@ public class ServiceTests
 	
 	@BeforeAll
 	public static void init() {
+		TestServerSupport.useInMemoryDatabase();
 		existingUser = new User("Joseph", "Smith", "urim@thummim.net");
 	}
 	

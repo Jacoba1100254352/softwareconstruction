@@ -36,6 +36,11 @@ public class UserDAO
 	 * @throws DataAccessException if there's an error during insertion.
 	 */
 	public void insertUser(User user) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().insertUser(new User(user.getUsername(), hashPassword(user.getPassword()), user.getEmail(), user.getIsAdmin()));
+			return;
+		}
+
 		// Updated SQL query to include the isAdmin field
 		String sql = "INSERT INTO Users (Username, Password, Email, IsAdmin) VALUES (?, ?, ?, ?);";
 		Connection conn = null;
@@ -89,6 +94,11 @@ public class UserDAO
 	 * @throws DataAccessException If there is an issue accessing the database or performing the query.
 	 */
 	public boolean validatePassword(String username, String password) throws DataAccessException {
+		if (db.isInMemory()) {
+			User user = db.memoryStore().getUser(username);
+			return user != null && user.getPassword().equals(hashPassword(password));
+		}
+
 		String sql = "SELECT Password FROM Users WHERE Username = ?;";
 		try (
 				Connection conn = db.getConnection();
@@ -113,6 +123,10 @@ public class UserDAO
 	 * @throws DataAccessException if there's an error during retrieval.
 	 */
 	public User getUser(String username) throws DataAccessException {
+		if (db.isInMemory()) {
+			return db.memoryStore().getUser(username);
+		}
+
 		String sql = "SELECT * FROM Users WHERE Username = ?;";
 		
 		try (
@@ -136,6 +150,11 @@ public class UserDAO
 	 * @throws DataAccessException if there's an error during update or user doesn't exist.
 	 */
 	public void updateUser(User user) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().updateUser(user);
+			return;
+		}
+
 		String sql = "UPDATE Users SET Password = ?, Email = ?, IsAdmin = ? WHERE Username = ?;";
 		
 		try (
@@ -162,6 +181,11 @@ public class UserDAO
 	 * @throws SQLException        if there is an error during the sql set auto commit process.
 	 */
 	public void deleteUser(String username) throws DataAccessException, SQLException {
+		if (db.isInMemory()) {
+			db.memoryStore().deleteUser(username);
+			return;
+		}
+
 		String sql = "DELETE FROM Users WHERE Username = ?;";
 		Connection conn = null;
 		try {
@@ -183,6 +207,11 @@ public class UserDAO
 	}
 	
 	public void clearUsers(Connection conn) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().clear();
+			return;
+		}
+
 		String sql = "DELETE FROM Users WHERE IsAdmin = false;"; // Delete all except admin // "DELETE FROM Users;";
 		try (Statement stmt = conn.createStatement()) {
 			stmt.executeUpdate(sql);

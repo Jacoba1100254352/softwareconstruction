@@ -18,7 +18,13 @@ public class ServerFacadeTests
 	
 	@BeforeAll
 	public static void setupClass() {
+		ClientTestServerSupport.startServer();
 		serverFacade = new ServerFacade("http://localhost:8080");
+	}
+
+	@AfterAll
+	public static void cleanupClass() {
+		ClientTestServerSupport.stopServer();
 	}
 	
 	@AfterEach // Clear the database after each test

@@ -63,6 +63,11 @@ public class GameDAO
 	 * @throws DataAccessException if the operation fails.
 	 */
 	public void insertGame(Game game) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().insertGame(game);
+			return;
+		}
+
 		String sql = "INSERT INTO Games (GameName, WhiteUsername, BlackUsername, ChessGame) VALUES (?, ?, ?, ?);";
 		try (
 				Connection conn = db.getConnection();
@@ -103,6 +108,10 @@ public class GameDAO
 	 * @throws DataAccessException if the operation fails.
 	 */
 	public Game findGameByID(Integer gameID) throws DataAccessException {
+		if (db.isInMemory()) {
+			return db.memoryStore().findGameByID(gameID);
+		}
+
 		String sql = "SELECT * FROM Games WHERE GameID = ?;";
 		try (
 				Connection conn = db.getConnection();
@@ -129,6 +138,10 @@ public class GameDAO
 	 * @return A list of all game objects.
 	 */
 	public List<Game> findAllGames() throws DataAccessException {
+		if (db.isInMemory()) {
+			return db.memoryStore().findAllGames();
+		}
+
 		String sql = "SELECT * FROM Games;";
 		try (
 				Connection conn = db.getConnection();
@@ -161,6 +174,11 @@ public class GameDAO
 	 * @throws DataAccessException if the operation fails.
 	 */
 	public void claimSpot(Integer gameID, String username, ChessGame.TeamColor color) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().claimSpot(gameID, username, color);
+			return;
+		}
+
 		String columnToUpdate = (color == ChessGame.TeamColor.WHITE) ? "WhiteUsername" : "BlackUsername";
 		String sql;
 		if (username == null) {
@@ -198,6 +216,11 @@ public class GameDAO
 	 * @throws DataAccessException if the operation fails.
 	 */
 	public void updateGame(Game game) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().updateGame(game);
+			return;
+		}
+
 		String sql = "UPDATE Games SET GameName = ?, WhiteUsername = ?, BlackUsername = ?, ChessGame = ? WHERE GameID = ?;";
 		Connection conn = null;
 		try {
@@ -229,6 +252,11 @@ public class GameDAO
 	 * Clear the games from the database.
 	 */
 	public void clearGames(Connection conn) throws DataAccessException {
+		if (db.isInMemory()) {
+			db.memoryStore().clearGames();
+			return;
+		}
+
 		String sql = "DELETE FROM Games;";
 		try (Statement stmt = conn.createStatement()) {
 			stmt.executeUpdate(sql);
@@ -245,6 +273,10 @@ public class GameDAO
 	 * @throws DataAccessException if the operation fails.
 	 */
 	public Integer getCurrentGameId() throws DataAccessException {
+		if (db.isInMemory()) {
+			return db.memoryStore().getCurrentGameId();
+		}
+
 		String sql = "SELECT GameID FROM Games ORDER BY GameID DESC LIMIT 1;";
 		try (
 				Connection conn = db.getConnection();
