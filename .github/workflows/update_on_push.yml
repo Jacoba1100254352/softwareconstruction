@@ -13,6 +13,7 @@ env:
   GIT_AUTHOR_NAME: GitHub Action
   GIT_AUTHOR_EMAIL: action@github.com
   GITHUB_REPO: ${{ github.server_url }}/${{ github.repository }}/blob/main
+  WIKI_SYNC_TOKEN: ${{ secrets.WIKI_SYNC_SECRET }}
 
 jobs:
   sync-content-to-wiki:
@@ -48,10 +49,11 @@ jobs:
           python3 .github/scripts/rewrite.py docs $GITHUB_REPO
 
       - name: Sync docs to wiki
+        if: env.WIKI_SYNC_TOKEN != ''
         uses: newrelic/wiki-sync-action@v1.0.1
         with:
           source: docs
           destination: wiki
-          token: ${{ secrets.WIKI_SYNC_SECRET }}
+          token: ${{ env.WIKI_SYNC_TOKEN }}
           gitAuthorName: ${{ env.GIT_AUTHOR_NAME }}
           gitAuthorEmail: ${{ env.GIT_AUTHOR_EMAIL }}
